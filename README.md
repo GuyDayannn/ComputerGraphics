@@ -2,14 +2,14 @@
 # Computer Graphics 203.3710
 ## Students Team data
 
-Name: 
+Name: Guy Dayan
 
-Student Number: 
+Student Number: 315695023
 
 
-Name: 
+Name: Michael Mogerman
 
-Student Number: 
+Student Number: 211575246
 
 ### Lecturer
 *Roi Poranne*
