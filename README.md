@@ -2,7 +2,7 @@
 # Computer Graphics 203.3710
 ## Students Team data
 
-Name: Guy D
+Name: Guy Dayan
 
 Student Number: 315695023
 
