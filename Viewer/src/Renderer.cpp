@@ -35,6 +35,112 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 {
 	// TODO: Implement bresenham algorithm
 	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
+	bool Switch = false;
+	bool posSlope = true; // true if positive slope, flase if negative
+	int dp, dq, e, x1, y1, x2, y2;
+	glm::ivec2 new_p1, new_p2;
+	double a;
+	int addedVal = 1;
+
+	if (p1.x <= p2.x)
+	{
+		new_p1 = p1;
+		new_p2 = p2;
+	}
+	else //switching between points so p1 comes before p2 (x wise)
+	{
+		new_p1 = p2;
+		new_p2 = p1;
+	}
+
+	dq = new_p2.y - new_p1.y;
+	dp = new_p2.x - new_p1.x;
+	a = double(dq) / dp;
+
+	if (a >= 0 && a <= 1)// normal way
+	{
+		Switch = false;
+		posSlope = true;
+		x1 = new_p1.x;
+		y1 = new_p1.y;
+		x2 = new_p2.x;
+		y2 = new_p2.y;
+		e = -dp;
+	}
+	else if (a > 1) //switching roles between x and y
+	{
+		Switch = true;
+		posSlope = true;
+		//switching
+		dp = new_p2.y - new_p1.y;
+		dq = new_p2.x - new_p1.x;
+		x1 = new_p1.y;
+		y1 = new_p1.x;
+		x2 = new_p2.y;
+		y2 = new_p2.x;
+		e = -dq;
+		//end of switching
+	}
+	else if (a >= -1 && a < 0) //reflecting
+	{
+		Switch = false;
+		posSlope = false;
+		x1 = new_p1.x;
+		y1 = new_p1.y;
+		x2 = new_p2.x;
+		y2 = new_p2.y;
+		e = -dp;
+		addedVal = -1;
+	}
+	else if (a < -1) //switching + reflecting
+	{
+		Switch = true;
+		posSlope = false;
+		//switching - we will loop on y so switching so y1 will be high and y2 will bo low
+		dp = new_p1.y - new_p2.y;
+		dq = new_p1.x - new_p2.x;
+		x1 = new_p2.y;
+		y1 = new_p2.x;
+		x2 = new_p1.y;
+		y2 = new_p1.x;
+		e = -dq;
+		//end of switching
+		addedVal = -1; //reflecting
+	}
+
+
+	while (x1 <= x2)
+	{
+		//e = (2 * dq * x1) + (2 * dp * c) - (2 * dp * y1) - 1;
+		if (posSlope)
+		{
+			if (e > 0)
+			{
+				y1 = y1 + 1;
+				e = e - 2 * dp;
+			}
+		}
+		else
+		{
+			if (e < 0)
+			{
+				y1 = y1 - 1;
+				e = e + 2 * dp;
+			}
+		}
+		if (!Switch)
+		{
+			PutPixel(x1, y1, color);
+		}
+		else
+		{
+			PutPixel(y1, x1, color);
+		}
+		x1 = x1 + 1;
+		e = e + 2 * dq;
+	}
+	
 }
 
 void Renderer::CreateBuffers(int w, int h)
@@ -175,6 +281,45 @@ void Renderer::Render(const Scene& scene)
 	int half_height = viewport_height / 2;
 	// draw circle
 
+	int x0 = half_width;
+	int y0 = half_height;
+
+	int r = 130;
+	double a;
+	//0, 180 - x axis
+	a = 0;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
+	a = M_PI;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
+	//90, 270 - y axis
+	a = 1.5708;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
+	a = 4.71239;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
+	
+	//60, -60
+	a = 1.0472;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r*cos(a), half_height + r*sin(a)), glm::vec3(0, 1, 0));
+	a = -1.0472;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 1));
+	
+	//20, -20
+	a = 0.349066;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 0, 0));
+	a = -0.349066;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 1, 0));
+	
+	//110, -100
+	a = 1.91986;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 1));
+	a = -1.91986;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 0));
+
+	//160, -160
+	a = 2.79253;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 1));
+	a = -2.79253;
+	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 0, 0));
 }
 
 int Renderer::GetViewportWidth() const
