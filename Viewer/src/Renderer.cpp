@@ -284,7 +284,7 @@ void Renderer::Render(const Scene& scene)
 	int x0 = half_width;
 	int y0 = half_height;
 
-	int r = 130;
+	int r = 300;
 	double a;
 	//0, 180 - x axis
 	a = 0;
@@ -309,10 +309,10 @@ void Renderer::Render(const Scene& scene)
 	a = -0.349066;
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 1, 0));
 	
-	//110, -100
-	a = 1.91986;
+	//120, -120
+	a = 2.0944;
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 1));
-	a = -1.91986;
+	a = -2.0944;
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 0));
 
 	//160, -160
