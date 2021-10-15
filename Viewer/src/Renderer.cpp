@@ -280,12 +280,21 @@ void Renderer::Render(const Scene& scene)
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	// draw circle
-
-	int x0 = half_width;
-	int y0 = half_height;
-
 	int r = 300;
-	double a;
+	int s = 30;
+	
+	for (int deg = 0; deg < 360; deg++)
+	{
+		//rand() % 2
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+		int x = round(half_width + r * cos(s * deg * M_PI / 180));
+		int y = round(half_height + r * sin(s * deg * M_PI / 180));
+		DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(x, y), glm::vec3(red, green, blue));
+	}
+	
+	/*
 	//0, 180 - x axis
 	a = 0;
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
@@ -320,6 +329,8 @@ void Renderer::Render(const Scene& scene)
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 1));
 	a = -2.79253;
 	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 0, 0));
+	*/
+
 }
 
 int Renderer::GetViewportWidth() const
