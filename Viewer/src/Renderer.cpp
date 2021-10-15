@@ -43,6 +43,12 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	double a;
 	int addedVal = 1;
 
+	if (p1 == p2)
+	{
+		PutPixel(p1.x, p1.y, color);
+		return;
+	}
+
 	if (p1.x <= p2.x)
 	{
 		new_p1 = p1;
@@ -54,9 +60,11 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		new_p2 = p1;
 	}
 
+	
 	dq = new_p2.y - new_p1.y;
 	dp = new_p2.x - new_p1.x;
 	a = double(dq) / dp;
+	
 
 	if (a >= 0 && a <= 1)// normal way
 	{
@@ -283,6 +291,7 @@ void Renderer::Render(const Scene& scene)
 	int r = 300;
 	int s = 30;
 	
+	/*
 	for (int deg = 0; deg < 360; deg++)
 	{
 		//rand() % 2
@@ -293,43 +302,55 @@ void Renderer::Render(const Scene& scene)
 		int y = round(half_height + r * sin(s * deg * M_PI / 180));
 		DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(x, y), glm::vec3(red, green, blue));
 	}
-	
-	/*
-	//0, 180 - x axis
-	a = 0;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
-	a = M_PI;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
-	//90, 270 - y axis
-	a = 1.5708;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
-	a = 4.71239;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 0));
-	
-	//60, -60
-	a = 1.0472;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r*cos(a), half_height + r*sin(a)), glm::vec3(0, 1, 0));
-	a = -1.0472;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 1));
-	
-	//20, -20
-	a = 0.349066;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 0, 0));
-	a = -0.349066;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 1, 0));
-	
-	//120, -120
-	a = 2.0944;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 1));
-	a = -2.0944;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 1, 0));
-
-	//160, -160
-	a = 2.79253;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(0, 0, 1));
-	a = -2.79253;
-	DrawLine(glm::ivec2(half_width, half_height), glm::ivec2(half_width + r * cos(a), half_height + r * sin(a)), glm::vec3(1, 0, 0));
 	*/
+	
+	//Drawing
+
+	//left side something
+	int a = 120;
+	double x1 = 220; double y1 = 70; int rr = 120;
+	double x2 = x1 + rr * cos(a * M_PI / 180);
+	double y2 = y1 + rr * sin(a * M_PI / 180);
+	double stepsize = 0.2;
+	//DrawLine(glm::ivec2(x1, y1), glm::ivec2(x2, y2), glm::vec3(0, 0, 0));
+	for (double x = x1; x < 409; x += stepsize)
+	{
+
+		DrawLine(glm::ivec2(x, y1), glm::ivec2(x2++, y2), glm::vec3(0, 0.7, 0));
+		y1+=2*stepsize;
+		x2 = round(x + rr * cos(a * M_PI / 180));
+		y2 = round(y1 + rr * sin(a * M_PI / 180));
+	}
+
+	x1 = 220; y1 = 70;
+	x2 = x1 + rr * cos(a * M_PI / 180);
+	y2 = y1 + rr * sin(a * M_PI / 180);
+	stepsize = 0.1;
+	for (double x = x1; x < 409; x += stepsize)
+	{
+
+		DrawLine(glm::ivec2(x, y1), glm::ivec2(x2++, y2), glm::vec3(0, 0.7, 0));
+		y1 += 2 * stepsize;
+		x2 = round(x + rr * cos(a * M_PI / 180));
+		y2 = round(y1 + rr * sin(a * M_PI / 180));
+	}
+
+	//lower something - BLUE
+	x1 = 220; y1 = 70; rr = 146;
+	x2 = x1 + rr * cos(63 * M_PI / 180);
+	y2 = y1 + rr * sin(63 * M_PI / 180);
+	for(int x=x1; x<635; x++)
+		DrawLine(glm::ivec2(x, y1), glm::ivec2(x2++, y2), glm::vec3(0, 0.4, 1));
+
+	//right side something
+	x1 = 700; y1 = 201; rr = 405;
+	x2 = x1 + rr * cos(120 * M_PI / 180);
+	y2 = y1 + rr * sin(120 * M_PI / 180);
+	//DrawLine(glm::ivec2(x1, y1), glm::ivec2(x2, y2), glm::vec3(1, 1, 0));
+	for (int x = x1; x > 550; x--)
+	{
+		DrawLine(glm::ivec2(x, 201), glm::ivec2(x2--, y2), glm::vec3(0.8, 0.7, 0));
+	}
 
 }
 
