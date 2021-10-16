@@ -304,22 +304,21 @@ void Renderer::Render(const Scene& scene)
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	// draw circle
-	int r = 355;
+	int r = 150;
 	int s = 1;
 	
-	/*
+	
 	for (int deg = 0; deg < 360; deg++)
 	{
 		//rand() % 2
-		int x0 = half_width - 210; int y0 = half_height - 20;
-		int red = 0;
-		int green = 0;
-		int blue = 0;
+		int x0 = half_width + 250; int y0 = half_height + 180;
+		double red = 1;
+		double green = 1;
+		double blue = 0.3;
 		int x = round(x0 + r * cos(s * deg * M_PI / 180));
 		int y = round(y0 + r * sin(s * deg * M_PI / 180));
 		DrawLine(glm::ivec2(x0, y0), glm::ivec2(x, y), glm::vec3(red, green, blue));
 	}
-	*/
 	
 	
 	//Drawing
