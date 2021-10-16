@@ -50,22 +50,39 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		return;
 	}
 
-	if (p1.x <= p2.x)
+	dq = p2.y - p1.y;
+	dp = p2.x - p1.x;
+	if (dp == 0) //vertical so a should be a > 1 or a < -1 - switching point order y wise
 	{
-		new_p1 = p1;
-		new_p2 = p2;
+		if (p1.y <= p2.y)
+		{
+			new_p1 = p1;
+			new_p2 = p2;
+		}
+		else //switching between points so p1 comes before p2 (y wise)
+		{
+			new_p1 = p2;
+			new_p2 = p1;
+		}
+		a = 3;
 	}
-	else //switching between points so p1 comes before p2 (x wise)
+	else // not vertical
 	{
-		new_p1 = p2;
-		new_p2 = p1;
+		a = dq / dp;
+		if (p1.x <= p2.x)
+		{
+			new_p1 = p1;
+			new_p2 = p2;
+		}
+		else //switching between points so p1 comes before p2 (x wise)
+		{
+			new_p1 = p2;
+			new_p2 = p1;
+		}
 	}
-
-	
 	dq = new_p2.y - new_p1.y;
 	dp = new_p2.x - new_p1.x;
-	a = dq / dp;
-	
+
 
 	if (a >= 0 && a <= 1)// normal way
 	{
@@ -122,7 +139,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		//e = (2 * dq * x1) + (2 * dp * c) - (2 * dp * y1) - 1;
 		if (posSlope)
 		{
-			if (e > 0)
+			if (e >= 0)
 			{
 				y1 = y1 + 1;
 				e = e - 2 * dp;
@@ -130,7 +147,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		}
 		else
 		{
-			if (e < 0)
+			if (e <= 0)
 			{
 				y1 = y1 - 1;
 				e = e + 2 * dp;
@@ -306,6 +323,7 @@ void Renderer::Render(const Scene& scene)
 	
 	
 	//Drawing
+	
 	//left side something - GREEN
 	double a = 123;
 	double x1 = 220; double y1 = 79; int rr = 185;
