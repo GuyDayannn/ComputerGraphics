@@ -26,3 +26,8 @@ const std::string& MeshModel::GetModelName() const
 {
 	return model_name;
 }
+
+const glm::vec3& MeshModel::GetPureVertex(int index) const
+{
+	return vertices[index - 1];
+}

@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "Utils.h"
 
+#include <iostream>
 /**
  * Fields
  */
@@ -56,6 +57,29 @@ int main(int argc, char **argv)
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
+	/**
+	* Starting 1b here
+	**/
+	/**
+	* 1b : (1)
+	**/
+	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/demo.obj");
+	int faceCounts = firstModel->GetFacesCount();
+	for (int i = 0; i < faceCounts; i++)
+	{
+		Face temp_face(firstModel->GetFace(i)); //gets ith Face
+		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
+		int secondVIn = temp_face.GetVertexIndex(1);
+		int thirdVIn = temp_face.GetVertexIndex(2);
+		glm::vec3 v1 = firstModel->GetPureVertex(firstVIn);
+		glm::vec3 v2 = firstModel->GetPureVertex(secondVIn);
+		glm::vec3 v3 = firstModel->GetPureVertex(thirdVIn);
+		std::cout << "Face #" << i << ": v1 = (" << v1.x << ", " << v1.y << ", " << v1.z << ")   ";
+		std::cout << "v2 = (" << v2.x << ", " << v2.y << ", " << v2.z << ")   ";
+		std::cout << "v3 = (" << v3.x << ", " << v3.y << ", " << v3.z << ")" << std::endl;
+
+	}
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();

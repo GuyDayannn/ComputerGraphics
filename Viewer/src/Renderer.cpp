@@ -303,6 +303,7 @@ void Renderer::Render(const Scene& scene)
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
+	/*
 	// draw circle
 	int r = 150;
 	int s = 1;
@@ -368,7 +369,7 @@ void Renderer::Render(const Scene& scene)
 	{
 		DrawLine(glm::ivec2(x, 249), glm::ivec2(x2--, y2), glm::vec3(0.8, 0.7, 0));
 	}
-	
+	*/
 }
 
 int Renderer::GetViewportWidth() const

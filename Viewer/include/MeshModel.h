@@ -11,6 +11,7 @@ public:
 	const Face& GetFace(int index) const;
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
+	const glm::vec3& GetPureVertex(int index) const;
 
 private:
 	std::vector<Face> faces;
