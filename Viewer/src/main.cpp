@@ -64,6 +64,7 @@ int main(int argc, char **argv)
 	* 1b : (1)
 	**/
 	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/demo.obj");
+	firstModel->FitToWindow(1280, 720);
 	int faceCounts = firstModel->GetFacesCount();
 	for (int i = 0; i < faceCounts; i++)
 	{
@@ -71,9 +72,9 @@ int main(int argc, char **argv)
 		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
 		int secondVIn = temp_face.GetVertexIndex(1);
 		int thirdVIn = temp_face.GetVertexIndex(2);
-		glm::vec3 v1 = firstModel->GetPureVertex(firstVIn);
-		glm::vec3 v2 = firstModel->GetPureVertex(secondVIn);
-		glm::vec3 v3 = firstModel->GetPureVertex(thirdVIn);
+		glm::vec3 v1 = firstModel->GetTransformedVertex(firstVIn);
+		glm::vec3 v2 = firstModel->GetTransformedVertex(secondVIn);
+		glm::vec3 v3 = firstModel->GetTransformedVertex(thirdVIn);
 		std::cout << "Face #" << i << ": v1 = (" << v1.x << ", " << v1.y << ", " << v1.z << ")   ";
 		std::cout << "v2 = (" << v2.x << ", " << v2.y << ", " << v2.z << ")   ";
 		std::cout << "v3 = (" << v3.x << ", " << v3.y << ", " << v3.z << ")" << std::endl;

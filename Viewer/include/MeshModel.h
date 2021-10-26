@@ -18,10 +18,14 @@ public:
 	void FitToWindow(int viewport_width, int viewport_height);
 	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate);
 	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate);
+	const std::vector<glm::mat4> GetScalingMatrices() const;
+	const std::vector<glm::mat4> GetTranslationMatrices() const;
+	//rotation by "axis" to grid system "grid"
+	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "x", const int grid = 1) const;
 
 private:
 	std::vector<glm::vec3> scaling; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
-	std::vector<glm::vec3> rotation;
+	std::vector<glm::vec3> rotation; // degrees
 	std::vector<glm::vec3> translation;
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
