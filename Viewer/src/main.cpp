@@ -63,9 +63,12 @@ int main(int argc, char **argv)
 	/**
 	* 1b : (1)
 	**/
-	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/demo.obj");
-	firstModel->FitToWindow(1280, 720);
+	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/bunny.obj");
+	//firstModel->FitToWindow(1280, 720);
+	firstModel->UpdateModelTransformations(glm::vec3(450.0f, 450.0f, 200.0f), glm::vec3(45.0f, 45.0f, 45.0f), glm::vec3(1280.0f / 2.0f, 720.0f / 2.0f, 0.0f));
+	scene.AddModel(firstModel);
 	int faceCounts = firstModel->GetFacesCount();
+	/*
 	for (int i = 0; i < faceCounts; i++)
 	{
 		Face temp_face(firstModel->GetFace(i)); //gets ith Face
@@ -80,6 +83,7 @@ int main(int argc, char **argv)
 		std::cout << "v3 = (" << v3.x << ", " << v3.y << ", " << v3.z << ")" << std::endl;
 
 	}
+	*/
 
     while (!glfwWindowShouldClose(window))
     {

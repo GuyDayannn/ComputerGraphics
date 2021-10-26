@@ -20,13 +20,14 @@ public:
 	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate);
 	const std::vector<glm::mat4> GetScalingMatrices() const;
 	const std::vector<glm::mat4> GetTranslationMatrices() const;
-	//rotation by "axis" to grid system "grid"
-	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "x", const int grid = 1) const;
+	//rotation around "axis" to grid system "grid" (geid system means model grid or world grid)
+	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "z", const int grid = 1) const;
+	const std::vector<std::vector<glm::vec3>> GetTriangles() const;
 
 private:
-	std::vector<glm::vec3> scaling; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
+	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
 	std::vector<glm::vec3> rotation; // degrees
-	std::vector<glm::vec3> translation;
+	std::vector<glm::vec3> scaling; 
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;

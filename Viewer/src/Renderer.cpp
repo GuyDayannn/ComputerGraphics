@@ -167,6 +167,25 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	
 }
 
+//drawing mesh model by drawing triangles received
+void Renderer::DrawMeshModel(MeshModel& meshModel, const glm::vec3& color)
+{
+	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
+	
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		std::vector<glm::vec3> triangle = triangles[i];
+		glm::vec3 v1 = triangle[0];
+		glm::vec3 v2 = triangle[1];
+		glm::vec3 v3 = triangle[2];
+
+		DrawLine(glm::ivec2(v1.x,v1.y), glm::ivec2(v2.x,v2.y), color);
+		DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v3.x, v3.y), color);
+		DrawLine(glm::ivec2(v2.x, v2.y), glm::ivec2(v3.x, v3.y), color);
+	}
+
+}
+
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
@@ -303,6 +322,10 @@ void Renderer::Render(const Scene& scene)
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
+
+
+	MeshModel myModel = scene.GetModel(0);
+	DrawMeshModel(myModel, glm::vec3(0, 0, 0));
 	/*
 	// draw circle
 	int r = 150;

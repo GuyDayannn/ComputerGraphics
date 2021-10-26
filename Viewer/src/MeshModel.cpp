@@ -52,6 +52,14 @@ glm::vec3 MeshModel::HomogeneousVecToVec3(const glm::vec4& vec)
 	return glm::vec3(vec.x / vec.w, vec.y / vec.w, vec.z / vec.w);
 }
 
+/**
+* just moving so model will be on middle by that formula:
+* (biggest_x_vertex - smallest_x_vertex) / 2 is the object "middle". kind of anywat...
+* same for y
+* then add to the translation matrix the 'command' to move it to the middle:
+*				viewport_width / 2.0f - (maxX - minX) / 2
+*				same for viewport_height
+*/
 void MeshModel::FitToWindow(int viewport_width, int viewport_height)
 {
 	float maxX = vertices[0].x;
@@ -77,6 +85,8 @@ void MeshModel::FitToWindow(int viewport_width, int viewport_height)
 	translation[1] = glm::vec3(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
 }
 
+
+//recieving worldTransformation request and updating scaling, roatation and translation
 void MeshModel::UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate)
 {
 	scaling[0] = scale;
@@ -84,6 +94,7 @@ void MeshModel::UpdateWorldTransformations(const glm::vec3& scale, const glm::ve
 	translation[0] = translate;
 }
 
+//same just for model
 void MeshModel::UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate)
 {
 	scaling[1] = scale;
@@ -91,6 +102,7 @@ void MeshModel::UpdateModelTransformations(const glm::vec3& scale, const glm::ve
 	translation[1] = translate;
 }
 
+//returning scaliing matrices for world and model with information in rotation vector
 const std::vector<glm::mat4> MeshModel::GetScalingMatrices() const
 {
 	std::vector<glm::mat4> scalingMats(2);
@@ -107,6 +119,8 @@ const std::vector<glm::mat4> MeshModel::GetScalingMatrices() const
 	return scalingMats;
 }
 
+
+//same just for translation
 const std::vector<glm::mat4> MeshModel::GetTranslationMatrices() const
 {
 	std::vector<glm::mat4> translationMats(2);
@@ -124,6 +138,7 @@ const std::vector<glm::mat4> MeshModel::GetTranslationMatrices() const
 	return translationMats;
 }
 
+//same for rotation
 const std::vector<glm::mat4> MeshModel::GetRotationMatrices(const std::string axis, const int grid) const
 {
 	std::vector<glm::mat4> rotationMats(2);
@@ -131,19 +146,19 @@ const std::vector<glm::mat4> MeshModel::GetRotationMatrices(const std::string ax
 	if (axis == "z")
 	{
 		float zRad = glm::radians(rotation[grid].z);
-		float cosRad = cosf(glm::radians(zRad));
-		float sinRad = sinf(glm::radians(zRad));
+		float cosRad = cosf(zRad);
+		float sinRad = sinf(zRad);
 		rotationMats[grid] = glm::mat4
-		(cosRad, -sinRad, 0.0f, 0.0f,
-		sinRad, cosRad, 0.0f, 0.0f,
+		(cosRad, sinRad, 0.0f, 0.0f,
+		-sinRad, cosRad, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else if (axis == "y")
 	{
 		float yRad = glm::radians(rotation[grid].y);
-		float cosRad = cosf(glm::radians(yRad));
-		float sinRad = sinf(glm::radians(yRad));
+		float cosRad = cosf(yRad);
+		float sinRad = sinf(yRad);
 		rotationMats[grid] = glm::mat4
 		(cosRad, 0.0f, -sinRad, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
@@ -153,16 +168,16 @@ const std::vector<glm::mat4> MeshModel::GetRotationMatrices(const std::string ax
 	else
 	{
 		float xRad = glm::radians(rotation[grid].x);
-		float cosRad = cosf(glm::radians(xRad));
-		float sinRad = sinf(glm::radians(xRad));
+		float cosRad = cosf(xRad);
+		float sinRad = sinf(xRad);
 		rotationMats[grid] = glm::mat4
 		(1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, cosRad, -sinRad, 0.0f,
-		0.0f, sinRad, cosRad, 0.0f,
+		0.0f, cosRad, sinRad, 0.0f,
+		0.0f, -sinRad, cosRad, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	if (grid != 1) //second matrix is identity
+	if (grid != 1) //second matrix is identity - for now anyway
 		rotationMats[1] = glm::mat4(1.0f);
 	else
 		rotationMats[0] = glm::mat4(1.0f);
@@ -170,14 +185,40 @@ const std::vector<glm::mat4> MeshModel::GetRotationMatrices(const std::string ax
 	return rotationMats;
 }
 
+//returning vertex after being transformed by transformation matrices which includes world and model matrices
 const glm::vec3& MeshModel::GetTransformedVertex(int index) const
 {
 	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
 	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
 	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
-	glm::mat4 worldTransformationMat = scalingMats[0] * rotationMats[0] * translationMats[0];
-	glm::mat4 modelTransformationMat = scalingMats[1] * rotationMats[1] * translationMats[1];
+	glm::mat4 worldTransformationMat = translationMats[0] * rotationMats[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * rotationMats[1] * scalingMats[1];
 	
 	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(vertices[index - 1]));
+}
 
+
+//returning triangles (faces)
+const std::vector<std::vector<glm::vec3>> MeshModel::GetTriangles() const
+{
+	std::vector<std::vector<glm::vec3>> triangles;
+	int faceCounts = GetFacesCount();
+	for (int i = 0; i < faceCounts; i++)
+	{
+		Face temp_face(GetFace(i)); //gets ith Face
+		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
+		int secondVIn = temp_face.GetVertexIndex(1);
+		int thirdVIn = temp_face.GetVertexIndex(2);
+		glm::vec3 v1 = GetTransformedVertex(firstVIn);
+		glm::vec3 v2 = GetTransformedVertex(secondVIn);
+		glm::vec3 v3 = GetTransformedVertex(thirdVIn);
+		std::vector<glm::vec3> triangle;
+		triangle.push_back(v1);
+		triangle.push_back(v2);
+		triangle.push_back(v3);
+		triangles.push_back(triangle);
+
+	}
+
+	return triangles;
 }
