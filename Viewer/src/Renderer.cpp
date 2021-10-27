@@ -168,7 +168,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 }
 
 //drawing mesh model by drawing triangles received
-void Renderer::DrawMeshModel(MeshModel& meshModel, const glm::vec3& color)
+void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color)
 {
 	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
 	

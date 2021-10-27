@@ -65,7 +65,19 @@ int main(int argc, char **argv)
 	**/
 	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/bunny.obj");
 	//firstModel->FitToWindow(1280, 720);
-	firstModel->UpdateModelTransformations(glm::vec3(450.0f, 450.0f, 200.0f), glm::vec3(45.0f, 45.0f, 45.0f), glm::vec3(1280.0f / 2.0f, 720.0f / 2.0f, 0.0f));
+	glm::vec3 fit = firstModel->FitToWindow(1280, 720);
+	glm::vec3 addition = glm::vec3(150, 0, 0);
+	firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", fit);
+
+	//Model Translate then World rotate
+	//firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", fit + addition);
+	//firstModel->UpdateWorldTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(20.0f, 20.0f, 20.0f), "z", glm::vec3(0, 0, 0));
+
+	//World Translate then Model rotate
+	firstModel->UpdateWorldTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", addition);
+	firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(20.0f, 20.0f, 20.0f), "z", fit);
+
+
 	scene.AddModel(firstModel);
 	int faceCounts = firstModel->GetFacesCount();
 	/*

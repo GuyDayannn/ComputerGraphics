@@ -15,9 +15,9 @@ public:
 	const glm::vec3& GetTransformedVertex(int index) const;
 	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
 	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
-	void FitToWindow(int viewport_width, int viewport_height);
-	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate);
-	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate);
+	const glm::vec3 FitToWindow(int viewport_width, int viewport_height) const;
+	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
+	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
 	const std::vector<glm::mat4> GetScalingMatrices() const;
 	const std::vector<glm::mat4> GetTranslationMatrices() const;
 	//rotation around "axis" to grid system "grid" (geid system means model grid or world grid)
@@ -27,7 +27,8 @@ public:
 private:
 	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
 	std::vector<glm::vec3> rotation; // degrees
-	std::vector<glm::vec3> scaling; 
+	std::vector<glm::vec3> scaling;
+	std::vector<glm::mat4> currentRotationMat;
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;

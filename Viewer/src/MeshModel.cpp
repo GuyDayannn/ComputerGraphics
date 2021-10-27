@@ -11,6 +11,8 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	rotation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	translation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	translation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	currentRotationMat.push_back(glm::mat4(1.0f));
+	currentRotationMat.push_back(glm::mat4(1.0f));
 }
 
 MeshModel::~MeshModel()
@@ -60,7 +62,7 @@ glm::vec3 MeshModel::HomogeneousVecToVec3(const glm::vec4& vec)
 *				viewport_width / 2.0f - (maxX - minX) / 2
 *				same for viewport_height
 */
-void MeshModel::FitToWindow(int viewport_width, int viewport_height)
+const glm::vec3 MeshModel::FitToWindow(int viewport_width, int viewport_height) const
 {
 	float maxX = vertices[0].x;
 	float maxY = vertices[0].y;
@@ -81,25 +83,31 @@ void MeshModel::FitToWindow(int viewport_width, int viewport_height)
 		if (vertices[i].y < minY)
 			minY = vertices[i].y;
 	}
+	glm::vec3 fittingSizes(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
 
-	translation[1] = glm::vec3(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
+	return fittingSizes;
+	//translation[1] = glm::vec3(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
 }
 
 
 //recieving worldTransformation request and updating scaling, roatation and translation
-void MeshModel::UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate)
+void MeshModel::UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate)
 {
 	scaling[0] = scale;
 	rotation[0] = rotate;
 	translation[0] = translate;
+
+	currentRotationMat[0] = GetRotationMatrices(axis, 0)[0] * currentRotationMat[0]; //incrementally rotation
 }
 
 //same just for model
-void MeshModel::UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, const glm::vec3& translate)
+void MeshModel::UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate)
 {
 	scaling[1] = scale;
 	rotation[1] = rotate;
 	translation[1] = translate;
+
+	currentRotationMat[1] = GetRotationMatrices(axis, 1)[1] * currentRotationMat[1]; //incrementally rotation
 }
 
 //returning scaliing matrices for world and model with information in rotation vector
@@ -162,8 +170,8 @@ const std::vector<glm::mat4> MeshModel::GetRotationMatrices(const std::string ax
 		rotationMats[grid] = glm::mat4
 		(cosRad, 0.0f, -sinRad, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		sinRad, 0.0f, cosRad, 1.0f);
+		sinRad, 0.0f, cosRad, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else
 	{
@@ -191,8 +199,8 @@ const glm::vec3& MeshModel::GetTransformedVertex(int index) const
 	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
 	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
 	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
-	glm::mat4 worldTransformationMat = translationMats[0] * rotationMats[0] * scalingMats[0];
-	glm::mat4 modelTransformationMat = translationMats[1] * rotationMats[1] * scalingMats[1];
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * currentRotationMat[1] * scalingMats[1];
 	
 	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(vertices[index - 1]));
 }
