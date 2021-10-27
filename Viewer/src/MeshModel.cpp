@@ -62,7 +62,7 @@ glm::vec3 MeshModel::HomogeneousVecToVec3(const glm::vec4& vec)
 *				viewport_width / 2.0f - (maxX - minX) / 2
 *				same for viewport_height
 */
-const glm::vec3 MeshModel::FitToWindow(int viewport_width, int viewport_height) const
+const std::vector<glm::vec3> MeshModel::FitToWindow(int viewport_width, int viewport_height) const
 {
 	float maxX = vertices[0].x;
 	float maxY = vertices[0].y;
@@ -83,9 +83,14 @@ const glm::vec3 MeshModel::FitToWindow(int viewport_width, int viewport_height) 
 		if (vertices[i].y < minY)
 			minY = vertices[i].y;
 	}
-	glm::vec3 fittingSizes(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
+	float embigen = 1.0f / (maxY - minY) * (viewport_height / 2.0f);
+	glm::vec3 fittingSizes(viewport_width / 2.0f - (embigen*(maxX + minX) / 2), viewport_height / 2.5f - (embigen*(maxY + minY) / 2), translation[1].z);
+	glm::vec3 fittingScale(embigen, embigen, embigen);
+	std::vector<glm::vec3> fittingMeasures;
+	fittingMeasures.push_back(fittingScale);
+	fittingMeasures.push_back(fittingSizes);
 
-	return fittingSizes;
+	return fittingMeasures;
 	//translation[1] = glm::vec3(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
 }
 

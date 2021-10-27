@@ -63,19 +63,20 @@ int main(int argc, char **argv)
 	/**
 	* 1b : (1)
 	**/
-	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/bunny.obj");
+	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/cow.obj");
 	//firstModel->FitToWindow(1280, 720);
-	glm::vec3 fit = firstModel->FitToWindow(1280, 720);
+	std::vector<glm::vec3> fit = firstModel->FitToWindow(1280, 720);
 	glm::vec3 addition = glm::vec3(150, 0, 0);
-	firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", fit);
+	firstModel->UpdateModelTransformations(fit[0], glm::vec3(0.0f, 0.0f, 0.0f), "y", fit[1]);
+	//firstModel->UpdateModelTransformations(fit[0], glm::vec3(45.0f, 45.0f, 45.0f), "z", fit[1] + addition);
 
 	//Model Translate then World rotate
-	//firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", fit + addition);
+	//firstModel->UpdateModelTransformations(fit[0], glm::vec3(0.0f, 0.0f, 0.0f), "z", fit[1] + addition);
 	//firstModel->UpdateWorldTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(20.0f, 20.0f, 20.0f), "z", glm::vec3(0, 0, 0));
 
 	//World Translate then Model rotate
-	firstModel->UpdateWorldTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", addition);
-	firstModel->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(20.0f, 20.0f, 20.0f), "z", fit);
+	//firstModel->UpdateWorldTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), "z", addition);
+	//firstModel->UpdateModelTransformations(fit[0], glm::vec3(20.0f, 20.0f, 20.0f), "z", fit[1]);
 
 
 	scene.AddModel(firstModel);
