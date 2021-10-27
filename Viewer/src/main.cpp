@@ -20,6 +20,7 @@
 bool show_demo_window = false;
 bool show_another_window = false;
 glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
+glm::vec3 transAxis = glm::vec3(0.0f, 0.0f, 0.0f);
 
 /**
  * Function declarations
@@ -63,7 +64,8 @@ int main(int argc, char **argv)
 	/**
 	* 1b : (1)
 	**/
-	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("C:/Users/guyda/OneDrive/Documents/GitHub/computer-graphics-2022-michael-guy/Data/cow.obj");
+	
+	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("../Data/bunny.obj");
 	//firstModel->FitToWindow(1280, 720);
 	std::vector<glm::vec3> fit = firstModel->FitToWindow(1280, 720);
 	glm::vec3 addition = glm::vec3(150, 0, 0);
@@ -81,6 +83,7 @@ int main(int argc, char **argv)
 
 	scene.AddModel(firstModel);
 	int faceCounts = firstModel->GetFacesCount();
+	
 	/*
 	for (int i = 0; i < faceCounts; i++)
 	{
@@ -246,6 +249,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	ImGui::ColorEdit3("Clear Color", (float*)&clear_color);
 	// TODO: Add more controls as needed
 	
+	
 	ImGui::End();
 
 	/**
@@ -260,6 +264,18 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 		static float f = 0.0f;
 		static int counter = 0;
+		static int degreesPlus = 0;
+		static int degreesMinus = 0;
+
+		static float xyzAddition[3] = { 0.0f, 0.0f, 0.0f }; //xyz addition
+		int modelCount = scene.GetModelCount();
+
+		//translating object
+		for (int i = 0; i < modelCount; i++)
+		{
+			std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+			scene.GetModel(i).UpdateModelTransformations(fitV[0], glm::vec3(0.0f, 0.0f, 0.0f), "z", fitV[1] + glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+		}
 
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
@@ -267,13 +283,34 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 		ImGui::Checkbox("Another Window", &show_another_window);
 
+		
+		ImGui::SliderFloat3("Translation", xyzAddition, -640.0f, 640.0f); //xyz slider
+		
+		
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+		
+		if (ImGui::SliderInt("Rotation", &degreesPlus, -10, 10)) //rotation slider - rotating as long as slider held relesing stop rotation
+		{
+			for (int i = 0; i < modelCount; i++)
+			{
+				std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+				scene.GetModel(i).UpdateModelTransformations(fitV[0], glm::vec3(degreesPlus, degreesPlus, degreesPlus), "y", fitV[1] + glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+			}
+			degreesPlus = 0;
+		}
+
+
 		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
 		ImGui::SameLine();
 		ImGui::Text("counter = %d", counter);
+		//if (ImGui::Button("Degrees +"))                            
+		//	degreesPlus++;
+		//ImGui::SameLine();
+		//ImGui::Text("degreesPlus = %d", degreesPlus);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

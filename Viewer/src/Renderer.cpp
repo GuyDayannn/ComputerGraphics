@@ -322,10 +322,17 @@ void Renderer::Render(const Scene& scene)
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-
-
+	
+	int modelCount = scene.GetModelCount();
+	for (int i = 0; i < modelCount; i++)
+	{
+		DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0));	
+	}
+	
+	/*
 	MeshModel myModel = scene.GetModel(0);
 	DrawMeshModel(myModel, glm::vec3(0, 0, 0));
+	*/
 	/*
 	// draw circle
 	int r = 150;
