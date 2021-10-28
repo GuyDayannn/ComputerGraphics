@@ -334,7 +334,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		}
 		*/
 
-		if (ImGui::BeginMenu("Transform Type")) //changing models
+		if (ImGui::BeginMenu("Frame Type")) //changing models
 		{
 			if (ImGui::MenuItem("World"))
 			{
