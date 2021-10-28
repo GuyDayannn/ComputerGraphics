@@ -36,7 +36,8 @@ static float xyzAddition[3] = { 0.0f, 0.0f, 0.0f }; //xyz addition
 static float xyzWorld[3] = { 0.0f, 0.0f, 0.0f };
 static float scaleWorld = 1.0f;
 int modelCount;
-static const char* choosenModel = "nothing";
+static const char* choosenModel = nullptr;
+static const char* choosenFrame = nullptr;
 static int active_index = 0;
 static int world_model_choice = 1;
 
@@ -85,6 +86,8 @@ int main(int argc, char **argv)
 	
 
 	//shared_ptr<MeshModel> myModel = Utils::LoadMeshModel("..\\Data\\bunny.obj");
+	//std::string namestr = myModel->GetModelName();
+	//char* name = NULL;
 	//scene.AddModel(myModel);
 	/*
 	shared_ptr<MeshModel> firstModel = Utils::LoadMeshModel("..\\Data\\bunny.obj");
@@ -197,10 +200,12 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	if (!io.WantCaptureKeyboard)
 	{
 		// TODO: Handle keyboard events here
-		if (io.KeysDown['W']) // World
+
+		if (io.KeysDown['W'] && modelCount > 0) // World
 		{
 			// W key is down
 			// Use the ASCII table for more key codes (https://www.asciitable.com/)
+			choosenFrame = "World";
 			world_model_choice = 0;
 			world_model_choice = 0;
 			xyzAddition[0] = xyzWorld[0];
@@ -208,17 +213,18 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			xyzAddition[2] = xyzWorld[2];
 			scaleAddition = scaleWorld;
 		}
-		if (io.KeysDown['M']) // Model
+		if (io.KeysDown['M'] && modelCount > 0) // Model
 		{
 			// M key is down
 			// Use the ASCII table for more key codes (https://www.asciitable.com/)
+			choosenFrame = "Model";
 			world_model_choice = 1;
 			xyzAddition[0] = modelAdditions[active_index][0];
 			xyzAddition[1] = modelAdditions[active_index][1];
 			xyzAddition[2] = modelAdditions[active_index][2];
 			scaleAddition = modelScale[active_index];
 		}
-		if (io.KeysDown['C'] && xyzAddition[0] > -640.0f && xyzAddition[0] < 640.0f) //C - translation by positive 1 on x
+		if (io.KeysDown['C'] && xyzAddition[0] < 640.0f) //C - translation by positive 1 on x !!!!might create problem becuase of -640.0f!!!
 		{
 			if (world_model_choice == 1)
 			{
@@ -234,7 +240,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 			}
 		}
-		if (io.KeysDown['Z'] && xyzAddition[0] > -640.0f && xyzAddition[0] < 640.0f) //Z - translation by negative 1 on x
+		if (io.KeysDown['Z'] && xyzAddition[0] > -640.0f) //Z - translation by negative 1 on x
 		{
 			if (world_model_choice == 1)
 			{
@@ -250,7 +256,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 			}
 		}
-		if (io.KeysDown['S'] && xyzAddition[0] > -360.0f && xyzAddition[0] < 360.0f) //S  -  translation by positive 1 on y
+		if (io.KeysDown['S'] && xyzAddition[0] < 360.0f) //S  -  translation by positive 1 on y
 		{
 			if (world_model_choice == 1)
 			{
@@ -266,7 +272,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 			}
 		}
-		if (io.KeysDown['X'] && xyzAddition[0] > -360.0f && xyzAddition[0] < 360.0f) //X -  translation by negative 1 on y
+		if (io.KeysDown['X'] && xyzAddition[0] > -360.0f) //X -  translation by negative 1 on y
 		{
 			if (world_model_choice == 1)
 			{
@@ -488,8 +494,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	 */
 	
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	if (show_demo_window)
-		ImGui::ShowDemoWindow(&show_demo_window);
+	//if (show_demo_window)
+		//ImGui::ShowDemoWindow(&show_demo_window);
 
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 	{
@@ -543,7 +549,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::EndCombo();
 		}
 		*/
-
+		/*
 		if (ImGui::BeginMenu("Frame Type")) //changing models
 		{
 			if (ImGui::MenuItem("World") && modelCount > 0)
@@ -566,7 +572,66 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 			ImGui::EndMenu();
 		}
+		*/
 		
+		if (ImGui::BeginCombo("Frame Type", choosenFrame))
+		{
+			if (ImGui::Selectable("World", choosenFrame == "World") && modelCount > 0)
+			{
+				choosenFrame = "World";
+				world_model_choice = 0;
+				xyzAddition[0] = xyzWorld[0];
+				xyzAddition[1] = xyzWorld[1];
+				xyzAddition[2] = xyzWorld[2];
+				scaleAddition = scaleWorld;
+			}
+			if (choosenFrame == "World")
+				ImGui::SetItemDefaultFocus();
+
+
+			if (ImGui::Selectable("Model", choosenFrame == "Model") && modelCount > 0)
+			{
+				choosenFrame = "Model";
+				world_model_choice = 1;
+				xyzAddition[0] = modelAdditions[active_index][0];
+				xyzAddition[1] = modelAdditions[active_index][1];
+				xyzAddition[2] = modelAdditions[active_index][2];
+				scaleAddition = modelScale[active_index];
+			}
+			if (choosenFrame == "Model")
+				ImGui::SetItemDefaultFocus();
+
+			ImGui::EndCombo();
+
+		}
+
+
+		if (ImGui::BeginCombo("Models", choosenModel))
+		{
+			if (world_model_choice == 1) // changing models just if on model transformation
+			{
+				for (int i = 0; i < modelCount; i++)
+				{
+					bool selectedModel = (scene.GetModel(i).GetModelName().c_str() == choosenModel);
+					if (ImGui::Selectable(scene.GetModel(i).GetModelName().c_str(), selectedModel)) // scene.GetModel(i).GetModelName().c_str() returns NULL
+					{
+						choosenModel = scene.GetModel(i).GetModelName().c_str();
+						active_index = i;
+						xyzAddition[0] = modelAdditions[active_index][0];
+						xyzAddition[1] = modelAdditions[active_index][1];
+						xyzAddition[2] = modelAdditions[active_index][2];
+						scaleAddition = modelScale[active_index];
+					}
+					if (selectedModel)
+						ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		
+
+
+		/*
 		if (ImGui::BeginMenu("Models")) //changing models
 		{
 			if (world_model_choice == 1) // changing models just if on model transformation
@@ -586,12 +651,12 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			ImGui::EndMenu();
 		}
-
+		*/
 
 
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 		ImGui::Checkbox("Another Window", &show_another_window);
 
 		
@@ -702,7 +767,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		}
 
 
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
 		//if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 		//	counter++;

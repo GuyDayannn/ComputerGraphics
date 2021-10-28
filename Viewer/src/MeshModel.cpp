@@ -3,7 +3,8 @@
 MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name) :
 	faces(faces),
 	vertices(vertices),
-	normals(normals)
+	normals(normals),
+	model_name(model_name)
 {
 	scaling.push_back(glm::vec3(1.0f, 1.0f, 1.0f)); //[0] - world
 	scaling.push_back(glm::vec3(1.0f, 1.0f, 1.0f)); //[1] - model
