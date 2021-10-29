@@ -256,7 +256,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 			}
 		}
-		if (io.KeysDown['S'] && xyzAddition[0] < 360.0f) //S  -  translation by positive 1 on y
+		if (io.KeysDown['S'] && xyzAddition[1] < 360.0f) //S  -  translation by positive 1 on y
 		{
 			if (world_model_choice == 1)
 			{
@@ -272,7 +272,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 			}
 		}
-		if (io.KeysDown['X'] && xyzAddition[0] > -360.0f) //X -  translation by negative 1 on y
+		if (io.KeysDown['X'] && xyzAddition[1] > -360.0f) //X -  translation by negative 1 on y
 		{
 			if (world_model_choice == 1)
 			{
