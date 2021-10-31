@@ -224,70 +224,39 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			xyzAddition[2] = modelAdditions[active_index][2];
 			scaleAddition = modelScale[active_index];
 		}
-		if (io.KeysDown['C'] && xyzAddition[0] < 640.0f) //C - translation by positive 1 on x !!!!might create problem becuase of -640.0f!!!
+
+		if (io.KeysDown['C'] && xyzAddition[0] < 640.0f) //C - translation by positive 1 on x
 		{
 			if (world_model_choice == 1)
-			{
 				modelAdditions[active_index][0] = ++xyzAddition[0];
-				modelAdditions[active_index][1] = xyzAddition[1];
-				modelAdditions[active_index][2] = xyzAddition[2];
-			}
 			else
-			{
 				xyzWorld[0] = ++xyzAddition[0];
-				xyzWorld[1] = xyzAddition[1];
-				xyzWorld[2] = xyzAddition[2];
-
-			}
 		}
+
 		if (io.KeysDown['Z'] && xyzAddition[0] > -640.0f) //Z - translation by negative 1 on x
 		{
 			if (world_model_choice == 1)
-			{
 				modelAdditions[active_index][0] = --xyzAddition[0];
-				modelAdditions[active_index][1] = xyzAddition[1];
-				modelAdditions[active_index][2] = xyzAddition[2];
-			}
 			else
-			{
 				xyzWorld[0] = --xyzAddition[0];
-				xyzWorld[1] = xyzAddition[1];
-				xyzWorld[2] = xyzAddition[2];
-
-			}
 		}
+
 		if (io.KeysDown['S'] && xyzAddition[1] < 360.0f) //S  -  translation by positive 1 on y
 		{
 			if (world_model_choice == 1)
-			{
-				modelAdditions[active_index][0] = xyzAddition[0];
 				modelAdditions[active_index][1] = ++xyzAddition[1];
-				modelAdditions[active_index][2] = xyzAddition[2];
-			}
 			else
-			{
-				xyzWorld[0] = xyzAddition[0];
-				xyzWorld[1] = ++xyzAddition[1];
-				xyzWorld[2] = xyzAddition[2];
-
-			}
+				xyzWorld[1] = ++xyzAddition[1];	
 		}
+
 		if (io.KeysDown['X'] && xyzAddition[1] > -360.0f) //X -  translation by negative 1 on y
 		{
 			if (world_model_choice == 1)
-			{
-				modelAdditions[active_index][0] = xyzAddition[0];
 				modelAdditions[active_index][1] = --xyzAddition[1];
-				modelAdditions[active_index][2] = xyzAddition[2];
-			}
 			else
-			{
-				xyzWorld[0] = xyzAddition[0];
-				xyzWorld[1] = --xyzAddition[1];
-				xyzWorld[2] = xyzAddition[2];
-
-			}
+				xyzWorld[1] = --xyzAddition[1];	
 		}
+
 		if (io.KeysDown['/']) // '/' -rotatin around y +
 		{
 			for (int i = 0; i < modelCount; i++)
@@ -297,12 +266,8 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -322,12 +287,8 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(--degreesY, --degreesY, --degreesY), "y", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(--degreesY, --degreesY, --degreesY), "y", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -347,12 +308,8 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -372,12 +329,8 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(--degreesX, --degreesX, --degreesX), "x", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(--degreesX, --degreesX, --degreesX), "x", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -388,31 +341,24 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			degreesX = 0;
 
 		}
+
 		if (io.KeysDown['='] && scaleAddition < 200.0f) // scaling +
 		{
 			if (world_model_choice == 1)
-			{
 				modelScale[active_index] = ++scaleAddition;
-			}
 			else
-			{
 				scaleWorld = ++scaleAddition;
-			}
 			
 		}
+
 		if (io.KeysDown['-'] && scaleAddition > -200.0f) //scaling -
 		{
 			if (world_model_choice == 1)
-			{
 				modelScale[active_index] = --scaleAddition;
-			}
 			else
-			{
-				scaleWorld = --scaleAddition;
-			}
+				scaleWorld = --scaleAddition;	
 
 		}
-
 
 	}
 
@@ -509,10 +455,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				if (i == active_index)
 				{
 					std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-					float modelScaleAdd = modelScale[i];
-					glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-					glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-					scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", fitV[1] + vec3ModelTranslate);
+					glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+					scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", fitV[1] + modelAdditions[i]);
 				}
 			}
 		}
@@ -520,8 +464,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			for (int i = 0; i < modelCount; i++)
 			{
-				scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(0.0f, 0.0f, 0.0f), "z", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
-				
+				scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(0.0f, 0.0f, 0.0f), "z", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));	
 			}
 
 		}
@@ -531,49 +474,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		
 
 		// TODO: Add more menubar items (if you want to)
-		/*
-		if (ImGui::BeginCombo("Models", choosenModel))
-		{
-			for (int i = 0; i < modelCount; i++)
-			{
-				bool is_selected = (choosenModel == scene.GetModel(i).GetModelName().c_str());
-				if (ImGui::Selectable(scene.GetModel(i).GetModelName().c_str(), is_selected))
-				{
-					active_index = i;
-					choosenModel = scene.GetModel(i).GetModelName().c_str();
-				}
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
-				
-			}
-			ImGui::EndCombo();
-		}
-		*/
-		/*
-		if (ImGui::BeginMenu("Frame Type")) //changing models
-		{
-			if (ImGui::MenuItem("World") && modelCount > 0)
-			{
-				world_model_choice = 0;
-				xyzAddition[0] = xyzWorld[0];
-				xyzAddition[1] = xyzWorld[1];
-				xyzAddition[2] = xyzWorld[2];
-				scaleAddition = scaleWorld;
-
-			}
-			if (ImGui::MenuItem("Model") && modelCount > 0)
-			{
-				world_model_choice = 1;
-				xyzAddition[0] = modelAdditions[active_index][0];
-				xyzAddition[1] = modelAdditions[active_index][1];
-				xyzAddition[2] = modelAdditions[active_index][2];
-				scaleAddition = modelScale[active_index];
-			}
-
-			ImGui::EndMenu();
-		}
-		*/
 		
+		//Frames - World or Model
 		if (ImGui::BeginCombo("Frame Type", choosenFrame))
 		{
 			if (ImGui::Selectable("World", choosenFrame == "World") && modelCount > 0)
@@ -605,7 +507,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		}
 
-
+		//Model choosing
 		if (ImGui::BeginCombo("Models", choosenModel))
 		{
 			if (world_model_choice == 1) // changing models just if on model transformation
@@ -629,31 +531,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::EndCombo();
 		}
 		
-
-
-		/*
-		if (ImGui::BeginMenu("Models")) //changing models
-		{
-			if (world_model_choice == 1) // changing models just if on model transformation
-			{
-				for (int i = 0; i < modelCount; i++)
-				{
-					if (ImGui::MenuItem(scene.GetModel(i).GetModelName().c_str())) // scene.GetModel(i).GetModelName().c_str() returns NULL
-					{
-						active_index = i;
-						xyzAddition[0] = modelAdditions[active_index][0];
-						xyzAddition[1] = modelAdditions[active_index][1];
-						xyzAddition[2] = modelAdditions[active_index][2];
-						scaleAddition = modelScale[active_index];
-					}
-
-				}
-			}
-			ImGui::EndMenu();
-		}
-		*/
-
-
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -701,12 +578,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesY, degreesY, degreesY), "y", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesY, degreesY, degreesY), "y", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -726,12 +599,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesZ, degreesZ, degreesZ), "z", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesZ, degreesZ, degreesZ), "z", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
@@ -750,12 +619,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (i == active_index)
 					{
 						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-
-						float modelScaleAdd = modelScale[i];
-						glm::vec3 vec3ModelScale(modelScaleAdd, modelScaleAdd, modelScaleAdd);
-						glm::vec3 vec3ModelTranslate(modelAdditions[i]);
-
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesX, degreesX, degreesX), "x", fitV[1] + vec3ModelTranslate);
+						glm::vec3 vec3ModelScale(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(fitV[0] + vec3ModelScale, glm::vec3(degreesX, degreesX, degreesX), "x", fitV[1] + modelAdditions[i]);
 					}
 				}
 				else
