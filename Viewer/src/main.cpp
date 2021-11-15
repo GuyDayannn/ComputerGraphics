@@ -20,7 +20,7 @@
  * Fields
  */
 bool show_demo_window = false;
-bool show_another_window = false;
+bool show_camera_window = false;
 glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
 glm::vec3 transAxis = glm::vec3(0.0f, 0.0f, 0.0f);
 std::vector< glm::vec3> modelAdditions;
@@ -42,6 +42,24 @@ static const char* choosenModel = nullptr;
 static const char* choosenFrame = nullptr;
 static int active_index = 0;
 static int world_model_choice = 1;
+/**
+* Fields for controling camera
+*/
+float view_width = 1280.0f;
+float view_height = 720.0f;
+static float up = view_height / 2.0f;
+static float down = -(view_height / 2.0f);
+static float left = -(view_width / 2.0f);
+static float right = view_width / 2.0f;
+static float nearZ = 0.0f;
+static float farZ = 500.0f;
+static float upDown[2] = { view_height / 2.0f , -(view_height / 2.0f) };
+static float leftRight[2] = { -(view_width / 2.0f) , view_width / 2.0f };
+static float nearFar[2] = { 30.0f , 500.0f };
+static float cameraPos[3] = { 0.0f,0.0f,1.0f };
+static float lookAtPos[3] = { 0.0f,0.0f,0.0f };
+static float upPos[3] = { 0.0f,1.0f,0.f };
+
 
 /**
  * Function declarations
@@ -546,7 +564,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
+		ImGui::Checkbox("Another Window", &show_camera_window);
 
 		
 		if (ImGui::SliderFloat("Scale", &scaleAddition, 0.0f, 15.0f)) //scaling
@@ -656,12 +674,41 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	}
 
 	// 3. Show another simple window.
-	if (show_another_window)
+	if (show_camera_window)
 	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close Me"))
-			show_another_window = false;
+		ImGui::Begin("Another Window", &show_camera_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		if (ImGui::SliderFloat2("Up Down", upDown, -360.0f, 360.0f))
+		{
+			std::vector<float> leftRight = scene.GetCamera(0).GetLeftRightVals();
+			std::vector<float> nearFar = scene.GetCamera(0).GetNearFarVals();
+			scene.GetCamera(0).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1]);
+		}
+
+		if (ImGui::SliderFloat2("Left Right", leftRight, -640.0f, 640.0f))
+		{
+			std::vector<float> upDown = scene.GetCamera(0).GetUpDownVals();
+			std::vector<float> nearFar = scene.GetCamera(0).GetNearFarVals();
+			scene.GetCamera(0).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1]);
+		}
+
+		if (ImGui::SliderFloat2("Near Far", nearFar, 0.0f, 500.0f))
+		{
+			std::vector<float> upDown = scene.GetCamera(0).GetUpDownVals();
+			std::vector<float> leftRight = scene.GetCamera(0).GetLeftRightVals();
+			scene.GetCamera(0).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1]);
+		}
+
+
+		if (ImGui::SliderFloat3("Camera Position xyz", cameraPos, -3.0f, 3.0f))
+		{
+			std::vector<glm::vec3> prop = scene.GetCamera(0).GetCameraLookAt();
+			scene.GetCamera(0).SetCameraLookAt(glm::vec3(cameraPos[0], cameraPos[1], cameraPos[2]), prop[1], prop[2]);
+		}
+		
+															   
+		//ImGui::Text("Hello from another window!");
+		//if (ImGui::Button("Close Me"))
+			//show_camera_window = false;
 		ImGui::End();
 	}
 }
