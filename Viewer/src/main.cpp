@@ -14,6 +14,8 @@
 #include "Utils.h"
 
 #include <iostream>
+#define STARTSCALE 200.0f
+
 /**
  * Fields
  */
@@ -74,6 +76,16 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
+	
+	
+	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+	scene.AddCamera(camera);
+	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\bunny.obj");
+	//scene.AddModel(model);
+	//modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	//modelScale.push_back(200.0f);
+	//model->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f),"x", glm::vec3(640.0f, 300.0f, 0.0f));
+
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -265,8 +277,9 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", modelAdditions[i]);
 					}
 				}
 				else
@@ -285,8 +298,9 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(--degreesY, --degreesY, --degreesY), "y", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(--degreesY, --degreesY, --degreesY), "y", modelAdditions[i]);
 					}
 				}
 				else
@@ -305,8 +319,9 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", modelAdditions[i]);
 					}
 				}
 				else
@@ -325,8 +340,9 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(--degreesX, --degreesX, --degreesX), "x", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(--degreesX, --degreesX, --degreesX), "x", modelAdditions[i]);
 					}
 				}
 				else
@@ -450,8 +466,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			{
 				if (i == active_index)
 				{
-					std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-					scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(0.0f, 0.0f, 0.0f), "z", fitV[1] + modelAdditions[i]);
+					//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+					glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+					scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", modelAdditions[i]);
 				}
 			}
 		}
@@ -572,8 +589,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i] , glm::vec3(degreesY, degreesY, degreesY), "y", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(degreesY, degreesY, degreesY), "y", modelAdditions[i]);
 					}
 				}
 				else
@@ -592,8 +610,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(degreesZ, degreesZ, degreesZ), "z", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(degreesZ, degreesZ, degreesZ), "z", modelAdditions[i]);
 					}
 				}
 				else
@@ -611,8 +630,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				{
 					if (i == active_index)
 					{
-						std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
-						scene.GetModel(i).UpdateModelTransformations(fitV[0] * modelScale[i], glm::vec3(degreesX, degreesX, degreesX), "x", fitV[1] + modelAdditions[i]);
+						//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
 					}
 				}
 				else

@@ -7,7 +7,7 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	model_name(model_name)
 {
 	scaling.push_back(glm::vec3(1.0f, 1.0f, 1.0f)); //[0] - world
-	scaling.push_back(glm::vec3(1.0f, 1.0f, 1.0f)); //[1] - model
+	scaling.push_back(glm::vec3(150.0f, 150.0f, 150.0f)); //[1] - model
 	rotation.push_back(glm::vec3(0.0f, 0.0f, 0.0f)); // [i] = {xrotate, yrotate, zrotate}
 	rotation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	translation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -63,6 +63,7 @@ glm::vec3 MeshModel::HomogeneousVecToVec3(const glm::vec4& vec)
 *				viewport_width / 2.0f - (maxX - minX) / 2
 *				same for viewport_height
 */
+/*
 const std::vector<glm::vec3> MeshModel::FitToWindow(int viewport_width, int viewport_height) const
 {
 	float maxX = vertices[0].x;
@@ -94,7 +95,7 @@ const std::vector<glm::vec3> MeshModel::FitToWindow(int viewport_width, int view
 	return fittingMeasures;
 	//translation[1] = glm::vec3(viewport_width / 2.0f - (maxX - minX) / 2, viewport_height / 2.0f - (maxY - minY) / 2, translation[1].z);
 }
-
+*/
 
 //recieving worldTransformation request and updating scaling, roatation and translation
 void MeshModel::UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate)

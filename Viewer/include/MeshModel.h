@@ -15,7 +15,7 @@ public:
 	const glm::vec3& GetTransformedVertex(int index) const;
 	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
 	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
-	const std::vector<glm::vec3> FitToWindow(int viewport_width, int viewport_height) const; //[0] - scale fit, [1] - translate fit
+	//const std::vector<glm::vec3> FitToWindow(int viewport_width, int viewport_height) const; //[0] - scale fit, [1] - translate fit
 	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
 	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
 	const std::vector<glm::mat4> GetScalingMatrices() const;

@@ -186,6 +186,34 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color)
 
 }
 
+void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		std::vector<glm::vec3> triangle = triangles[i];
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
+		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
+		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
+		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
+		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));
+		v3.x = (1.0f + v3.x) * (1280.0f / 2.0f);
+		v3.y = (1.0f + v3.y) * (720.0f / 2.0f);
+
+
+		DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), color);
+		DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v3.x, v3.y), color);
+		DrawLine(glm::ivec2(v2.x, v2.y), glm::ivec2(v3.x, v3.y), color);
+	}
+
+}
+
+
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
@@ -324,10 +352,20 @@ void Renderer::Render(const Scene& scene)
 	int half_height = viewport_height / 2;
 	
 	int modelCount = scene.GetModelCount();
+	Camera cam = scene.GetCamera(0);
+
+	for (int i = 0; i < modelCount; i++)
+	{
+		DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
+	}
+
+
+	/*
 	for (int i = 0; i < modelCount; i++)
 	{
 		DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0));	
 	}
+	*/
 	
 	/*
 	MeshModel myModel = scene.GetModel(0);
