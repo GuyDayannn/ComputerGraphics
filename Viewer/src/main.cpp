@@ -564,7 +564,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_camera_window);
+		ImGui::Checkbox("Camera Window", &show_camera_window);
 
 		
 		if (ImGui::SliderFloat("Scale", &scaleAddition, 0.0f, 15.0f)) //scaling
@@ -676,7 +676,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	// 3. Show another simple window.
 	if (show_camera_window)
 	{
-		ImGui::Begin("Another Window", &show_camera_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Begin("Camera Window", &show_camera_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 		if (ImGui::SliderFloat2("Up Down", upDown, -360.0f, 360.0f))
 		{
 			std::vector<float> leftRight = scene.GetCamera(0).GetLeftRightVals();
