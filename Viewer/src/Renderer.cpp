@@ -213,6 +213,55 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 
 }
 
+void Renderer::DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	std::vector<std::vector<glm::vec3>> axises = meshModel.GetTransformedModelAxisWorld();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+
+	for (int i = 0; i < axises.size(); i++)
+	{
+		std::vector<glm::vec3> axis = axises[i];
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
+		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
+		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+
+		if (i == 0) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(1.0f, 0.0f, 0.0f));
+		if (i == 1) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		if (i == 2) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	}
+
+}
+
+void Renderer::DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	std::vector<std::vector<glm::vec3>> axises = meshModel.GetTransformedModelAxisModel();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+
+	for (int i = 0; i < axises.size(); i++)
+	{
+		std::vector<glm::vec3> axis = axises[i];
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
+		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
+		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+
+		if (i == 0) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(1.0f, 0.0f, 0.0f));
+		if (i == 1) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		if (i == 2) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	}
+
+}
+
+
 
 void Renderer::CreateBuffers(int w, int h)
 {
@@ -357,6 +406,8 @@ void Renderer::Render(const Scene& scene)
 	for (int i = 0; i < modelCount; i++)
 	{
 		DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
+		if (scene.GetModel(i).GetWorldAxisShowState()) DrawMeshModelAxisWorld(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
+		if (scene.GetModel(i).GetModelAxisShowState()) DrawMeshModelAxisModel(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
 	}
 
 

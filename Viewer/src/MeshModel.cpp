@@ -14,6 +14,28 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	translation.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	currentRotationMat.push_back(glm::mat4(1.0f));
 	currentRotationMat.push_back(glm::mat4(1.0f));
+	
+	std::vector<glm::vec3> xAxis;
+	xAxis.push_back(glm::vec3(-200.0f, 0.0f, 0.0f));
+	xAxis.push_back(glm::vec3(200.0f, 0.0f, 0.0f));
+	std::vector<glm::vec3> yAxis;
+	yAxis.push_back(glm::vec3(0.0f, -200.0f, 0.0f));
+	yAxis.push_back(glm::vec3(0.0f, 200.0f, 0.0f));
+	std::vector<glm::vec3> zAxis;
+	zAxis.push_back(glm::vec3(0.0f, 0.0f, -200.0f));
+	zAxis.push_back(glm::vec3(0.0f, 0.0f, 200.0f));
+	modelAxis.push_back(xAxis);
+	modelAxis.push_back(yAxis);
+	modelAxis.push_back(zAxis);
+	modelAxisModel = modelAxis;
+	for (int i = 0; i < modelAxisModel.size(); i++)
+	{
+		modelAxisModel[i][0] /= 200.0f;
+		modelAxisModel[i][1] /= 200.0f;
+
+	}
+	showAxisWorld = false;
+	showAxisModel = false;
 }
 
 MeshModel::~MeshModel()
@@ -236,4 +258,100 @@ const std::vector<std::vector<glm::vec3>> MeshModel::GetTriangles() const
 	}
 
 	return triangles;
+}
+
+const std::vector<std::vector<glm::vec3>> MeshModel::GetModelAxis() const
+{
+	return modelAxis;
+}
+
+const std::vector<std::vector<glm::vec3>> MeshModel::GetTransformedModelAxisWorld() const
+{
+	std::vector<std::vector<glm::vec3>> tranformdAxis;
+	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
+	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
+	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
+
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+
+	//xAXis
+	std::vector<glm::vec3> xAxis;
+	xAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[0][0]))); //left
+	xAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[0][1]))); //right
+	//yAxis
+	std::vector<glm::vec3> yAxis;
+	yAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[1][0]))); //left
+	yAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[1][1]))); //right
+	//zAxis
+	std::vector<glm::vec3> zAxis;
+	zAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[2][0]))); //left
+	zAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * Vec3ToHomogeneousVec(modelAxis[2][1]))); //right
+	
+	tranformdAxis.push_back(xAxis);
+	tranformdAxis.push_back(yAxis);
+	tranformdAxis.push_back(zAxis);
+
+	return tranformdAxis;
+}
+
+const std::vector<std::vector<glm::vec3>> MeshModel::GetTransformedModelAxisModel() const
+{
+	std::vector<std::vector<glm::vec3>> tranformdAxis;
+	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
+	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
+	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
+
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * currentRotationMat[1] * scalingMats[1];
+
+	//xAXis
+	std::vector<glm::vec3> xAxis;
+	xAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[0][0]))); //left
+	xAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[0][1]))); //right
+	//yAxis
+	std::vector<glm::vec3> yAxis;
+	yAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[1][0]))); //left
+	yAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[1][1]))); //right
+	//zAxis
+	std::vector<glm::vec3> zAxis;
+	zAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[2][0]))); //left
+	zAxis.push_back(HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(modelAxisModel[2][1]))); //right
+
+	tranformdAxis.push_back(xAxis);
+	tranformdAxis.push_back(yAxis);
+	tranformdAxis.push_back(zAxis);
+
+	return tranformdAxis;
+}
+
+
+void MeshModel::ShowWorldAxis()
+{
+	showAxisWorld = true;
+}
+
+void MeshModel::HideWorldAxis()
+{
+	showAxisWorld = false;
+}
+
+const bool MeshModel::GetWorldAxisShowState() const
+{
+	return showAxisWorld;
+}
+
+
+void MeshModel::ShowModelAxis()
+{
+	showAxisModel = true;
+}
+
+void MeshModel::HideModelAxis()
+{
+	showAxisModel = false;
+}
+
+const bool MeshModel::GetModelAxisShowState() const
+{
+	return showAxisModel;
 }

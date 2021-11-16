@@ -15,6 +15,8 @@ Camera::Camera()
 	up = viewport_height / 2.0f;
 	view_transformation = glm::lookAt(camPos, atPos, upPos);
 	projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
+	currentRotationMat.push_back(glm::mat4(1.0f));
+	currentRotationMat.push_back(glm::mat4(1.0f));
 }
 
 Camera::~Camera()
@@ -85,4 +87,29 @@ const std::vector<glm::vec3> Camera::GetCameraLookAt() const
 	cameraLookAt.push_back(upPos);
 	return cameraLookAt;
 
+}
+
+const std::vector<glm::mat4>& Camera::GetCurrentRotations() const
+{
+	return currentRotationMat;
+}
+
+void Camera::UpdateRotationWorld(float degrees, std::string axis)
+{
+	glm::vec3 rotateAround;
+	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
+	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
+	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	currentRotationMat[0] = glm::rotate(currentRotationMat[0], glm::radians(degrees), rotateAround);	
+}
+
+void Camera::UpdateRotationModel(float degrees, std::string axis)
+{
+	glm::vec3 rotateAround;
+	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
+	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
+	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	currentRotationMat[1] = glm::rotate(currentRotationMat[1], glm::radians(degrees), rotateAround);
 }

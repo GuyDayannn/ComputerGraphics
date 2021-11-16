@@ -19,6 +19,8 @@ private:
 	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color);
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
+	void DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
+	void DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();

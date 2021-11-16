@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <string>
 
 class Camera
 {
@@ -15,14 +16,18 @@ public:
 	const glm::mat4x4& GetViewTransformation() const;
 
 	void UpdateViewVolume(float up, float down, float left, float right, float near, float far);
+	void UpdateRotationWorld(float degrees, std::string axis);
+	void UpdateRotationModel(float degrees, std::string axis);
 	const std::vector<float> GetUpDownVals();
 	const std::vector<float> GetLeftRightVals();
 	const std::vector<float> GetNearFarVals();
 	const std::vector<glm::vec3> GetCameraLookAt() const;
+	const std::vector<glm::mat4>& GetCurrentRotations() const;
 
 private:
 	glm::mat4x4 view_transformation;
 	glm::mat4x4 projection_transformation;
+	std::vector<glm::mat4> currentRotationMat; //[0] world - [1] - camera itself
 
 	glm::vec3 camPos;
 	glm::vec3 atPos;

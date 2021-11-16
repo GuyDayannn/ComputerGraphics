@@ -25,6 +25,10 @@ glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
 glm::vec3 transAxis = glm::vec3(0.0f, 0.0f, 0.0f);
 std::vector< glm::vec3> modelAdditions;
 std::vector<float> modelScale;
+std::vector<bool> modelAxisWorld;
+std::vector<bool> modelAxisModel;
+std::vector< glm::vec3> worldAdditions;
+std::vector<float> worldScale;
 /**
 * Fields for controling model transformations
 */
@@ -42,6 +46,8 @@ static const char* choosenModel = nullptr;
 static const char* choosenFrame = nullptr;
 static int active_index = 0;
 static int world_model_choice = 1;
+static bool showAxisWorld = false;
+static bool showAxisModel = false;
 /**
 * Fields for controling camera
 */
@@ -101,7 +107,7 @@ int main(int argc, char **argv)
 	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\bunny.obj");
 	//scene.AddModel(model);
 	//modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	//modelScale.push_back(200.0f);
+	//modelScale.push_back(1.0f);
 	//model->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f),"x", glm::vec3(640.0f, 300.0f, 0.0f));
 
 	
@@ -238,10 +244,10 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			choosenFrame = "World";
 			world_model_choice = 0;
 			world_model_choice = 0;
-			xyzAddition[0] = xyzWorld[0];
-			xyzAddition[1] = xyzWorld[1];
-			xyzAddition[2] = xyzWorld[2];
-			scaleAddition = scaleWorld;
+			xyzAddition[0] = worldAdditions[active_index][0];
+			xyzAddition[1] = worldAdditions[active_index][1];
+			xyzAddition[2] = worldAdditions[active_index][2];
+			scaleAddition = worldScale[active_index];
 		}
 		if (io.KeysDown['M'] && modelCount > 0) // Model
 		{
@@ -260,7 +266,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelAdditions[active_index][0] = ++xyzAddition[0];
 			else
-				xyzWorld[0] = ++xyzAddition[0];
+				worldAdditions[active_index][0] = ++xyzAddition[0];
 		}
 
 		if (io.KeysDown['Z'] && xyzAddition[0] > -640.0f) //Z - translation by negative 1 on x
@@ -268,7 +274,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelAdditions[active_index][0] = --xyzAddition[0];
 			else
-				xyzWorld[0] = --xyzAddition[0];
+				worldAdditions[active_index][0] = --xyzAddition[0];
 		}
 
 		if (io.KeysDown['S'] && xyzAddition[1] < 360.0f) //S  -  translation by positive 1 on y
@@ -276,7 +282,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelAdditions[active_index][1] = ++xyzAddition[1];
 			else
-				xyzWorld[1] = ++xyzAddition[1];	
+				worldAdditions[active_index][1] = ++xyzAddition[1];
 		}
 
 		if (io.KeysDown['X'] && xyzAddition[1] > -360.0f) //X -  translation by negative 1 on y
@@ -284,7 +290,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelAdditions[active_index][1] = --xyzAddition[1];
 			else
-				xyzWorld[1] = --xyzAddition[1];	
+				worldAdditions[active_index][1] = --xyzAddition[1];
 		}
 
 		if (io.KeysDown['/']) // '/' -rotatin around y +
@@ -302,7 +308,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(++degreesY, ++degreesY, ++degreesY), "y", worldAdditions[i]);
+					}
 				}
 
 			}
@@ -323,7 +333,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(--degreesY, --degreesY, --degreesY), "y", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(--degreesY, --degreesY, --degreesY), "y", worldAdditions[i]);
+					}
 				}
 
 			}
@@ -344,7 +358,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(++degreesX, ++degreesX, ++degreesX), "x", worldAdditions[i]);
+					}
 				}
 			}
 			degreesX = 0;
@@ -365,7 +383,11 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(--degreesX, --degreesX, --degreesX), "x", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(--degreesX, --degreesX, --degreesX), "x", worldAdditions[i]);
+					}
 				}
 			}
 			degreesX = 0;
@@ -377,7 +399,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelScale[active_index] = ++scaleAddition;
 			else
-				scaleWorld = ++scaleAddition;
+				worldScale[active_index] = ++scaleAddition;
 			
 		}
 
@@ -386,7 +408,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 			if (world_model_choice == 1)
 				modelScale[active_index] = --scaleAddition;
 			else
-				scaleWorld = --scaleAddition;	
+				worldScale[active_index] = --scaleAddition;
 
 		}
 
@@ -441,6 +463,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					scene.AddModel(Utils::LoadMeshModel(outPath));
 					modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 					modelScale.push_back(1.0f);
+					modelAxisWorld.push_back(false);
+					modelAxisModel.push_back(false);
+					worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+					worldScale.push_back(1.0f);
 					free(outPath);
 				}
 				else if (result == NFD_CANCEL)
@@ -494,7 +520,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			for (int i = 0; i < modelCount; i++)
 			{
-				scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(0.0f, 0.0f, 0.0f), "z", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));	
+				if (i == active_index)
+				{
+					glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+					scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", worldAdditions[i]);
+				}
 			}
 
 		}
@@ -512,10 +542,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			{
 				choosenFrame = "World";
 				world_model_choice = 0;
-				xyzAddition[0] = xyzWorld[0];
-				xyzAddition[1] = xyzWorld[1];
-				xyzAddition[2] = xyzWorld[2];
-				scaleAddition = scaleWorld;
+				xyzAddition[0] = worldAdditions[active_index][0];
+				xyzAddition[1] = worldAdditions[active_index][1];
+				xyzAddition[2] = worldAdditions[active_index][2];
+				scaleAddition = worldScale[active_index];
 			}
 			if (choosenFrame == "World")
 				ImGui::SetItemDefaultFocus();
@@ -549,10 +579,13 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					{
 						choosenModel = scene.GetModel(i).GetModelName().c_str();
 						active_index = i;
+						scene.SetActiveModelIndex(i);
 						xyzAddition[0] = modelAdditions[active_index][0];
 						xyzAddition[1] = modelAdditions[active_index][1];
 						xyzAddition[2] = modelAdditions[active_index][2];
 						scaleAddition = modelScale[active_index];
+						showAxisWorld = modelAxisWorld[active_index];
+						showAxisModel = modelAxisModel[active_index];
 					}
 					if (selectedModel)
 						ImGui::SetItemDefaultFocus();
@@ -575,7 +608,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			else
 			{
-				scaleWorld = scaleAddition;
+				worldScale[active_index] = scaleAddition;
 			}
 		}
 		if (ImGui::SliderFloat3("Translation", xyzAddition, -640.0f, 640.0f)) //translating
@@ -588,9 +621,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			}
 			else
 			{
-				xyzWorld[0] = xyzAddition[0];
-				xyzWorld[1] = xyzAddition[1];
-				xyzWorld[2] = xyzAddition[2];
+				worldAdditions[active_index][0] = xyzAddition[0];
+				worldAdditions[active_index][1] = xyzAddition[1];
+				worldAdditions[active_index][2] = xyzAddition[2];
 			}
 		}
 		
@@ -614,7 +647,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(degreesY, degreesY, degreesY), "y", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesY, degreesY, degreesY), "y", worldAdditions[i]);
+					}
 				}
 				
 			}
@@ -635,7 +672,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(degreesZ, degreesZ, degreesZ), "z", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesZ, degreesZ, degreesZ), "z", worldAdditions[i]);
+					}
 				}
 			}
 			degreesZ = 0;
@@ -655,7 +696,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				}
 				else
 				{
-					scene.GetModel(i).UpdateWorldTransformations(glm::vec3(scaleWorld, scaleWorld, scaleWorld), glm::vec3(degreesX, degreesX, degreesX), "x", glm::vec3(xyzAddition[0], xyzAddition[1], xyzAddition[2]));
+					if (i == active_index)
+					{
+						glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+						scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", worldAdditions[i]);
+					}
 				}	
 			}
 			degreesX = 0;
@@ -668,6 +713,21 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		//	counter++;
 		//ImGui::SameLine();
 		//ImGui::Text("counter = %d", counter);
+		if (ImGui::Checkbox("Show World Frame Axis", &showAxisWorld))
+		{
+			modelAxisWorld[active_index] = showAxisWorld;
+			if (showAxisWorld) scene.GetModel(active_index).ShowWorldAxis();
+			else scene.GetModel(active_index).HideWorldAxis();
+
+		}
+
+		if (ImGui::Checkbox("Show Model Frame Axis", &showAxisModel))
+		{
+			modelAxisModel[active_index] = showAxisModel;
+			if (showAxisModel) scene.GetModel(active_index).ShowModelAxis();
+			else scene.GetModel(active_index).HideModelAxis();
+
+		}
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
@@ -704,7 +764,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			std::vector<glm::vec3> prop = scene.GetCamera(0).GetCameraLookAt();
 			scene.GetCamera(0).SetCameraLookAt(glm::vec3(cameraPos[0], cameraPos[1], cameraPos[2]), prop[1], prop[2]);
 		}
-		
 															   
 		//ImGui::Text("Hello from another window!");
 		//if (ImGui::Button("Close Me"))
