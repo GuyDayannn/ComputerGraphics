@@ -198,14 +198,14 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 	{
 		std::vector<glm::vec3> triangle = triangles[i];
 		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
-		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
-		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
+		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
 		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
-		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
-		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
+		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));
-		v3.x = (1.0f + v3.x) * (1280.0f / 2.0f);
-		v3.y = (1.0f + v3.y) * (720.0f / 2.0f);
+		v3.x = (1.0f + v3.x) * (viewport_width / 2.0f);
+		v3.y = (1.0f + v3.y) * (viewport_height / 2.0f);
 
 
 		DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), color);
@@ -227,11 +227,11 @@ void Renderer::DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec
 	{
 		std::vector<glm::vec3> axis = axises[i];
 		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
-		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
-		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
+		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
 		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
-		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
-		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
+		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
 		if (i == 0) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(1.0f, 0.0f, 0.0f));
 		if (i == 1) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -253,11 +253,11 @@ void Renderer::DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec
 	{
 		std::vector<glm::vec3> axis = axises[i];
 		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
-		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
-		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
+		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
+		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
 		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
-		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
-		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
+		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
+		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
 		if (i == 0) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(1.0f, 0.0f, 0.0f));
 		if (i == 1) DrawLine(glm::ivec2(v1.x, v1.y), glm::ivec2(v2.x, v2.y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -267,7 +267,138 @@ void Renderer::DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec
 
 }
 
+void Renderer::DrawMeshModelVerticesNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	std::vector<std::vector<std::vector<glm::vec3>>> normals = meshModel.GetVerticesNormals();
 
+	std::vector<glm::mat4> modelTranslation = meshModel.GetTranslationMatrices();
+	std::vector<glm::mat4> modelRotations = meshModel.GetCurrentRotation();
+	std::vector<glm::mat4> modelScale = meshModel.GetScalingMatrices();
+
+	glm::mat4 modelTransformation = modelTranslation[0] * modelRotations[0] * modelScale[0] * modelTranslation[1] * modelRotations[1] * modelScale[1];
+
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+
+	for (int i = 0; i < normals.size(); i++)
+	{
+		// <{<glm::vec3, glm::vec3>, <glm::vec3, glm::vec3>, <glm::vec3, glm::vec3>}>
+		std::vector<std::vector<glm::vec3>> faceNormals = normals[i];
+
+		for (int j = 0; j < faceNormals.size(); j++)
+		{
+			//<glm::vec3, glm::vec3>
+			std::vector<glm::vec3> vertexNormal = faceNormals[j];
+			glm::vec3 normalPoint1 = vertexNormal[0];
+			glm::vec3 normalPoint2 = vertexNormal[1];
+			glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint1));
+			v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
+			v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
+			glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation *MeshModel::Vec3ToHomogeneousVec(normalPoint2));
+			v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
+			v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
+
+			DrawLine(v1, v2, color);
+
+		}	
+	}
+
+}
+
+
+void Renderer::DrawMeshModelFaceNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	std::vector<std::vector<glm::vec3>> normals = meshModel.GetFacesNormals();
+
+	std::vector<glm::mat4> modelTranslation = meshModel.GetTranslationMatrices();
+	std::vector<glm::mat4> modelRotations = meshModel.GetCurrentRotation();
+	std::vector<glm::mat4> modelScale = meshModel.GetScalingMatricesChangeable();
+	
+	glm::mat4 modelTransformation = modelTranslation[0] * modelRotations[0] * modelScale[0] * modelTranslation[1] * modelRotations[1] * modelScale[1];
+
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+
+	glm::mat4 scaleNormal = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+
+	for (int i = 0; i < normals.size(); i++)
+	{
+		// <{x,y,z}, {x,y,z}}>
+		std::vector<glm::vec3> faceNormals = normals[i];
+
+	
+		//<glm::vec3, glm::vec3>
+		glm::vec3 normalPoint1 = faceNormals[0];
+		glm::vec3 normalPoint2 = faceNormals[1];
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation  * MeshModel::Vec3ToHomogeneousVec(normalPoint1));
+		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
+		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * scaleNormal * modelTransformation  * MeshModel::Vec3ToHomogeneousVec(normalPoint2));
+		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
+		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
+
+		DrawLine(v1, v2, color);
+
+		
+	}
+
+}
+
+
+/*
+void Renderer::DrawMeshModelFaceNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+{
+	//std::vector<std::vector<glm::vec3>> normals = meshModel.GetFacesNormals();
+
+	std::vector<glm::mat4> modelTranslation = meshModel.GetTranslationMatrices();
+	std::vector<glm::mat4> modelRotations = meshModel.GetCurrentRotation();
+	std::vector<glm::mat4> modelScale = meshModel.GetScalingMatricesChangeable();
+
+	//glm::mat4 modelTransformation = modelTranslation[0] * modelRotations[0] * modelScale[0] * modelTranslation[1] * modelRotations[1] * modelScale[1];
+
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+
+	//std::vector<std::vector<glm::vec3>> facesNormals;
+	for (int i = 0; i < meshModel.GetFacesCount(); i++)
+	{
+		Face temp_face(meshModel.GetFace(i)); //gets ith Face
+		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
+		int secondVIn = temp_face.GetVertexIndex(1);
+		int thirdVIn = temp_face.GetVertexIndex(2);
+		glm::vec3 v1 = meshModel.GetPureVertex(firstVIn);
+		glm::vec3 v2 = meshModel.GetPureVertex(secondVIn);
+		glm::vec3 v3 = meshModel.GetPureVertex(thirdVIn);
+		glm::vec3 v1Transformed = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(meshModel.GetTransformedVertex(firstVIn)));
+		v1Transformed.x = (1.0f + v1Transformed.x) * (viewport_width / 2.0f);
+		v1Transformed.y = (1.0f + v1Transformed.y) * (viewport_height / 2.0f);
+		glm::vec3 v2Transformed = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(meshModel.GetTransformedVertex(secondVIn)));
+		v2Transformed.x = (1.0f + v2Transformed.x) * (viewport_width / 2.0f);
+		v2Transformed.y = (1.0f + v2Transformed.y) * (viewport_height / 2.0f);
+		glm::vec3 v3Transformed = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(meshModel.GetTransformedVertex(thirdVIn)));
+		v3Transformed.x = (1.0f + v3Transformed.x) * (viewport_width / 2.0f);
+		v3Transformed.y = (1.0f + v3Transformed.y) * (viewport_height / 2.0f);
+		glm::vec3 middleV = (v1Transformed + v2Transformed + v3Transformed) / 3.0f;
+		glm::vec3 v1Normal = glm::cross(v1 - v2, v1 - v3);
+
+		//glm::mat4 scaleMat = modelScale[1] + glm::scale(glm::mat4(1.0f), glm::vec3(200.0f, 200.0f, 200.0f));
+		//v1Normal = MeshModel::HomogeneousVecToVec3(modelScale[1] * MeshModel::Vec3ToHomogeneousVec(v1Normal));
+
+		DrawLine(middleV, middleV + v1Normal, color);
+
+		//std::vector<std::vector<glm::vec3>> triangleNormals;
+
+		//facesNormals.push_back({ middleV,  middleV + v1Normal });
+	}
+
+}
+*/
 
 void Renderer::CreateBuffers(int w, int h)
 {
@@ -414,6 +545,8 @@ void Renderer::Render(const Scene& scene)
 		DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
 		if (scene.GetModel(i).GetWorldAxisShowState()) DrawMeshModelAxisWorld(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
 		if (scene.GetModel(i).GetModelAxisShowState()) DrawMeshModelAxisModel(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
+		if (scene.GetModel(i).GetFaceNormalsShowState()) DrawMeshModelFaceNormals(scene.GetModel(i), glm::vec3(1, 0, 1), cam);
+		if (scene.GetModel(i).GetVertexNormalsShowState()) DrawMeshModelVerticesNormals(scene.GetModel(i), glm::vec3(1, 0, 1), cam);
 	}
 
 

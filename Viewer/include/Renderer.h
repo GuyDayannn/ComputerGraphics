@@ -21,6 +21,8 @@ private:
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
+	void DrawMeshModelVerticesNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
+	void DrawMeshModelFaceNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();

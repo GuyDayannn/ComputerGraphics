@@ -1,18 +1,16 @@
 #include "Camera.h"
 
-Camera::Camera()
+Camera::Camera(int window_width, int window_height)
 {
-	float viewport_width = 1280.0f;
-	float viewport_height = 720.0f;
 	camPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	atPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	upPos = glm::vec3(0.0f, 1.0f, 0.0f);
 	nearZ = 30.0f;
 	farZ = 500.0f;
-	left = -(viewport_width / 2.0f);
-	right = viewport_width / 2.0f;
-	down = -(viewport_height / 2.0f);
-	up = viewport_height / 2.0f;
+	left = -(window_width / 2.0f);
+	right = window_width / 2.0f;
+	down = -(window_height / 2.0f);
+	up = window_height / 2.0f;
 	view_transformation = glm::lookAt(camPos, atPos, upPos);
 	projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
 	currentRotationMat.push_back(glm::mat4(1.0f));

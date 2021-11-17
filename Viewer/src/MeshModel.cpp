@@ -36,6 +36,10 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	}
 	showAxisWorld = false;
 	showAxisModel = false;
+	faceNormalSize = 0.4f;
+	showFaceNormals = false;
+	vertexNormalSize = 1.0f;
+	showVertexNormals = false;
 }
 
 MeshModel::~MeshModel()
@@ -55,6 +59,74 @@ int MeshModel::GetFacesCount() const
 const std::string& MeshModel::GetModelName() const
 {
 	return model_name;
+}
+
+
+//return type - each element in vector is <{<glm::vec3, glm::vec3>, <glm::vec3, glm::vec3>, <glm::vec3, glm::vec3>}>
+const std::vector<std::vector<std::vector<glm::vec3>>> MeshModel::GetVerticesNormals() const
+{
+	std::vector<std::vector<std::vector<glm::vec3>>> faceVeticesNormals;
+	int faceCounts = GetFacesCount();
+	for (int i = 0; i < faceCounts; i++)
+	{
+		Face temp_face(GetFace(i)); //gets ith Face
+		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
+		int secondVIn = temp_face.GetVertexIndex(1);
+		int thirdVIn = temp_face.GetVertexIndex(2);
+		int firstVNormalIn = temp_face.GetNormalIndex(0);	//Gets first vertex's Normal index in this face
+		int secondVNormalIn = temp_face.GetNormalIndex(1);
+		int thirdVNormalIn = temp_face.GetNormalIndex(2);
+		glm::vec3 v1 = GetPureVertex(firstVIn);
+		glm::vec3 v1Normal = GetPureNormal(firstVNormalIn);
+		glm::vec3 v2 = GetPureVertex(secondVIn);
+		glm::vec3 v2Normal = GetPureNormal(secondVNormalIn);
+		glm::vec3 v3 = GetPureVertex(thirdVIn);
+		glm::vec3 v3Normal = GetPureNormal(thirdVNormalIn);
+		std::vector<std::vector<glm::vec3>> triangleNormals;
+		
+		triangleNormals.push_back({ v1,  v1 + vertexNormalSize * v1Normal });
+		triangleNormals.push_back({ v2, v2 + vertexNormalSize * v2Normal });
+		triangleNormals.push_back({ v3, v3 + vertexNormalSize * v3Normal });
+		faceVeticesNormals.push_back(triangleNormals);
+
+	}
+
+	return faceVeticesNormals;
+}
+
+void MeshModel::SetVertexNormalSize(float size)
+{
+	vertexNormalSize = size;
+}
+
+
+const std::vector<std::vector<glm::vec3>> MeshModel::GetFacesNormals() const
+{
+	std::vector<std::vector<glm::vec3>> facesNormals;
+	int faceCounts = GetFacesCount();
+	for (int i = 0; i < faceCounts; i++)
+	{
+		Face temp_face(GetFace(i)); //gets ith Face
+		int firstVIn = temp_face.GetVertexIndex(0);	//Gets first vertex's index in this face
+		int secondVIn = temp_face.GetVertexIndex(1);
+		int thirdVIn = temp_face.GetVertexIndex(2);
+		glm::vec3 v1 = GetPureVertex(firstVIn);
+		glm::vec3 v2 = GetPureVertex(secondVIn);
+		glm::vec3 v3 = GetPureVertex(thirdVIn);
+		glm::vec3 middleV = (glm::vec3((v1.x + v2.x + v3.x) / 3.0f, (v1.y + v2.y + v3.y) / 3.0f, (v1.z + v2.z + v3.z) / 3.0f));
+		glm::vec3 v1Normal = glm::cross(v1 - v2, v1 - v3);
+		std::vector<std::vector<glm::vec3>> triangleNormals;
+
+		facesNormals.push_back({ middleV,  middleV + (faceNormalSize * v1Normal) });
+
+	}
+
+	return facesNormals;
+}
+
+void MeshModel::SetFaceNormalSize(float size)
+{
+	faceNormalSize = size;
 }
 
 //gets vertex on index
@@ -156,6 +228,22 @@ const std::vector<glm::mat4> MeshModel::GetScalingMatrices() const
 	return scalingMats;
 }
 
+std::vector<glm::mat4> MeshModel::GetScalingMatricesChangeable() const
+{
+	std::vector<glm::mat4> scalingMats(2);
+	for (int i = 0; i < scalingMats.size(); i++)
+	{
+		scalingMats[i] = glm::mat4
+		(scaling[i].x, 0.0f, 0.0f, 0.0f,
+			0.0f, scaling[i].y, 0.0f, 0.0f,
+			0.0f, 0.0f, scaling[i].z, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
+
+	}
+
+	return scalingMats;
+}
+
 
 //same just for translation
 const std::vector<glm::mat4> MeshModel::GetTranslationMatrices() const
@@ -233,6 +321,24 @@ const glm::vec3& MeshModel::GetTransformedVertex(int index) const
 	
 	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(vertices[index - 1]));
 }
+
+const glm::vec3& MeshModel::GetTransformedNormal(int index) const
+{
+	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
+	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
+	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * currentRotationMat[1] * scalingMats[1];
+
+	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(normals[index - 1]));
+}
+
+const glm::vec3& MeshModel::GetPureNormal(int index) const
+{
+	
+	return normals[index - 1];
+}
+
 
 
 //returning triangles (faces)
@@ -354,4 +460,39 @@ void MeshModel::HideModelAxis()
 const bool MeshModel::GetModelAxisShowState() const
 {
 	return showAxisModel;
+}
+
+const std::vector<glm::mat4> MeshModel::GetCurrentRotation() const
+{
+	return currentRotationMat;
+}
+
+bool MeshModel::GetFaceNormalsShowState()
+{
+	return showFaceNormals;
+}
+
+bool MeshModel::GetVertexNormalsShowState()
+{
+	return showVertexNormals;
+}
+
+void MeshModel::ShowFaceNormals()
+{
+	showFaceNormals = true;
+}
+
+void MeshModel::HideFaceNormals()
+{
+	showFaceNormals = false;
+}
+
+void MeshModel::ShowVertexNormals()
+{
+	showVertexNormals = true;
+}
+
+void MeshModel::HideVertexNormals()
+{
+	showVertexNormals = false;
 }

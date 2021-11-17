@@ -27,6 +27,8 @@ std::vector< glm::vec3> modelAdditions;
 std::vector<float> modelScale;
 std::vector<bool> modelAxisWorld;
 std::vector<bool> modelAxisModel;
+std::vector<bool> faceNormals;
+std::vector<bool> vertexNormals;
 std::vector< glm::vec3> worldAdditions;
 std::vector<float> worldScale;
 /**
@@ -48,6 +50,8 @@ static int active_index = 0;
 static int world_model_choice = 1;
 static bool showAxisWorld = false;
 static bool showAxisModel = false;
+static bool showFaceNormals = false;
+static bool showVertexNormals = false;
 /**
 * Fields for controling camera
 */
@@ -102,14 +106,17 @@ int main(int argc, char **argv)
 	Scene scene = Scene();
 	
 	
-	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
-	camera->UpdateRotationModel(45.0f, "x");
+	std::shared_ptr<Camera> camera = std::make_shared<Camera>(windowWidth, windowHeight);
+	//camera->UpdateRotationModel(45.0f, "x");
 	scene.AddCamera(camera);
-	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\bunny.obj");
+	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
 	//scene.AddModel(model);
 	//modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	//modelScale.push_back(1.0f);
-	//model->UpdateModelTransformations(glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(0.0f, 0.0f, 0.0f),"x", glm::vec3(640.0f, 300.0f, 0.0f));
+	//modelAxisWorld.push_back(false);
+	//modelAxisModel.push_back(false);
+	//worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	//worldScale.push_back(1.0f);
 
 	
 	ImGuiIO& io = SetupDearImgui(window);
@@ -466,6 +473,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					modelScale.push_back(1.0f);
 					modelAxisWorld.push_back(false);
 					modelAxisModel.push_back(false);
+					faceNormals.push_back(false);
+					vertexNormals.push_back(false);
 					worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 					worldScale.push_back(1.0f);
 					free(outPath);
@@ -532,7 +541,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		
 
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-		
+		ImGui::Checkbox("Camera Window", &show_camera_window);
 
 		// TODO: Add more menubar items (if you want to)
 		
@@ -587,6 +596,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						scaleAddition = modelScale[active_index];
 						showAxisWorld = modelAxisWorld[active_index];
 						showAxisModel = modelAxisModel[active_index];
+						showFaceNormals = faceNormals[active_index];
+						showVertexNormals = vertexNormals[active_index];
 					}
 					if (selectedModel)
 						ImGui::SetItemDefaultFocus();
@@ -598,7 +609,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Camera Window", &show_camera_window);
 
 		
 		if (ImGui::SliderFloat("Scale", &scaleAddition, 0.0f, 15.0f)) //scaling
@@ -714,7 +724,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		//	counter++;
 		//ImGui::SameLine();
 		//ImGui::Text("counter = %d", counter);
-		if (ImGui::Checkbox("Show World Frame Axis", &showAxisWorld))
+		
+		if (ImGui::Checkbox("Show World Frame Axis", &showAxisWorld) && modelCount != 0)
 		{
 			modelAxisWorld[active_index] = showAxisWorld;
 			if (showAxisWorld) scene.GetModel(active_index).ShowWorldAxis();
@@ -722,13 +733,30 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		}
 
-		if (ImGui::Checkbox("Show Model Frame Axis", &showAxisModel))
+		if (ImGui::Checkbox("Show Model Frame Axis", &showAxisModel) && modelCount != 0)
 		{
 			modelAxisModel[active_index] = showAxisModel;
 			if (showAxisModel) scene.GetModel(active_index).ShowModelAxis();
 			else scene.GetModel(active_index).HideModelAxis();
 
 		}
+
+		if (ImGui::Checkbox("Show Face Normals", &showFaceNormals) && modelCount != 0)
+		{
+			faceNormals[active_index] = showFaceNormals;
+			if (showFaceNormals) scene.GetModel(active_index).ShowFaceNormals();
+			else scene.GetModel(active_index).HideFaceNormals();
+
+		}
+
+		if (ImGui::Checkbox("Show Vertex Normals", &showVertexNormals) && modelCount != 0)
+		{
+			vertexNormals[active_index] = showVertexNormals;
+			if (showVertexNormals) scene.GetModel(active_index).ShowVertexNormals();
+			else scene.GetModel(active_index).HideVertexNormals();
+
+		}
+
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

@@ -11,14 +11,19 @@ public:
 	const Face& GetFace(int index) const;
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
+	const std::vector<std::vector<std::vector<glm::vec3>>> GetVerticesNormals() const;
+	const std::vector<std::vector<glm::vec3>> GetFacesNormals() const;
 	const glm::vec3& GetPureVertex(int index) const;
 	const glm::vec3& GetTransformedVertex(int index) const;
+	const glm::vec3& GetPureNormal(int index) const;
+	const glm::vec3& GetTransformedNormal(int index) const;
 	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
 	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
 	//const std::vector<glm::vec3> FitToWindow(int viewport_width, int viewport_height) const; //[0] - scale fit, [1] - translate fit
 	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
 	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
 	const std::vector<glm::mat4> GetScalingMatrices() const;
+	std::vector<glm::mat4> GetScalingMatricesChangeable() const;
 	const std::vector<glm::mat4> GetTranslationMatrices() const;
 	//rotation around "axis" to grid system "grid" (geid system means model grid or world grid)
 	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "z", const int grid = 1) const;
@@ -32,6 +37,15 @@ public:
 	void ShowModelAxis();
 	void HideModelAxis();
 	const bool GetModelAxisShowState() const;
+	const std::vector<glm::mat4> GetCurrentRotation() const;
+	void SetVertexNormalSize(float size);
+	void SetFaceNormalSize(float size);
+	bool GetFaceNormalsShowState();
+	void ShowFaceNormals();
+	void HideFaceNormals();
+	bool GetVertexNormalsShowState();
+	void ShowVertexNormals();
+	void HideVertexNormals();
 
 private:
 	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
@@ -46,4 +60,8 @@ private:
 	std::vector<std::vector<glm::vec3>> modelAxisModel;
 	bool showAxisWorld;
 	bool showAxisModel;
+	float faceNormalSize;
+	float vertexNormalSize;
+	bool showFaceNormals;
+	bool showVertexNormals;
 };
