@@ -101,7 +101,7 @@ void Camera::UpdateRotationWorld(float degrees, std::string axis)
 	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
 	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
 
-	currentRotationMat[0] = glm::rotate(currentRotationMat[0], glm::radians(degrees), rotateAround);	
+	currentRotationMat[0] = glm::rotate(currentRotationMat[0], glm::radians(degrees), rotateAround);
 }
 
 void Camera::UpdateRotationModel(float degrees, std::string axis)

@@ -103,6 +103,7 @@ int main(int argc, char **argv)
 	
 	
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
+	camera->UpdateRotationModel(45.0f, "x");
 	scene.AddCamera(camera);
 	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\bunny.obj");
 	//scene.AddModel(model);

@@ -191,17 +191,19 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
 	glm::mat4x4 view_transformation = camera.GetViewTransformation();
 	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
 
 	for (int i = 0; i < triangles.size(); i++)
 	{
 		std::vector<glm::vec3> triangle = triangles[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
 		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
 		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
 		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
 		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
-		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));
+		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));
 		v3.x = (1.0f + v3.x) * (1280.0f / 2.0f);
 		v3.y = (1.0f + v3.y) * (720.0f / 2.0f);
 
@@ -218,14 +220,16 @@ void Renderer::DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec
 	std::vector<std::vector<glm::vec3>> axises = meshModel.GetTransformedModelAxisWorld();
 	glm::mat4x4 view_transformation = camera.GetViewTransformation();
 	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
 
 	for (int i = 0; i < axises.size(); i++)
 	{
 		std::vector<glm::vec3> axis = axises[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
 		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
 		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
 		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
 		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
 
@@ -242,14 +246,16 @@ void Renderer::DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec
 	std::vector<std::vector<glm::vec3>> axises = meshModel.GetTransformedModelAxisModel();
 	glm::mat4x4 view_transformation = camera.GetViewTransformation();
 	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
 
 	for (int i = 0; i < axises.size(); i++)
 	{
 		std::vector<glm::vec3> axis = axises[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
 		v1.x = (1.0f + v1.x) * (1280.0f / 2.0f);
 		v1.y = (1.0f + v1.y) * (720.0f / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
 		v2.x = (1.0f + v2.x) * (1280.0f / 2.0f);
 		v2.y = (1.0f + v2.y) * (720.0f / 2.0f);
 
