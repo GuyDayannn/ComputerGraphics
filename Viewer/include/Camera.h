@@ -7,7 +7,7 @@
 class Camera
 {
 public:
-	Camera(int window_width = 1280, int window_height = 720);
+	Camera(int window_width = 1280, int window_height = 720, int num=0);
 	virtual ~Camera();
 
 	void SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up);
@@ -15,7 +15,7 @@ public:
 	const glm::mat4x4& GetProjectionTransformation() const;
 	const glm::mat4x4& GetViewTransformation() const;
 
-	void UpdateViewVolume(float up, float down, float left, float right, float near, float far);
+	void UpdateViewVolume(float up, float down, float left, float right, float near, float far, float fovy);
 	void UpdateRotationWorld(float degrees, std::string axis);
 	void UpdateRotationModel(float degrees, std::string axis);
 	const std::vector<float> GetUpDownVals();
@@ -23,6 +23,9 @@ public:
 	const std::vector<float> GetNearFarVals();
 	const std::vector<glm::vec3> GetCameraLookAt() const;
 	const std::vector<glm::mat4>& GetCurrentRotations() const;
+	void UpdateProjType(bool type);
+	const bool GetProjType() const;
+	const std::string& GetCamName() const;
 
 private:
 	glm::mat4x4 view_transformation;
@@ -33,6 +36,12 @@ private:
 	glm::vec3 atPos;
 	glm::vec3 upPos;
 
+	std::string camName;
+
+	float window_width;
+	float window_height;
+
+	bool projType; //false - orth, true - perspec
 	float up;
 	float down;
 	float left;
@@ -40,4 +49,5 @@ private:
 	float nearZ;
 	float farZ;
 	//float whereEverYouAre;
+	float fov;
 };
