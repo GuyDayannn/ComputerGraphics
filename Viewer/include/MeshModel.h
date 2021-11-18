@@ -10,6 +10,7 @@ public:
 	virtual ~MeshModel();
 	const Face& GetFace(int index) const;
 	int GetFacesCount() const;
+	int GetVerticesCount() const;
 	const std::string& GetModelName() const;
 	const std::vector<std::vector<std::vector<glm::vec3>>> GetVerticesNormals() const;
 	const std::vector<std::vector<glm::vec3>> GetFacesNormals() const;
@@ -46,6 +47,8 @@ public:
 	bool GetVertexNormalsShowState();
 	void ShowVertexNormals();
 	void HideVertexNormals();
+
+	bool displayBoundingBox;
 
 private:
 	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}

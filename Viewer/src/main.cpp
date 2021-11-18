@@ -29,6 +29,7 @@ std::vector<bool> modelAxisWorld;
 std::vector<bool> modelAxisModel;
 std::vector<bool> faceNormals;
 std::vector<bool> vertexNormals;
+std::vector<bool> boundingBox;
 std::vector< glm::vec3> worldAdditions;
 std::vector<float> worldScale;
 /**
@@ -52,6 +53,7 @@ static bool showAxisWorld = false;
 static bool showAxisModel = false;
 static bool showFaceNormals = false;
 static bool showVertexNormals = false;
+static bool showBoundingBox = false;
 /**
 * Fields for controling camera
 */
@@ -109,15 +111,18 @@ int main(int argc, char **argv)
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>(windowWidth, windowHeight);
 	//camera->UpdateRotationModel(45.0f, "x");
 	scene.AddCamera(camera);
-	//std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
-	//scene.AddModel(model);
-	//modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	//modelScale.push_back(1.0f);
-	//modelAxisWorld.push_back(false);
-	//modelAxisModel.push_back(false);
-	//worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-	//worldScale.push_back(1.0f);
-
+	/*
+	std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
+	scene.AddModel(model);
+	modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	modelScale.push_back(1.0f);
+	modelAxisWorld.push_back(false);
+	modelAxisModel.push_back(false);
+	faceNormals.push_back(false);
+	vertexNormals.push_back(false);
+	worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	worldScale.push_back(1.0f);
+	*/
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -475,6 +480,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					modelAxisModel.push_back(false);
 					faceNormals.push_back(false);
 					vertexNormals.push_back(false);
+					boundingBox.push_back(false);
 					worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 					worldScale.push_back(1.0f);
 					free(outPath);
@@ -598,6 +604,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						showAxisModel = modelAxisModel[active_index];
 						showFaceNormals = faceNormals[active_index];
 						showVertexNormals = vertexNormals[active_index];
+						showBoundingBox = boundingBox[active_index];
 					}
 					if (selectedModel)
 						ImGui::SetItemDefaultFocus();
@@ -754,6 +761,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			vertexNormals[active_index] = showVertexNormals;
 			if (showVertexNormals) scene.GetModel(active_index).ShowVertexNormals();
 			else scene.GetModel(active_index).HideVertexNormals();
+
+		}
+
+		if (ImGui::Checkbox("Show Bounding Box", &showBoundingBox) && modelCount != 0)
+		{
+			boundingBox[active_index] = showBoundingBox;
+			if (showBoundingBox) scene.GetModel(active_index).displayBoundingBox = showBoundingBox;
+			else scene.GetModel(active_index).displayBoundingBox = showBoundingBox;
 
 		}
 

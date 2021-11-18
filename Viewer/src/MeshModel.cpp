@@ -36,10 +36,11 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	}
 	showAxisWorld = false;
 	showAxisModel = false;
-	faceNormalSize = 0.4f;
+	faceNormalSize = 0.035f;
 	showFaceNormals = false;
-	vertexNormalSize = 1.0f;
+	vertexNormalSize = 0.035f;
 	showVertexNormals = false;
+	displayBoundingBox = false;
 }
 
 MeshModel::~MeshModel()
@@ -54,6 +55,11 @@ const Face& MeshModel::GetFace(int index) const
 int MeshModel::GetFacesCount() const
 {
 	return faces.size();
+}
+
+int MeshModel::GetVerticesCount() const
+{
+	return vertices.size();
 }
 
 const std::string& MeshModel::GetModelName() const
@@ -84,9 +90,9 @@ const std::vector<std::vector<std::vector<glm::vec3>>> MeshModel::GetVerticesNor
 		glm::vec3 v3Normal = GetPureNormal(thirdVNormalIn);
 		std::vector<std::vector<glm::vec3>> triangleNormals;
 		
-		triangleNormals.push_back({ v1,  v1 + vertexNormalSize * v1Normal });
-		triangleNormals.push_back({ v2, v2 + vertexNormalSize * v2Normal });
-		triangleNormals.push_back({ v3, v3 + vertexNormalSize * v3Normal });
+		triangleNormals.push_back({ v1,  v1 + (vertexNormalSize * glm::normalize(v1Normal)) });
+		triangleNormals.push_back({ v2, v2 + (vertexNormalSize * glm::normalize(v2Normal)) });
+		triangleNormals.push_back({ v3, v3 + (vertexNormalSize * glm::normalize(v3Normal)) });
 		faceVeticesNormals.push_back(triangleNormals);
 
 	}
@@ -117,7 +123,7 @@ const std::vector<std::vector<glm::vec3>> MeshModel::GetFacesNormals() const
 		glm::vec3 v1Normal = glm::cross(v1 - v2, v1 - v3);
 		std::vector<std::vector<glm::vec3>> triangleNormals;
 
-		facesNormals.push_back({ middleV,  middleV + (faceNormalSize * v1Normal) });
+		facesNormals.push_back({ middleV,  middleV + (faceNormalSize * glm::normalize(v1Normal)) });
 
 	}
 
