@@ -79,6 +79,8 @@ std::vector<glm::vec2> nearFarVec;
 std::vector<glm::vec3> cameraPosVec;
 std::vector<glm::vec3> lookAtPosVec;
 std::vector<glm::vec3> upPosVec;
+static bool perspectiveProj = false;
+std::vector<bool> perspectiveProjVec;
 
 /**
  * Function declarations
@@ -508,7 +510,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				cameraPos[0] = camera->GetCameraLookAt()[0][0];
 				cameraPos[1] = camera->GetCameraLookAt()[0][1];
 				cameraPos[2] = camera->GetCameraLookAt()[0][2];
-				camera->UpdateProjType(true);
 				scene.AddCamera(camera);
 				upDownVec.push_back(glm::vec2(windowHeight / 2.0f, -(windowHeight / 2.0f)));
 				leftRightVec.push_back(glm::vec2(-(windowWidth / 2.0f), windowWidth / 2.0f));
@@ -516,6 +517,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				cameraPosVec.push_back(glm::vec3(0.0f, 0.0f, 3.0f));
 				lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 				upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+				perspectiveProjVec.push_back(false);
 			}
 
 			
@@ -545,6 +547,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 		modelCount = scene.GetModelCount();
 		camCount = scene.GetCameraCount();
+
+		if (perspectiveProj == 0)
+			STARTSCALE = 200.0f;
+		else
+			STARTSCALE = 1.0f;
 
 		//translating and scaling object
 		if (world_model_choice == 1)
@@ -809,6 +816,34 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 		ImGui::Begin("Camera Window", &show_camera_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 		
+		if (ImGui::Checkbox("Perspective Projection", &perspectiveProj) && camCount != 0)
+		{
+			perspectiveProjVec[active_camera_index] = perspectiveProj;
+			scene.GetActiveCamera().UpdateProjType(perspectiveProj);
+			
+			if (perspectiveProj == 0)
+				STARTSCALE = 200.0f;
+			else
+				STARTSCALE = 1.0f; //Now Outside of func
+			
+			for (int i = 0; i < scene.GetModelCount(); i++)
+			{
+				scene.GetModel(i).UpdateAxisScale(perspectiveProj);
+
+				if (world_model_choice == 1)
+				{	
+					glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+					scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
+				}
+				else
+				{
+					glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+					scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", worldAdditions[i]);	
+				}
+			}
+			
+		}
+
 		
 		if (ImGui::BeginCombo("Cameras", choosenCam)) //!!!!!!!!!!!!problem here!!!!!!!!!!!!!!!!
 		{
@@ -836,7 +871,30 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					upPos[0] = upPosVec[i].x;
 					upPos[1] = upPosVec[i].y;
 					upPos[2] = upPosVec[i].z;
+					perspectiveProj = perspectiveProjVec[active_camera_index];
 
+					
+					if (perspectiveProj == 0)
+						STARTSCALE = 200.0f;
+					else
+						STARTSCALE = 1.0f; //Now Outside of func
+
+					for (int i = 0; i < scene.GetModelCount(); i++)
+					{
+						scene.GetModel(i).UpdateAxisScale(perspectiveProj);
+
+						if (world_model_choice == 1)
+						{
+							glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+							scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
+						}
+						else
+						{
+							glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
+							scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", worldAdditions[i]);
+						}
+					}
+					
 				}
 				if (selectedCam)
 					ImGui::SetItemDefaultFocus();
@@ -847,43 +905,24 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		
 		if (ImGui::SliderFloat2("Up Down", upDown, -360.0f, 360.0f))
 		{
-			std::cout << -2 << std::endl;
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
-			std::cout << -1 << std::endl;
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
-			std::cout << 0 << std::endl;
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], 70.0f);
-			std::cout << 1 << std::endl;
 			upDownVec[active_camera_index][0] = upDown[0];
-			std::cout << 2 << std::endl;
 			upDownVec[active_camera_index][1] = upDown[1];
-			std::cout << 3 << std::endl;
 			leftRightVec[active_camera_index][0] = leftRight[0];
-			std::cout << 4 << std::endl;
 			leftRightVec[active_camera_index][1] = leftRight[1];
-			std::cout << 5 << std::endl;
 			nearFarVec[active_camera_index][0] = nearFar[0];
-			std::cout << 6 << std::endl;
 			nearFarVec[active_camera_index][1] = nearFar[1];
-			std::cout << 7 << std::endl;
 			cameraPosVec[active_camera_index][0] = cameraPos[0];
-			std::cout << 8 << std::endl;
 			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			std::cout << 9 << std::endl;
 			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			std::cout << 10 << std::endl;
 			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			std::cout << 11 << std::endl;
 			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			std::cout << 12 << std::endl;
 			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			std::cout << 13 << std::endl;
 			upPosVec[active_camera_index][0] = upPos[0];
-			std::cout << 14 << std::endl;
 			upPosVec[active_camera_index][1] = upPos[1];
-			std::cout << 15 << std::endl;
 			upPosVec[active_camera_index][2] = upPos[2];
-			std::cout << 16 << std::endl;
 		}
 
 		if (ImGui::SliderFloat2("Left Right", leftRight, -640.0f, 640.0f))
@@ -891,37 +930,21 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], 70.0f);
-			std::cout << 1 << std::endl;
 			upDownVec[active_camera_index][0] = upDown[0];
-			std::cout << 2 << std::endl;
 			upDownVec[active_camera_index][1] = upDown[1];
-			std::cout << 3 << std::endl;
 			leftRightVec[active_camera_index][0] = leftRight[0];
-			std::cout << 4 << std::endl;
 			leftRightVec[active_camera_index][1] = leftRight[1];
-			std::cout << 5 << std::endl;
 			nearFarVec[active_camera_index][0] = nearFar[0];
-			std::cout << 6 << std::endl;
 			nearFarVec[active_camera_index][1] = nearFar[1];
-			std::cout << 7 << std::endl;
 			cameraPosVec[active_camera_index][0] = cameraPos[0];
-			std::cout << 8 << std::endl;
 			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			std::cout << 9 << std::endl;
 			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			std::cout << 10 << std::endl;
 			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			std::cout << 11 << std::endl;
 			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			std::cout << 12 << std::endl;
 			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			std::cout << 13 << std::endl;
 			upPosVec[active_camera_index][0] = upPos[0];
-			std::cout << 14 << std::endl;
 			upPosVec[active_camera_index][1] = upPos[1];
-			std::cout << 15 << std::endl;
 			upPosVec[active_camera_index][2] = upPos[2];
-			std::cout << 16 << std::endl;
 		}
 
 		if (ImGui::SliderFloat2("Near Far", nearFar, 0.0f, 500.0f))

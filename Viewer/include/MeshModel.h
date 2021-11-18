@@ -47,6 +47,7 @@ public:
 	bool GetVertexNormalsShowState();
 	void ShowVertexNormals();
 	void HideVertexNormals();
+	void UpdateAxisScale(bool perspectiveProj);
 
 	bool displayBoundingBox;
 

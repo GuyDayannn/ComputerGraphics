@@ -16,23 +16,22 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	currentRotationMat.push_back(glm::mat4(1.0f));
 	
 	std::vector<glm::vec3> xAxis;
-	xAxis.push_back(glm::vec3(-200.0f, 0.0f, 0.0f));
-	xAxis.push_back(glm::vec3(200.0f, 0.0f, 0.0f));
+	xAxis.push_back(glm::vec3(-2.0f, 0.0f, 0.0f));
+	xAxis.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
 	std::vector<glm::vec3> yAxis;
-	yAxis.push_back(glm::vec3(0.0f, -200.0f, 0.0f));
-	yAxis.push_back(glm::vec3(0.0f, 200.0f, 0.0f));
+	yAxis.push_back(glm::vec3(0.0f, -2.0f, 0.0f));
+	yAxis.push_back(glm::vec3(0.0f, 2.0f, 0.0f));
 	std::vector<glm::vec3> zAxis;
-	zAxis.push_back(glm::vec3(0.0f, 0.0f, -200.0f));
-	zAxis.push_back(glm::vec3(0.0f, 0.0f, 200.0f));
+	zAxis.push_back(glm::vec3(0.0f, 0.0f, -2.0f));
+	zAxis.push_back(glm::vec3(0.0f, 0.0f, 2.0f));
 	modelAxis.push_back(xAxis);
 	modelAxis.push_back(yAxis);
 	modelAxis.push_back(zAxis);
 	modelAxisModel = modelAxis;
 	for (int i = 0; i < modelAxisModel.size(); i++)
 	{
-		modelAxisModel[i][0] /= 200.0f;
-		modelAxisModel[i][1] /= 200.0f;
-
+		modelAxisModel[i][0] /= 2.0f;
+		modelAxisModel[i][1] /= 2.0f;
 	}
 	showAxisWorld = false;
 	showAxisModel = false;
@@ -501,4 +500,41 @@ void MeshModel::ShowVertexNormals()
 void MeshModel::HideVertexNormals()
 {
 	showVertexNormals = false;
+}
+
+void MeshModel::UpdateAxisScale(bool perspectiveProj)
+{
+	if (perspectiveProj == 0) //ortho
+	{
+		std::vector<glm::vec3> xAxis;
+		xAxis.push_back(glm::vec3(-200.0f, 0.0f, 0.0f));
+		xAxis.push_back(glm::vec3(200.0f, 0.0f, 0.0f));
+		std::vector<glm::vec3> yAxis;
+		yAxis.push_back(glm::vec3(0.0f, -200.0f, 0.0f));
+		yAxis.push_back(glm::vec3(0.0f, 200.0f, 0.0f));
+		std::vector<glm::vec3> zAxis;
+		zAxis.push_back(glm::vec3(0.0f, 0.0f, -200.0f));
+		zAxis.push_back(glm::vec3(0.0f, 0.0f, 200.0f));
+		modelAxis[0] = xAxis;
+		modelAxis[1] = yAxis;
+		modelAxis[2] = zAxis;	
+	}
+	else
+	{
+		std::vector<glm::vec3> xAxis;
+		xAxis.push_back(glm::vec3(-2.0f, 0.0f, 0.0f));
+		xAxis.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
+		std::vector<glm::vec3> yAxis;
+		yAxis.push_back(glm::vec3(0.0f, -2.0f, 0.0f));
+		yAxis.push_back(glm::vec3(0.0f, 2.0f, 0.0f));
+		std::vector<glm::vec3> zAxis;
+		zAxis.push_back(glm::vec3(0.0f, 0.0f, -2.0f));
+		zAxis.push_back(glm::vec3(0.0f, 0.0f, 2.0f));
+		modelAxis[0] = xAxis;
+		modelAxis[1] = yAxis;
+		modelAxis[2] = zAxis;
+
+	}
+
+
 }
