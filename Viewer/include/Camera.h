@@ -26,6 +26,7 @@ public:
 	void UpdateProjType(bool type);
 	const bool GetProjType() const;
 	const std::string& GetCamName() const;
+	void SetWindowSize(const int gwindow_width, const int gwindow_height);
 
 private:
 	glm::mat4x4 view_transformation;

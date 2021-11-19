@@ -193,21 +193,14 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
 	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
 	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
-	/*
-	glm::mat4 extra = glm::mat4(
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
-	);
-	*/
+	
 	for (int i = 0; i < triangles.size(); i++)
 	{
 		std::vector<glm::vec3> triangle = triangles[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3( projection_transformation* invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
+		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
 		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3( projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
+		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
 		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));

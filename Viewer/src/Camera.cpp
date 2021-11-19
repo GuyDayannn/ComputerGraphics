@@ -2,18 +2,18 @@
 
 Camera::Camera(int window_width, int window_height, int num): window_width(window_width), window_height(window_height)
 {
-	camPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	camPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	atPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	upPos = glm::vec3(0.0f, 1.0f, 0.0f);
-	nearZ = 1.0f;
-	farZ = 150.0f;
+	nearZ = 30.0f;
+	farZ = 500.0f;
 	left = -(window_width / 2.0f);
 	right = window_width / 2.0f;
 	down = -(window_height / 2.0f);
 	up = window_height / 2.0f;
 	view_transformation = glm::lookAt(camPos, atPos, upPos);
 	projType = false;
-	fov = 70.0f;
+	fov = 100.0f;
 	projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
 	currentRotationMat.push_back(glm::mat4(1.0f));
 	currentRotationMat.push_back(glm::mat4(1.0f));
@@ -121,6 +121,7 @@ void Camera::UpdateRotationModel(float degrees, std::string axis)
 	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	currentRotationMat[1] = glm::rotate(currentRotationMat[1], glm::radians(degrees), rotateAround);
+	int x = 1;
 }
 
 void Camera::UpdateProjType(bool type)
@@ -132,7 +133,7 @@ void Camera::UpdateProjType(bool type)
 	else
 	{
 		float rFov = glm::radians(fov);
-		projection_transformation = glm::perspective(rFov, (right - left) / (up - down), nearZ, farZ);
+		projection_transformation = glm::perspective(rFov, window_width / window_height, nearZ, farZ);
 	}
 }
 
@@ -143,4 +144,14 @@ const bool Camera::GetProjType() const
 const std::string& Camera::GetCamName() const
 {
 	return camName;
+}
+
+void Camera::SetWindowSize(const int gwindow_width, const int gwindow_height)
+{
+	if (projType == true) //Perspective
+	{
+		window_width = gwindow_width;
+		window_height = gwindow_height;
+		projection_transformation = glm::perspective(fov, window_width / window_height, nearZ, farZ);
+	}
 }

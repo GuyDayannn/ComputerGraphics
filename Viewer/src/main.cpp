@@ -70,9 +70,10 @@ static float farZ = 500.0f;
 static float upDown[2] = { windowHeight / 2.0f , -(windowHeight / 2.0f) };
 static float leftRight[2] = { -(windowWidth / 2.0f) , windowWidth / 2.0f };
 static float nearFar[2] = { 30.0f , 500.0f };
-static float cameraPos[3] = { 0.0f,0.0f,1.0f };
+static float cameraPos[3] = { 0.0f,0.0f,3.0f };
 static float lookAtPos[3] = { 0.0f,0.0f,0.0f };
 static float upPos[3] = { 0.0f,1.0f,0.f };
+static float fovy = 100.0f;
 std::vector<glm::vec2> upDownVec;
 std::vector<glm::vec2> leftRightVec;
 std::vector<glm::vec2> nearFarVec;
@@ -81,6 +82,11 @@ std::vector<glm::vec3> lookAtPosVec;
 std::vector<glm::vec3> upPosVec;
 static bool perspectiveProj = false;
 std::vector<bool> perspectiveProjVec;
+std::vector<float> fovyVec;
+static int cam_window_width = windowWidth;
+static int cam_window_height = windowHeight;
+std::vector<int> cam_window_widthVec;
+std::vector<int> cam_window_heightVec;
 
 /**
  * Function declarations
@@ -115,13 +121,24 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
-	
-	
-	std::shared_ptr<Camera> camera = std::make_shared<Camera>(windowWidth, windowHeight, scene.GetCameraCount());
-	//camera->UpdateRotationModel(45.0f, "x");
-	//camera->UpdateProjType(true);
-	//scene.AddCamera(camera);
 	/*
+	perspectiveProj = true;
+	std::shared_ptr<Camera> camera = std::make_shared<Camera>(windowWidth, windowHeight, scene.GetCameraCount());
+	cameraPos[0] = camera->GetCameraLookAt()[0][0];
+	cameraPos[1] = camera->GetCameraLookAt()[0][1];
+	cameraPos[2] = camera->GetCameraLookAt()[0][2];
+	scene.AddCamera(camera);
+	upDownVec.push_back(glm::vec2(windowHeight / 2.0f, -(windowHeight / 2.0f)));
+	leftRightVec.push_back(glm::vec2(-(windowWidth / 2.0f), windowWidth / 2.0f));
+	nearFarVec.push_back(glm::vec2(30.0f, 500.0f));
+	cameraPosVec.push_back(glm::vec3(0.0f, 0.0f, 3.0f));
+	lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	perspectiveProjVec.push_back(false);
+	camera->UpdateProjType(true);
+	//camera->UpdateRotationModel(90.f, "y");
+	scene.AddCamera(camera);
+	
 	std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
 	scene.AddModel(model);
 	modelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -132,6 +149,7 @@ int main(int argc, char **argv)
 	vertexNormals.push_back(false);
 	worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	worldScale.push_back(1.0f);
+	model->UpdateModelTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(180.0f, 180.0f, 180.0f),"y", glm::vec3(0.0f, 0.0f, 0.0f));
 	*/
 	
 	ImGuiIO& io = SetupDearImgui(window);
@@ -518,6 +536,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 				upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 				perspectiveProjVec.push_back(false);
+				fovyVec.push_back(100.0f);
+				cam_window_widthVec.push_back(windowWidth);
+				cam_window_heightVec.push_back(windowHeight);
 			}
 
 			
@@ -829,19 +850,39 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			for (int i = 0; i < scene.GetModelCount(); i++)
 			{
 				scene.GetModel(i).UpdateAxisScale(perspectiveProj);
-
-				if (world_model_choice == 1)
-				{	
-					glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
-					scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
-				}
-				else
-				{
-					glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
-					scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", worldAdditions[i]);	
-				}
+				glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+				scene.GetModel(i).UpdateModelTransformations(STARTSCALE* tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
 			}
-			
+		}
+
+		/*
+		if (perspectiveProj)
+		{
+			if (ImGui::SliderInt("Window Width", &cam_window_width, 0, 1280))
+			{
+				cam_window_widthVec[active_camera_index] = cam_window_width;
+				scene.GetCamera(active_camera_index).SetWindowSize(cam_window_widthVec[active_camera_index], cam_window_heightVec[active_camera_index]);
+			}
+
+		}
+
+		if (perspectiveProj)
+		{
+			if (ImGui::SliderInt("Window Height", &cam_window_height, 0, 720))
+			{
+				cam_window_heightVec[active_camera_index] = cam_window_height;
+				scene.GetCamera(active_camera_index).SetWindowSize(cam_window_widthVec[active_camera_index], cam_window_heightVec[active_camera_index]);
+			}
+
+		}
+		*/
+		if (perspectiveProj)
+		{
+			if (ImGui::SliderFloat("FOV y", &fovy, 45.0f, 120.0f))
+			{
+				scene.GetCamera(active_camera_index).UpdateViewVolume(upDownVec[active_camera_index][0], upDownVec[active_camera_index][1], leftRightVec[active_camera_index][0], leftRightVec[active_camera_index][1], nearFarVec[active_camera_index][0], nearFarVec[active_camera_index][1], fovy);
+				fovyVec[active_camera_index] = fovy;
+			}
 		}
 
 		
@@ -872,6 +913,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					upPos[1] = upPosVec[i].y;
 					upPos[2] = upPosVec[i].z;
 					perspectiveProj = perspectiveProjVec[active_camera_index];
+					fovy = fovyVec[active_camera_index];
 
 					
 					if (perspectiveProj == 0)
@@ -882,17 +924,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					for (int i = 0; i < scene.GetModelCount(); i++)
 					{
 						scene.GetModel(i).UpdateAxisScale(perspectiveProj);
-
-						if (world_model_choice == 1)
-						{
-							glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
-							scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
-						}
-						else
-						{
-							glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
-							scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", worldAdditions[i]);
-						}
+						glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
+						scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(degreesX, degreesX, degreesX), "x", modelAdditions[i]);
 					}
 					
 				}
@@ -907,7 +940,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
-			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], 70.0f);
+			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
 			upDownVec[active_camera_index][0] = upDown[0];
 			upDownVec[active_camera_index][1] = upDown[1];
 			leftRightVec[active_camera_index][0] = leftRight[0];
@@ -923,13 +956,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			upPosVec[active_camera_index][0] = upPos[0];
 			upPosVec[active_camera_index][1] = upPos[1];
 			upPosVec[active_camera_index][2] = upPos[2];
+			//fovyVec[active_camera_index] = fovy;
 		}
 
 		if (ImGui::SliderFloat2("Left Right", leftRight, -640.0f, 640.0f))
 		{
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
-			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], 70.0f);
+			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
 			upDownVec[active_camera_index][0] = upDown[0];
 			upDownVec[active_camera_index][1] = upDown[1];
 			leftRightVec[active_camera_index][0] = leftRight[0];
@@ -945,13 +979,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			upPosVec[active_camera_index][0] = upPos[0];
 			upPosVec[active_camera_index][1] = upPos[1];
 			upPosVec[active_camera_index][2] = upPos[2];
+			//fovyVec[active_camera_index] = fovy;
 		}
 
-		if (ImGui::SliderFloat2("Near Far", nearFar, 0.0f, 500.0f))
+		if (ImGui::SliderFloat2("Near Far", nearFar, 30.0f, 500.0f))
 		{
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
-			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], 70.0f);
+			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
 			upDownVec[active_camera_index][0] = upDown[0];
 			upDownVec[active_camera_index][1] = upDown[1];
 			leftRightVec[active_camera_index][0] = leftRight[0];
@@ -967,10 +1002,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			upPosVec[active_camera_index][0] = upPos[0];
 			upPosVec[active_camera_index][1] = upPos[1];
 			upPosVec[active_camera_index][2] = upPos[2];
+			//fovyVec[active_camera_index] = fovy;
 		}
 
 
-		if (ImGui::SliderFloat3("Camera Position xyz", cameraPos, -3.0f, 3.0f))
+		if (ImGui::SliderFloat3("Camera Position xyz", cameraPos, -10.0f, 10.0f))
 		{
 			std::vector<glm::vec3> prop = scene.GetCamera(active_camera_index).GetCameraLookAt();
 			scene.GetCamera(active_camera_index).SetCameraLookAt(glm::vec3(cameraPos[0], cameraPos[1], cameraPos[2]), prop[1], prop[2]);
@@ -989,7 +1025,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			upPosVec[active_camera_index][0] = upPos[0];
 			upPosVec[active_camera_index][1] = upPos[1];
 			upPosVec[active_camera_index][2] = upPos[2];
+			//fovyVec[active_camera_index] = fovy;
 		}
+
 															   
 		//ImGui::Text("Hello from another window!");
 		//if (ImGui::Button("Close Me"))
