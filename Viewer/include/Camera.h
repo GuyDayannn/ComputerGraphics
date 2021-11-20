@@ -18,6 +18,10 @@ public:
 	void UpdateViewVolume(float up, float down, float left, float right, float near, float far, float fovy);
 	void UpdateRotationWorld(float degrees, std::string axis);
 	void UpdateRotationModel(float degrees, std::string axis);
+	void UpdateTranslationWorld(const glm::vec3& vec);
+	void UpdateTranslationModel(const glm::vec3& vec);
+	void UpdateScalingWorld(const glm::vec3& vec);
+	void UpdateScalingModel(const glm::vec3& vec);
 	const std::vector<float> GetUpDownVals();
 	const std::vector<float> GetLeftRightVals();
 	const std::vector<float> GetNearFarVals();
@@ -27,11 +31,16 @@ public:
 	const bool GetProjType() const;
 	const std::string& GetCamName() const;
 	void SetWindowSize(const int gwindow_width, const int gwindow_height);
+	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
+	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
+	glm::vec3 GetTransformedVertex(const glm::vec3 vec) const;
 
 private:
 	glm::mat4x4 view_transformation;
 	glm::mat4x4 projection_transformation;
+	std::vector<glm::mat4> currentTranslationMat;
 	std::vector<glm::mat4> currentRotationMat; //[0] world - [1] - camera itself
+	std::vector<glm::mat4> currentScalingMat;
 
 	glm::vec3 camPos;
 	glm::vec3 atPos;

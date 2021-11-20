@@ -87,6 +87,18 @@ static int cam_window_width = windowWidth;
 static int cam_window_height = windowHeight;
 std::vector<int> cam_window_widthVec;
 std::vector<int> cam_window_heightVec;
+static float camxyzAddition[3] = { 0.0f, 0.0f, 0.0f }; //xyz addition
+static float camxyzWorld[3] = { 0.0f, 0.0f, 0.0f };
+static float camscaleAddition = 1.0f;
+static float camscaleWorld = 1.0f;
+std::vector< glm::vec3> cameraModelAdditions;
+std::vector< glm::vec3> cameraWorldAdditions;
+std::vector<float> cameraModelScale;
+std::vector<float> cameraWorldScale;
+static int camdegreesY = 0;
+static int camdegreesX = 0;
+static int camdegreesZ = 0;
+static bool camWorld = false;
 
 /**
  * Function declarations
@@ -539,6 +551,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				fovyVec.push_back(100.0f);
 				cam_window_widthVec.push_back(windowWidth);
 				cam_window_heightVec.push_back(windowHeight);
+				cameraModelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+				cameraWorldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+				cameraModelScale.push_back(1.0f);
+				cameraWorldScale.push_back(1.0f);
 			}
 
 			
@@ -603,6 +619,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 		ImGui::Checkbox("Camera Window", &show_camera_window);
+		//ImGui::Checkbox("Demo", &show_demo_window);
 
 		// TODO: Add more menubar items (if you want to)
 		
@@ -915,6 +932,19 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					perspectiveProj = perspectiveProjVec[active_camera_index];
 					fovy = fovyVec[active_camera_index];
 
+					if (!camWorld)
+					{
+						camxyzAddition[0] = cameraModelAdditions[active_camera_index][0];
+						camxyzAddition[1] = cameraModelAdditions[active_camera_index][1];
+						camxyzAddition[2] = cameraModelAdditions[active_camera_index][2];
+					}
+					else
+					{
+						camxyzAddition[0] = cameraWorldAdditions[active_camera_index][0];
+						camxyzAddition[1] = cameraWorldAdditions[active_camera_index][1];
+						camxyzAddition[2] = cameraWorldAdditions[active_camera_index][2];
+					}
+
 					
 					if (perspectiveProj == 0)
 						STARTSCALE = 200.0f;
@@ -1026,6 +1056,51 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			upPosVec[active_camera_index][1] = upPos[1];
 			upPosVec[active_camera_index][2] = upPos[2];
 			//fovyVec[active_camera_index] = fovy;
+		}
+
+		if (ImGui::RadioButton("Local", !camWorld))
+		{
+			camWorld = false;
+			camxyzAddition[0] = cameraModelAdditions[active_camera_index][0];
+			camxyzAddition[1] = cameraModelAdditions[active_camera_index][1];
+			camxyzAddition[2] = cameraModelAdditions[active_camera_index][2];
+		}
+		ImGui::SameLine();
+		if (ImGui::RadioButton("World", camWorld))
+		{
+			camWorld = true;
+			camxyzAddition[0] = cameraWorldAdditions[active_camera_index][0];
+			camxyzAddition[1] = cameraWorldAdditions[active_camera_index][1];
+			camxyzAddition[2] = cameraWorldAdditions[active_camera_index][2];
+		}
+
+		if (ImGui::SliderFloat3("Translation", camxyzAddition, -10.0f, 10.0f))
+		{
+			if (!camWorld)
+			{
+				cameraModelAdditions[active_camera_index] = glm::vec3(camxyzAddition[0], camxyzAddition[1], camxyzAddition[2]);
+				scene.GetCamera(active_camera_index).UpdateTranslationModel(cameraModelAdditions[active_camera_index]);
+			}
+			else
+			{
+				cameraWorldAdditions[active_camera_index] = glm::vec3(camxyzAddition[0], camxyzAddition[1], camxyzAddition[2]);
+				scene.GetCamera(active_camera_index).UpdateTranslationWorld(cameraWorldAdditions[active_camera_index]);
+			}
+		}
+
+		if (ImGui::SliderInt("Rotation", &camdegreesY, -10.0f, 10.0f))
+		{
+			if (!camWorld)
+			{
+				scene.GetCamera(active_camera_index).UpdateRotationModel(camdegreesY, "y");
+				camdegreesY = 0.0f;
+			}
+			else
+			{
+				scene.GetCamera(active_camera_index).UpdateRotationWorld(camdegreesY, "y");
+				camdegreesY = 0.0f;
+			}
+
 		}
 
 															   

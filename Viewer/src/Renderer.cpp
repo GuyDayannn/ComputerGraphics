@@ -197,13 +197,13 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 	for (int i = 0; i < triangles.size(); i++)
 	{
 		std::vector<glm::vec3> triangle = triangles[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation* invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[0]));
+		glm::vec3 v1 = camera.GetTransformedVertex(triangle[0]);
 		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[1]));
+		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
-		glm::vec3 v3 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(triangle[2]));
+		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 		v3.x = (1.0f + v3.x) * (viewport_width / 2.0f);
 		v3.y = (1.0f + v3.y) * (viewport_height / 2.0f);
 
@@ -226,10 +226,10 @@ void Renderer::DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec
 	for (int i = 0; i < axises.size(); i++)
 	{
 		std::vector<glm::vec3> axis = axises[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		glm::vec3 v1 = camera.GetTransformedVertex(axis[0]);
 		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		glm::vec3 v2 = camera.GetTransformedVertex(axis[1]);
 		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
@@ -252,10 +252,10 @@ void Renderer::DrawMeshModelAxisModel(const MeshModel& meshModel, const glm::vec
 	for (int i = 0; i < axises.size(); i++)
 	{
 		std::vector<glm::vec3> axis = axises[i];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[0]));
+		glm::vec3 v1 = camera.GetTransformedVertex(axis[0]);
 		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * MeshModel::Vec3ToHomogeneousVec(axis[1]));
+		glm::vec3 v2 = camera.GetTransformedVertex(axis[1]);
 		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
@@ -293,10 +293,10 @@ void Renderer::DrawMeshModelVerticesNormals(const MeshModel& meshModel, const gl
 			std::vector<glm::vec3> vertexNormal = faceNormals[j];
 			glm::vec3 normalPoint1 = vertexNormal[0];
 			glm::vec3 normalPoint2 = vertexNormal[1];
-			glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint1));
+			glm::vec3 v1 = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint1)));
 			v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 			v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-			glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation *MeshModel::Vec3ToHomogeneousVec(normalPoint2));
+			glm::vec3 v2 = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint2)));
 			v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 			v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
@@ -332,10 +332,10 @@ void Renderer::DrawMeshModelFaceNormals(const MeshModel& meshModel, const glm::v
 		//<glm::vec3, glm::vec3>
 		glm::vec3 normalPoint1 = faceNormals[0];
 		glm::vec3 normalPoint2 = faceNormals[1];
-		glm::vec3 v1 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation  * MeshModel::Vec3ToHomogeneousVec(normalPoint1));
+		glm::vec3 v1 = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint1)));
 		v1.x = (1.0f + v1.x) * (viewport_width / 2.0f);
 		v1.y = (1.0f + v1.y) * (viewport_height / 2.0f);
-		glm::vec3 v2 = MeshModel::HomogeneousVecToVec3(projection_transformation * invertedRotationMats * view_transformation * modelTransformation  * MeshModel::Vec3ToHomogeneousVec(normalPoint2));
+		glm::vec3 v2 = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(normalPoint2)));
 		v2.x = (1.0f + v2.x) * (viewport_width / 2.0f);
 		v2.y = (1.0f + v2.y) * (viewport_height / 2.0f);
 
@@ -398,35 +398,35 @@ void Renderer::DrawMeshModelBoundigBox(const MeshModel& meshModel, const glm::ve
 	glm::vec3 minMinMax(minX, minY, maxZ);
 	glm::vec3 minMaxMax(minX, maxY, maxZ);
 
-	minMinMin = MeshModel::HomogeneousVecToVec3(modelCamMat* MeshModel::Vec3ToHomogeneousVec(minMinMin));
+	minMinMin = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(minMinMin)));
 	minMinMin.x = (1.0f + minMinMin.x) * (viewport_width / 2.0f);
 	minMinMin.y = (1.0f + minMinMin.y) * (viewport_height / 2.0f);
 
-	maxMinMin = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(maxMinMin));
+	maxMinMin = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(maxMinMin)));
 	maxMinMin.x = (1.0f + maxMinMin.x) * (viewport_width / 2.0f);
 	maxMinMin.y = (1.0f + maxMinMin.y) * (viewport_height / 2.0f);
 
-	minMaxMin = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(minMaxMin));
+	minMaxMin = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(minMaxMin)));
 	minMaxMin.x = (1.0f + minMaxMin.x) * (viewport_width / 2.0f);
 	minMaxMin.y = (1.0f + minMaxMin.y) * (viewport_height / 2.0f);
 
-	maxMaxMin = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(maxMaxMin));
+	maxMaxMin = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(maxMaxMin)));
 	maxMaxMin.x = (1.0f + maxMaxMin.x) * (viewport_width / 2.0f);
 	maxMaxMin.y = (1.0f + maxMaxMin.y) * (viewport_height / 2.0f);
 
-	maxMinMax = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(maxMinMax));
+	maxMinMax = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(maxMinMax)));
 	maxMinMax.x = (1.0f + maxMinMax.x) * (viewport_width / 2.0f);
 	maxMinMax.y = (1.0f + maxMinMax.y) * (viewport_height / 2.0f);
 
-	maxMaxMax = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(maxMaxMax));
+	maxMaxMax = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(maxMaxMax)));
 	maxMaxMax.x = (1.0f + maxMaxMax.x) * (viewport_width / 2.0f);
 	maxMaxMax.y = (1.0f + maxMaxMax.y) * (viewport_height / 2.0f);
 
-	minMinMax = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(minMinMax));
+	minMinMax = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(minMinMax)));
 	minMinMax.x = (1.0f + minMinMax.x) * (viewport_width / 2.0f);
 	minMinMax.y = (1.0f + minMinMax.y) * (viewport_height / 2.0f);
 
-	minMaxMax = MeshModel::HomogeneousVecToVec3(modelCamMat * MeshModel::Vec3ToHomogeneousVec(minMaxMax));
+	minMaxMax = camera.GetTransformedVertex(MeshModel::HomogeneousVecToVec3(modelTransformation * MeshModel::Vec3ToHomogeneousVec(minMaxMax)));
 	minMaxMax.x = (1.0f + minMaxMax.x) * (viewport_width / 2.0f);
 	minMaxMax.y = (1.0f + minMaxMax.y) * (viewport_height / 2.0f);
 
