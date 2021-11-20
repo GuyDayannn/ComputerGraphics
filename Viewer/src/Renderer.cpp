@@ -589,7 +589,6 @@ void Renderer::Render(const Scene& scene)
 	int modelCount = scene.GetModelCount();
 	
 	int camCount = scene.GetCameraCount();
-
 	if (camCount != 0)
 	{
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());

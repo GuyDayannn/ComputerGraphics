@@ -65,11 +65,11 @@ static float up = windowWidth / 2.0f;
 static float down = -(windowHeight / 2.0f);
 static float left = -(windowWidth / 2.0f);
 static float right = windowHeight / 2.0f;
-static float nearZ = 0.0f;
-static float farZ = 500.0f;
+static float nearZ = 0.1f;
+static float farZ = 100.0f;
 static float upDown[2] = { windowHeight / 2.0f , -(windowHeight / 2.0f) };
 static float leftRight[2] = { -(windowWidth / 2.0f) , windowWidth / 2.0f };
-static float nearFar[2] = { 30.0f , 500.0f };
+static float nearFar[2] = { 0.1f , 100.0f };
 static float cameraPos[3] = { 0.0f,0.0f,3.0f };
 static float lookAtPos[3] = { 0.0f,0.0f,0.0f };
 static float upPos[3] = { 0.0f,1.0f,0.f };
@@ -543,7 +543,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				scene.AddCamera(camera);
 				upDownVec.push_back(glm::vec2(windowHeight / 2.0f, -(windowHeight / 2.0f)));
 				leftRightVec.push_back(glm::vec2(-(windowWidth / 2.0f), windowWidth / 2.0f));
-				nearFarVec.push_back(glm::vec2(30.0f, 500.0f));
+				nearFarVec.push_back(glm::vec2(0.1f, 100.0f));
 				cameraPosVec.push_back(glm::vec3(0.0f, 0.0f, 3.0f));
 				lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 				upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1012,7 +1012,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			//fovyVec[active_camera_index] = fovy;
 		}
 
-		if (ImGui::SliderFloat2("Near Far", nearFar, 30.0f, 500.0f))
+		if (ImGui::SliderFloat2("Near Far", nearFar, 0.1f, 100.0f))
 		{
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();

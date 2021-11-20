@@ -5,8 +5,8 @@ Camera::Camera(int window_width, int window_height, int num): window_width(windo
 	camPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	atPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	upPos = glm::vec3(0.0f, 1.0f, 0.0f);
-	nearZ = 30.0f;
-	farZ = 500.0f;
+	nearZ = 0.1f;
+	farZ = 100.0f;
 	left = -(window_width / 2.0f);
 	right = window_width / 2.0f;
 	down = -(window_height / 2.0f);
@@ -125,7 +125,6 @@ void Camera::UpdateRotationModel(float degrees, std::string axis)
 	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	currentRotationMat[1] = glm::rotate(currentRotationMat[1], glm::radians(degrees), rotateAround);
-	int x = 1;
 }
 
 void Camera::UpdateTranslationWorld(const glm::vec3& vec)
