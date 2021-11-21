@@ -903,7 +903,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		}
 
 		
-		if (ImGui::BeginCombo("Cameras", choosenCam)) //!!!!!!!!!!!!problem here!!!!!!!!!!!!!!!!
+		if (ImGui::BeginCombo("Cameras", choosenCam))
 		{
 			
 			for (int i = 0; i < camCount; i++)
@@ -973,20 +973,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
 			upDownVec[active_camera_index][0] = upDown[0];
 			upDownVec[active_camera_index][1] = upDown[1];
-			//leftRightVec[active_camera_index][0] = leftRight[0];
-			//leftRightVec[active_camera_index][1] = leftRight[1];
-			//nearFarVec[active_camera_index][0] = nearFar[0];
-			//nearFarVec[active_camera_index][1] = nearFar[1];
-			//cameraPosVec[active_camera_index][0] = cameraPos[0];
-			//cameraPosVec[active_camera_index][1] = cameraPos[1];
-			//cameraPosVec[active_camera_index][2] = cameraPos[2];
-			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			//upPosVec[active_camera_index][0] = upPos[0];
-			//upPosVec[active_camera_index][1] = upPos[1];
-			//upPosVec[active_camera_index][2] = upPos[2];
-			//fovyVec[active_camera_index] = fovy;
 		}
 
 		if (ImGui::SliderFloat2("Left Right", leftRight, -float(windowWidth / 2), float(windowWidth / 2)))
@@ -994,22 +980,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
-			//upDownVec[active_camera_index][0] = upDown[0];
-			//upDownVec[active_camera_index][1] = upDown[1];
 			leftRightVec[active_camera_index][0] = leftRight[0];
 			leftRightVec[active_camera_index][1] = leftRight[1];
-			//nearFarVec[active_camera_index][0] = nearFar[0];
-			//nearFarVec[active_camera_index][1] = nearFar[1];
-			//cameraPosVec[active_camera_index][0] = cameraPos[0];
-			//cameraPosVec[active_camera_index][1] = cameraPos[1];
-			//cameraPosVec[active_camera_index][2] = cameraPos[2];
-			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			//upPosVec[active_camera_index][0] = upPos[0];
-			//upPosVec[active_camera_index][1] = upPos[1];
-			//upPosVec[active_camera_index][2] = upPos[2];
-			//fovyVec[active_camera_index] = fovy;
 		}
 
 		if (ImGui::SliderFloat2("Near Far", nearFar, 0.1f, 100.0f))
@@ -1017,22 +989,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
-			//upDownVec[active_camera_index][0] = upDown[0];
-			//upDownVec[active_camera_index][1] = upDown[1];
-			//leftRightVec[active_camera_index][0] = leftRight[0];
-			//leftRightVec[active_camera_index][1] = leftRight[1];
 			nearFarVec[active_camera_index][0] = nearFar[0];
 			nearFarVec[active_camera_index][1] = nearFar[1];
-			//cameraPosVec[active_camera_index][0] = cameraPos[0];
-			//cameraPosVec[active_camera_index][1] = cameraPos[1];
-			//cameraPosVec[active_camera_index][2] = cameraPos[2];
-			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			//upPosVec[active_camera_index][0] = upPos[0];
-			//upPosVec[active_camera_index][1] = upPos[1];
-			//upPosVec[active_camera_index][2] = upPos[2];
-			//fovyVec[active_camera_index] = fovy;
 		}
 
 
@@ -1040,22 +998,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			std::vector<glm::vec3> prop = scene.GetCamera(active_camera_index).GetCameraLookAt();
 			scene.GetCamera(active_camera_index).SetCameraLookAt(glm::vec3(cameraPos[0], cameraPos[1], cameraPos[2]), prop[1], prop[2]);
-			//upDownVec[active_camera_index][0] = upDown[0];
-			//upDownVec[active_camera_index][1] = upDown[1];
-			//leftRightVec[active_camera_index][0] = leftRight[0];
-			//leftRightVec[active_camera_index][1] = leftRight[1];
-			//nearFarVec[active_camera_index][0] = nearFar[0];
-			//nearFarVec[active_camera_index][1] = nearFar[1];
 			cameraPosVec[active_camera_index][0] = cameraPos[0];
 			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			//upPosVec[active_camera_index][0] = upPos[0];
-			//upPosVec[active_camera_index][1] = upPos[1];
-			//upPosVec[active_camera_index][2] = upPos[2];
-			//fovyVec[active_camera_index] = fovy;
+			cameraPosVec[active_camera_index][2] = cameraPos[2];	
 		}
 
 		if (ImGui::RadioButton("Local", !camWorld))
