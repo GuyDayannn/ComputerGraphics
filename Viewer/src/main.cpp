@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 	upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
 	perspectiveProjVec.push_back(false);
 	camera->UpdateProjType(true);
-	//camera->UpdateRotationModel(90.f, "y");
+	camera->UpdateRotationModel(90.0f, "y");
 	scene.AddCamera(camera);
 	
 	std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
@@ -966,49 +966,49 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::EndCombo();
 		}
 		
-		if (ImGui::SliderFloat2("Up Down", upDown, -360.0f, 360.0f))
+		if (ImGui::SliderFloat2("Up Down", upDown, -float(windowHeight / 2), float(windowHeight / 2)))
 		{
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
 			upDownVec[active_camera_index][0] = upDown[0];
 			upDownVec[active_camera_index][1] = upDown[1];
-			leftRightVec[active_camera_index][0] = leftRight[0];
-			leftRightVec[active_camera_index][1] = leftRight[1];
-			nearFarVec[active_camera_index][0] = nearFar[0];
-			nearFarVec[active_camera_index][1] = nearFar[1];
-			cameraPosVec[active_camera_index][0] = cameraPos[0];
-			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			upPosVec[active_camera_index][0] = upPos[0];
-			upPosVec[active_camera_index][1] = upPos[1];
-			upPosVec[active_camera_index][2] = upPos[2];
+			//leftRightVec[active_camera_index][0] = leftRight[0];
+			//leftRightVec[active_camera_index][1] = leftRight[1];
+			//nearFarVec[active_camera_index][0] = nearFar[0];
+			//nearFarVec[active_camera_index][1] = nearFar[1];
+			//cameraPosVec[active_camera_index][0] = cameraPos[0];
+			//cameraPosVec[active_camera_index][1] = cameraPos[1];
+			//cameraPosVec[active_camera_index][2] = cameraPos[2];
+			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
+			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
+			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
+			//upPosVec[active_camera_index][0] = upPos[0];
+			//upPosVec[active_camera_index][1] = upPos[1];
+			//upPosVec[active_camera_index][2] = upPos[2];
 			//fovyVec[active_camera_index] = fovy;
 		}
 
-		if (ImGui::SliderFloat2("Left Right", leftRight, -640.0f, 640.0f))
+		if (ImGui::SliderFloat2("Left Right", leftRight, -float(windowWidth / 2), float(windowWidth / 2)))
 		{
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
-			upDownVec[active_camera_index][0] = upDown[0];
-			upDownVec[active_camera_index][1] = upDown[1];
+			//upDownVec[active_camera_index][0] = upDown[0];
+			//upDownVec[active_camera_index][1] = upDown[1];
 			leftRightVec[active_camera_index][0] = leftRight[0];
 			leftRightVec[active_camera_index][1] = leftRight[1];
-			nearFarVec[active_camera_index][0] = nearFar[0];
-			nearFarVec[active_camera_index][1] = nearFar[1];
-			cameraPosVec[active_camera_index][0] = cameraPos[0];
-			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			upPosVec[active_camera_index][0] = upPos[0];
-			upPosVec[active_camera_index][1] = upPos[1];
-			upPosVec[active_camera_index][2] = upPos[2];
+			//nearFarVec[active_camera_index][0] = nearFar[0];
+			//nearFarVec[active_camera_index][1] = nearFar[1];
+			//cameraPosVec[active_camera_index][0] = cameraPos[0];
+			//cameraPosVec[active_camera_index][1] = cameraPos[1];
+			//cameraPosVec[active_camera_index][2] = cameraPos[2];
+			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
+			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
+			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
+			//upPosVec[active_camera_index][0] = upPos[0];
+			//upPosVec[active_camera_index][1] = upPos[1];
+			//upPosVec[active_camera_index][2] = upPos[2];
 			//fovyVec[active_camera_index] = fovy;
 		}
 
@@ -1017,21 +1017,21 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			std::vector<float> upDown = scene.GetCamera(active_camera_index).GetUpDownVals();
 			std::vector<float> leftRight = scene.GetCamera(active_camera_index).GetLeftRightVals();
 			scene.GetCamera(active_camera_index).UpdateViewVolume(upDown[0], upDown[1], leftRight[0], leftRight[1], nearFar[0], nearFar[1], fovyVec[active_camera_index]);
-			upDownVec[active_camera_index][0] = upDown[0];
-			upDownVec[active_camera_index][1] = upDown[1];
-			leftRightVec[active_camera_index][0] = leftRight[0];
-			leftRightVec[active_camera_index][1] = leftRight[1];
+			//upDownVec[active_camera_index][0] = upDown[0];
+			//upDownVec[active_camera_index][1] = upDown[1];
+			//leftRightVec[active_camera_index][0] = leftRight[0];
+			//leftRightVec[active_camera_index][1] = leftRight[1];
 			nearFarVec[active_camera_index][0] = nearFar[0];
 			nearFarVec[active_camera_index][1] = nearFar[1];
-			cameraPosVec[active_camera_index][0] = cameraPos[0];
-			cameraPosVec[active_camera_index][1] = cameraPos[1];
-			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			upPosVec[active_camera_index][0] = upPos[0];
-			upPosVec[active_camera_index][1] = upPos[1];
-			upPosVec[active_camera_index][2] = upPos[2];
+			//cameraPosVec[active_camera_index][0] = cameraPos[0];
+			//cameraPosVec[active_camera_index][1] = cameraPos[1];
+			//cameraPosVec[active_camera_index][2] = cameraPos[2];
+			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
+			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
+			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
+			//upPosVec[active_camera_index][0] = upPos[0];
+			//upPosVec[active_camera_index][1] = upPos[1];
+			//upPosVec[active_camera_index][2] = upPos[2];
 			//fovyVec[active_camera_index] = fovy;
 		}
 
@@ -1040,21 +1040,21 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			std::vector<glm::vec3> prop = scene.GetCamera(active_camera_index).GetCameraLookAt();
 			scene.GetCamera(active_camera_index).SetCameraLookAt(glm::vec3(cameraPos[0], cameraPos[1], cameraPos[2]), prop[1], prop[2]);
-			upDownVec[active_camera_index][0] = upDown[0];
-			upDownVec[active_camera_index][1] = upDown[1];
-			leftRightVec[active_camera_index][0] = leftRight[0];
-			leftRightVec[active_camera_index][1] = leftRight[1];
-			nearFarVec[active_camera_index][0] = nearFar[0];
-			nearFarVec[active_camera_index][1] = nearFar[1];
+			//upDownVec[active_camera_index][0] = upDown[0];
+			//upDownVec[active_camera_index][1] = upDown[1];
+			//leftRightVec[active_camera_index][0] = leftRight[0];
+			//leftRightVec[active_camera_index][1] = leftRight[1];
+			//nearFarVec[active_camera_index][0] = nearFar[0];
+			//nearFarVec[active_camera_index][1] = nearFar[1];
 			cameraPosVec[active_camera_index][0] = cameraPos[0];
 			cameraPosVec[active_camera_index][1] = cameraPos[1];
 			cameraPosVec[active_camera_index][2] = cameraPos[2];
-			lookAtPosVec[active_camera_index][0] = lookAtPos[0];
-			lookAtPosVec[active_camera_index][1] = lookAtPos[1];
-			lookAtPosVec[active_camera_index][2] = lookAtPos[2];
-			upPosVec[active_camera_index][0] = upPos[0];
-			upPosVec[active_camera_index][1] = upPos[1];
-			upPosVec[active_camera_index][2] = upPos[2];
+			//lookAtPosVec[active_camera_index][0] = lookAtPos[0];
+			//lookAtPosVec[active_camera_index][1] = lookAtPos[1];
+			//lookAtPosVec[active_camera_index][2] = lookAtPos[2];
+			//upPosVec[active_camera_index][0] = upPos[0];
+			//upPosVec[active_camera_index][1] = upPos[1];
+			//upPosVec[active_camera_index][2] = upPos[2];
 			//fovyVec[active_camera_index] = fovy;
 		}
 
