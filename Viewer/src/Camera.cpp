@@ -64,7 +64,7 @@ void Camera::UpdateViewVolume(float up, float down, float left, float right, flo
 	{
 		fov = fovy;
 		float rFov = glm::radians(fov);
-		projection_transformation = glm::perspective(rFov, window_width / window_height, nearZ, farZ);
+		projection_transformation = glm::perspective(rFov, (right - left) / (up - down), nearZ, farZ);
 	}
 }
 
@@ -157,7 +157,7 @@ void Camera::UpdateProjType(bool type)
 	else
 	{
 		float rFov = glm::radians(fov);
-		projection_transformation = glm::perspective(rFov, window_width / window_height, nearZ, farZ);
+		projection_transformation = glm::perspective(rFov, (right - left) / (up - down), nearZ, farZ);
 	}
 }
 
