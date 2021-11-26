@@ -601,6 +601,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
 					scene.GetModel(i).UpdateModelTransformations(STARTSCALE * tempScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", modelAdditions[i]);
 				}
+				scene.GetModel(i).UpdateAxisScale(perspectiveProj);
 			}
 		}
 		else
@@ -612,6 +613,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
 					scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", worldAdditions[i]);
 				}
+				scene.GetModel(i).UpdateAxisScale(perspectiveProj);
 			}
 
 		}
