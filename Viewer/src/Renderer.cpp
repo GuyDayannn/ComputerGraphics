@@ -4,6 +4,7 @@
 
 #include "Renderer.h"
 #include "InitShader.h"
+#include <iostream>
 
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 #define Z_INDEX(width,x,y) ((x)+(y)*(width))
@@ -167,6 +168,113 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	
 }
 
+void swapPoints(glm::vec3& p1, glm::vec3& p2)
+{
+	glm::vec3 temp = p1;
+	p1 = p2;
+	p2 = temp;
+}
+
+std::vector<float> interpolate(float y0, float x0, float y1, float x1)
+{
+	std::vector<float> xCords;
+	if (x1 != x0)
+	{
+		float m = (y1 - y0) / (x1 - x0);
+		float c = y0 - m * x0;
+
+		for (float y = y0; y < y1; y++)
+		{
+			float xCord = (y - c) / m;
+			xCords.push_back(xCord);
+		}
+
+	}
+	else
+	{
+		for (float y = y0; y < y1; y++)
+		{
+			xCords.push_back(x0);
+		}
+
+	}
+	return xCords;
+
+}
+
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color)
+{
+	glm::vec3 p0 = pnt0;
+	glm::vec3 p1 = pnt1;
+	glm::vec3 p2 = pnt2;
+	int i = 0, j = 0, k = 0;
+
+	if (p1.y < p0.y) swapPoints(p1, p0);
+	if (p2.y < p0.y) swapPoints(p2, p0);
+	if (p2.y < p1.y) swapPoints(p2, p1);
+	//now yo<=y1<=y2
+
+	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
+	std::vector<float> x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
+	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+
+	if (p0.y == p1.y) //draw between 02 to 12
+	{
+		//std::cout << "p0.y == p1.y" << endl;
+		float y = p0.y;
+		for (y = p0.y; y < p2.y; y++, i++, k++) //loop from p0 to p2
+		{
+			DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
+		}
+
+	}
+	else if (p1.y == p2.y) //draw between 02 to 01
+	{
+		//std::cout << "p1.y == p2.y" << endl;
+		float y = p0.y;
+		for (y = p0.y; y < p1.y; y++, i++, j++) //loop from p0 to p1
+		{
+			DrawLine(glm::vec2(x02[i], y), glm::vec2(x01[j], y), color);
+		}
+	}
+	else
+	{
+		//std::cout << "else" << endl;
+		float y = p0.y;
+		for (y = p0.y; y < p1.y; y++, i++, j++) //loop from p0 to p1
+		{
+			DrawLine(glm::vec2(x02[i], y), glm::vec2(x01[j], y), color);
+		}
+
+		for (y = y; y < p2.y; y++, i++, k++) //loop from p0 to p2
+		{
+			DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
+		}
+
+	}
+}
+
+void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
+{
+	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+	std::vector<glm::vec3> colors = meshModel.GetFaceColors();
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		std::vector<glm::vec3> triangle = triangles[i];
+		glm::vec3 v1 = camera.GetTransformedVertex(triangle[0]);
+		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
+		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
+
+		DrawTriangle(v1, v2, v3, colors[i]);
+	}
+
+}
+
 //drawing mesh model by drawing triangles received
 void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color)
 {
@@ -186,7 +294,7 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color)
 
 }
 
-void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
+void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
 {
 	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
 	glm::mat4x4 view_transformation = camera.GetViewTransformation();
@@ -209,6 +317,44 @@ void Renderer::DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color,
 	}
 
 }
+
+void Renderer::DrawTrainglesBoundings(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
+{
+	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+	float minX, maxX, minY, maxY;
+	std::vector<glm::vec3> colors = meshModel.GetFaceColors();
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		std::vector<glm::vec3> triangle = triangles[i];
+		glm::vec3 v1 = camera.GetTransformedVertex(triangle[0]);
+		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
+		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
+
+		minX = std::min(std::min(v1.x, v2.x), v3.x);
+		maxX = std::max(std::max(v1.x, v2.x), v3.x);
+		minY = std::min(std::min(v1.y, v2.y), v3.y);
+		maxY = std::max(std::max(v1.y, v2.y), v3.y);
+
+		glm::vec2 minMin = glm::vec2(minX, minY);
+		glm::vec2 minMax = glm::vec2(minX, maxY);
+		glm::vec2 maxMin = glm::vec2(maxX, minY);
+		glm::vec2 maxMax = glm::vec2(maxX, maxY);
+
+		DrawLine(minMin, minMax, colors[i]);
+		DrawLine(minMin, maxMin, colors[i]);
+		DrawLine(maxMin, maxMax, colors[i]);
+		DrawLine(minMax, maxMax, colors[i]);
+
+	}
+
+}
+
+
 
 void Renderer::DrawMeshModelAxisWorld(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera)
 {
@@ -547,7 +693,9 @@ void Renderer::Render(const Scene& scene)
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());
 		for (int i = 0; i < modelCount; i++)
 		{
+			DrawColorMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
 			DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
+			if(scene.GetModel(i).displayBoundingRec) DrawTrainglesBoundings(scene.GetModel(i), glm::vec3(0.5, 0.5, 0.5), cam);
 			if (scene.GetModel(i).GetWorldAxisShowState()) DrawMeshModelAxisWorld(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
 			if (scene.GetModel(i).GetModelAxisShowState()) DrawMeshModelAxisModel(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
 			if (scene.GetModel(i).GetFaceNormalsShowState()) DrawMeshModelFaceNormals(scene.GetModel(i), glm::vec3(0, 1, 1), cam);

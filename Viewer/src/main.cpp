@@ -30,6 +30,7 @@ std::vector<bool> modelAxisModel;
 std::vector<bool> faceNormals;
 std::vector<bool> vertexNormals;
 std::vector<bool> boundingBox;
+std::vector<bool> boundingRec;
 std::vector< glm::vec3> worldAdditions;
 std::vector<float> worldScale;
 /**
@@ -54,6 +55,7 @@ static bool showAxisModel = false;
 static bool showFaceNormals = false;
 static bool showVertexNormals = false;
 static bool showBoundingBox = false;
+static bool showBoundingRec = false;
 /**
 * Fields for controling camera
 */
@@ -80,7 +82,7 @@ std::vector<glm::vec2> nearFarVec;
 std::vector<glm::vec3> cameraPosVec;
 std::vector<glm::vec3> lookAtPosVec;
 std::vector<glm::vec3> upPosVec;
-static bool perspectiveProj = false;
+static bool perspectiveProj = true;
 std::vector<bool> perspectiveProjVec;
 std::vector<float> fovyVec;
 static int cam_window_width = windowWidth;
@@ -142,13 +144,20 @@ int main(int argc, char **argv)
 	scene.AddCamera(camera);
 	upDownVec.push_back(glm::vec2(windowHeight / 2.0f, -(windowHeight / 2.0f)));
 	leftRightVec.push_back(glm::vec2(-(windowWidth / 2.0f), windowWidth / 2.0f));
-	nearFarVec.push_back(glm::vec2(30.0f, 500.0f));
+	nearFarVec.push_back(glm::vec2(0.1f, 100.0f));
 	cameraPosVec.push_back(glm::vec3(0.0f, 0.0f, 3.0f));
 	lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	perspectiveProjVec.push_back(false);
+	perspectiveProjVec.push_back(true);
+	fovyVec.push_back(100.0f);
+	cam_window_widthVec.push_back(windowWidth);
+	cam_window_heightVec.push_back(windowHeight);
+	cameraModelAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	cameraWorldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	cameraModelScale.push_back(1.0f);
+	cameraWorldScale.push_back(1.0f);
 	camera->UpdateProjType(true);
-	camera->UpdateRotationModel(90.0f, "y");
+	//camera->UpdateRotationModel(90.0f, "y");
 	scene.AddCamera(camera);
 	
 	std::shared_ptr<MeshModel> model = Utils::LoadMeshModel("..\\Data\\demo.obj");
@@ -159,9 +168,11 @@ int main(int argc, char **argv)
 	modelAxisModel.push_back(false);
 	faceNormals.push_back(false);
 	vertexNormals.push_back(false);
+	boundingBox.push_back(false);
+	boundingRec.push_back(false);
 	worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	worldScale.push_back(1.0f);
-	model->UpdateModelTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(180.0f, 180.0f, 180.0f),"y", glm::vec3(0.0f, 0.0f, 0.0f));
+	//model->UpdateModelTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(180.0f, 180.0f, 180.0f),"y", glm::vec3(0.0f, 0.0f, 0.0f));
 	*/
 	
 	ImGuiIO& io = SetupDearImgui(window);
@@ -521,6 +532,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					faceNormals.push_back(false);
 					vertexNormals.push_back(false);
 					boundingBox.push_back(false);
+					boundingRec.push_back(false);
 					worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 					worldScale.push_back(1.0f);
 					free(outPath);
@@ -547,7 +559,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				cameraPosVec.push_back(glm::vec3(0.0f, 0.0f, 3.0f));
 				lookAtPosVec.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 				upPosVec.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-				perspectiveProjVec.push_back(false);
+				perspectiveProjVec.push_back(true);
 				fovyVec.push_back(100.0f);
 				cam_window_widthVec.push_back(windowWidth);
 				cam_window_heightVec.push_back(windowHeight);
@@ -595,7 +607,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			for (int i = 0; i < modelCount; i++)
 			{
-				if (i == active_model_index)
+				//if (i == active_model_index)
 				{
 					//std::vector<glm::vec3> fitV = scene.GetModel(i).FitToWindow(1280, 720);
 					glm::vec3 tempScale = glm::vec3(modelScale[i], modelScale[i], modelScale[i]);
@@ -608,7 +620,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			for (int i = 0; i < modelCount; i++)
 			{
-				if (i == active_model_index)
+				//if (i == active_model_index)
 				{
 					glm::vec3 tempScale = glm::vec3(worldScale[i], worldScale[i], worldScale[i]);
 					scene.GetModel(i).UpdateWorldTransformations(tempScale, glm::vec3(0.0f, 0.0f, 0.0f), "z", worldAdditions[i]);
@@ -679,6 +691,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						showFaceNormals = faceNormals[active_model_index];
 						showVertexNormals = vertexNormals[active_model_index];
 						showBoundingBox = boundingBox[active_model_index];
+						showBoundingRec = boundingRec[active_model_index];
 					}
 					if (selectedModel)
 						ImGui::SetItemDefaultFocus();
@@ -703,7 +716,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				worldScale[active_model_index] = scaleAddition;
 			}
 		}
-		if (ImGui::SliderFloat3("Translation", xyzAddition, -640.0f, 640.0f)) //translating
+		if (ImGui::SliderFloat3("Translation", xyzAddition, -10.0f, 10.0f)) //translating
 		{
 			if (world_model_choice == 1)
 			{
@@ -843,6 +856,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			boundingBox[active_model_index] = showBoundingBox;
 			if (showBoundingBox) scene.GetModel(active_model_index).displayBoundingBox = showBoundingBox;
 			else scene.GetModel(active_model_index).displayBoundingBox = showBoundingBox;
+
+		}
+
+		if (ImGui::Checkbox("Show Bounding Rectangles", &showBoundingRec) && modelCount != 0)
+		{
+			boundingRec[active_model_index] = showBoundingRec;
+			if (showBoundingRec) scene.GetModel(active_model_index).displayBoundingRec = showBoundingRec;
+			else scene.GetModel(active_model_index).displayBoundingRec = showBoundingRec;
 
 		}
 

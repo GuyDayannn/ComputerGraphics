@@ -12,9 +12,9 @@ Camera::Camera(int window_width, int window_height, int num): window_width(windo
 	down = -(window_height / 2.0f);
 	up = window_height / 2.0f;
 	view_transformation = glm::lookAt(camPos, atPos, upPos);
-	projType = false;
+	projType = true;
 	fov = 100.0f;
-	projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
+	UpdateViewVolume(up, down, left, right, nearZ, farZ, fov);
 	currentRotationMat.push_back(glm::mat4(1.0f));
 	currentRotationMat.push_back(glm::mat4(1.0f));
 	currentTranslationMat.push_back(glm::mat4(1.0f));

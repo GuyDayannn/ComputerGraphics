@@ -29,6 +29,7 @@ public:
 	//rotation around "axis" to grid system "grid" (geid system means model grid or world grid)
 	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "z", const int grid = 1) const;
 	const std::vector<std::vector<glm::vec3>> GetTriangles() const;
+	const std::vector<glm::vec3>& GetFaceColors() const;
 	const std::vector<std::vector<glm::vec3>> GetModelAxis() const;
 	const std::vector<std::vector<glm::vec3>> GetTransformedModelAxisWorld() const;
 	const std::vector<std::vector<glm::vec3>> GetTransformedModelAxisModel() const;
@@ -50,6 +51,7 @@ public:
 	void UpdateAxisScale(bool perspectiveProj);
 
 	bool displayBoundingBox;
+	bool displayBoundingRec;
 
 private:
 	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
@@ -62,6 +64,7 @@ private:
 	std::string model_name;
 	std::vector<std::vector<glm::vec3>> modelAxis;
 	std::vector<std::vector<glm::vec3>> modelAxisModel;
+	std::vector<glm::vec3> colors; //color for each face / triangle
 	bool showAxisWorld;
 	bool showAxisModel;
 	float faceNormalSize;

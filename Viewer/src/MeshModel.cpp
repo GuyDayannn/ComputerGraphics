@@ -40,6 +40,16 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	vertexNormalSize = 0.035f;
 	showVertexNormals = false;
 	displayBoundingBox = false;
+	displayBoundingRec = false;
+
+	for (int i = 0; i < faces.size(); i++)
+	{
+		float r = ((float)rand() / (RAND_MAX));
+		float g = ((float)rand() / (RAND_MAX));
+		float b = ((float)rand() / (RAND_MAX));
+
+		colors.push_back(glm::vec3(r, g, b));
+	}
 }
 
 MeshModel::~MeshModel()
@@ -369,6 +379,11 @@ const std::vector<std::vector<glm::vec3>> MeshModel::GetTriangles() const
 	}
 
 	return triangles;
+}
+
+const std::vector<glm::vec3>& MeshModel::GetFaceColors() const
+{
+	return colors;
 }
 
 const std::vector<std::vector<glm::vec3>> MeshModel::GetModelAxis() const
