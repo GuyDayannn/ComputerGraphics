@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 	boundingRec.push_back(false);
 	worldAdditions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	worldScale.push_back(1.0f);
-	//model->UpdateModelTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(180.0f, 180.0f, 180.0f),"y", glm::vec3(0.0f, 0.0f, 0.0f));
+	model->UpdateModelTransformations(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(130.0f, 130.0f, 130.0f),"y", glm::vec3(0.0f, 0.0f, 0.0f));
 	*/
 	
 	ImGuiIO& io = SetupDearImgui(window);
