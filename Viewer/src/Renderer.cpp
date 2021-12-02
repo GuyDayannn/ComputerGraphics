@@ -292,6 +292,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	if (p2.y < p1.y) swapPoints(p2, p1);
 	//now yo<=y1<=y2
 
+	//interpolating to get x values of the edges
 	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
 	std::vector<float> x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
 	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
@@ -299,7 +300,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	if (p0.y == p1.y) //draw between 02 to 12
 	{
 		float y = p0.y;
-		for (y = p0.y; y < p2.y; y++, i++, k++) //loop from p0 to p2
+		for (y = p0.y; y < p2.y; y++, i++, k++) //looping from triangle bottom to top
 		{
 			//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
 			
@@ -312,11 +313,9 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			}
 
 
-			for (float x = left; x < right; x++)
+			for (float x = left; x < right; x++) // drawing the horizontal line of the triangle (the filling)
 			{
 				float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
-
-				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 				{
 					zBuffer[x][y] = z;
@@ -330,18 +329,15 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	{
 		//std::cout << "p1.y == p2.y" << endl;
 		float y = p0.y;
-		for (y = p0.y; y < p1.y; y++, i++, j++) //loop from p0 to p1
+		for (y = p0.y; y < p1.y; y++, i++, j++) 
 		{
 			//DrawLine(glm::vec2(x02[i], y), glm::vec2(x01[j], y), color);
-		
-
 			float left = x02[i], right = x01[j];
 			float alphaLeft, alphaRight, leftZ, rightZ;
 			if (left > right) //not the right order
 			{
 				right = x02[i];
-				left = x01[j];
-				
+				left = x01[j];	
 			}
 			//now we have left z and right z
 
@@ -349,9 +345,6 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			for (float x = left; x < right; x++)
 			{
 				float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
-
-
-				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 				{
 					zBuffer[x][y] = z;
@@ -360,11 +353,10 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			}
 		}
 	}
-	else
+	else //base case
 	{
-		//std::cout << "else" << endl;
 		float y = p0.y;
-		for (y = p0.y; y < p1.y; y++, i++, j++) //loop from p0 to p1
+		for (y = p0.y; y < p1.y; y++, i++, j++) 
 		{
 			float left = x02[i], right = x01[j];
 			float zLeft, zRight;
@@ -380,8 +372,6 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			for (float x = left; x < right; x++)
 			{
 				float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
-
-				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 				{
 					zBuffer[x][y] = z;
@@ -391,7 +381,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 
 		}
 
-		for (y = y; y < p2.y; y++, i++, k++) //loop from p0 to p2
+		for (y = y; y < p2.y; y++, i++, k++) 
 		{
 			//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
 			float left = x02[i], right = x12[k];
@@ -402,15 +392,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 				right = x02[i];
 				left = x12[k];
 			}
-			//now we have left z and right z
 
 
 			for (float x = left; x < right; x++)
 			{
 
 				float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
-				
-				float zbuufel = zBuffer[x][y];
+		
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 				{
 					zBuffer[x][y] = z;
@@ -610,7 +598,6 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	}
 }
 */
-
 
 
 void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
