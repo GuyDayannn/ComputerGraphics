@@ -278,7 +278,62 @@ float CalculateZ(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, 
 	return z;
 }
 
+/*
+float calculateZ()
+{
 
+}
+*/
+
+/*
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color)
+{
+	glm::vec3 p0 = pnt0;
+	glm::vec3 p1 = pnt1;
+	glm::vec3 p2 = pnt2;
+	int i = 0, j = 0, k = 0;
+
+	if (p1.y < p0.y) swapPoints(p1, p0);
+	if (p2.y < p0.y) swapPoints(p2, p0);
+	if (p2.y < p1.y) swapPoints(p2, p1);
+	//now yo<=y1<=y2
+
+	//interpolating to get x values of the edges
+	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
+	std::vector<float> x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
+	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+
+	x01.insert(x01.end(), x12.begin(), x12.end());
+
+	float y = p0.y;
+	for (y = p0.y; i < x02.size(); y++, i++) //looping from triangle bottom to top
+	{
+		//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
+
+		float left = x02[i], right = x01[i];
+		float alphaLeft, alphaRight, leftZ, rightZ;
+		if (left > right) //not the right order
+		{
+			right = x02[i];
+			left = x01[i];
+		}
+
+		for (float x = left; x < right; x++) // drawing the horizontal line of the triangle (the filling)
+		{
+			float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
+			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
+			{
+				zBuffer[x][y] = z;
+				PutPixel(x, y, color);
+			}
+		}
+	}
+}
+*/
+
+
+
+/*
 //using edge walking
 void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color)
 {
@@ -410,6 +465,130 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 
 	}
 }
+*/
+
+
+float alpha(float p0, float p1, float cord)
+{
+	return (p1 - cord) / (p1 - p0);
+}
+
+float CalcZSides(const glm::vec3& v0, const glm::vec3& v1, float y)
+{
+	float alphaa = alpha(v0.y, v1.y, y);
+	return alphaa * v0.z + (1.0f - alphaa) * v1.z;
+
+}
+
+float CalcZX(float left, float leftZ, float right,float rightZ, float x)
+{
+	float alphaa = alpha(left, right, x);
+	return alphaa * leftZ + (1.0f - alphaa) * rightZ;
+
+}
+
+
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color)
+{
+	glm::vec3 p0 = pnt0;
+	glm::vec3 p1 = pnt1;
+	glm::vec3 p2 = pnt2;
+	int i = 0, j = 0, k = 0;
+	int tricase = 0;
+
+	if (p1.y < p0.y) swapPoints(p1, p0);
+	if (p2.y < p0.y) swapPoints(p2, p0);
+	if (p2.y < p1.y) swapPoints(p2, p1);
+	//now yo<=y1<=y2
+
+	//interpolating to get x values of the edges
+	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
+	int x01OGsize = x01.size();
+	std::vector<float> x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
+	int x12OGSize = x12.size();
+	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+	int x02OGSize = x02.size();
+
+	x01.insert(x01.end(), x12.begin(), x12.end());
+
+	if (p0.y == p1.y) tricase = 0;
+	else if (p1.y == p2.y) tricase = 1;
+	else tricase = 2;
+
+	float y = p0.y;
+	for (y = p0.y; i < x02.size(); y++, i++) //looping from triangle bottom to top
+	{
+		//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
+
+		float left = x02[i], right = x01[i];
+		float alphaLeft, alphaRight, leftZ, rightZ;
+		if (left > right) //not the right order
+		{
+			right = x02[i];
+			left = x01[i];
+			rightZ = CalcZSides(p0, p2, y);
+
+			if (tricase == 0)
+			{
+				leftZ = CalcZSides(p1, p2, y);
+			}
+			else if (tricase == 1)
+			{
+				leftZ = CalcZSides(p0, p1, y);
+			}
+			else
+			{
+				if (i < x01OGsize)
+				{
+					leftZ = CalcZSides(p0, p1, y);
+				}
+				else
+				{
+					leftZ = CalcZSides(p1, p2, y);
+				}
+
+			}
+		}
+		else
+		{
+			leftZ = CalcZSides(p0, p2, y);
+			if (tricase == 0)
+			{
+				rightZ = CalcZSides(p1, p2, y);
+			}
+			else if (tricase == 1)
+			{
+				rightZ = CalcZSides(p0, p1, y);
+			}
+			else
+			{
+				if (i < x01OGsize)
+				{
+					rightZ = CalcZSides(p0, p1, y);
+				}
+				else
+				{
+					rightZ = CalcZSides(p1, p2, y);
+				}
+
+			}
+
+		}
+
+		for (float x = left; x < right; x++) // drawing the horizontal line of the triangle (the filling)
+		{
+			//float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
+			float z = CalcZX(left, leftZ, right, rightZ, x);
+			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
+			{
+				zBuffer[x][y] = z;
+				PutPixel(x, y, color);
+			}
+		}
+	}
+}
+
+
 
 
 /*
@@ -443,25 +622,22 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			{
 				right = x02[i];
 				left = x12[k];
-				alphaLeft = ((p2.y - y) / (p2.y - p1.y));
-				leftZ = alphaLeft * p1.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p2.y - y) / (p2.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p1, p2, y);
+				rightZ = CalcZSides(p0, p2, y);
 			}
 			else //right order
 			{
-				alphaLeft = ((p2.y - y) / (p2.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p2.y - y) / (p2.y - p1.y));
-				rightZ = alphaRight * p1.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p0, p2, y);
+				rightZ = CalcZSides(p1, p2, y);
 			}
 			//now we have left z and right z
 
 
 			for (float x = left; x < right; x++)
 			{
-				float alphaMiddle = ((right - x) / (right - left));
-				float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				//float alphaMiddle = ((right - x) / (right - left));
+				//float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				float zOfPixel = CalcZX(left, leftZ, right, rightZ, x);
 				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= zOfPixel)
 				{
@@ -486,17 +662,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			{
 				right = x02[i];
 				left = x01[j];
-				alphaLeft = ((p1.y - y) / (p1.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p1.z;
-				alphaRight = ((p2.y - y) / (p2.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p0, p1, y);
+				rightZ = CalcZSides(p0, p2, y);
 			}
 			else //right order
 			{
-				alphaLeft = ((p2.y - y) / (p2.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p1.y - y) / (p1.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p1.z;
+				leftZ = CalcZSides(p0, p2, y);
+				rightZ = CalcZSides(p0, p1, y);
 			}
 			//now we have left z and right z
 
@@ -504,7 +676,8 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			for (float x = left; x < right; x++)
 			{
 				float alphaMiddle = ((right - x) / (right - left));
-				float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				//float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				float zOfPixel = CalcZX(left, leftZ, right, rightZ, x);
 				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= zOfPixel)
 				{
@@ -527,17 +700,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			{
 				right = x02[i];
 				left = x01[j];
-				alphaLeft = ((p1.y - y) / (p1.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p1.z;
-				alphaRight = ((p2.y - y) / (p2.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p0, p1, y);
+				rightZ = CalcZSides(p0, p2, y);
 			}
 			else //right order
 			{
-				alphaLeft = ((p2.y - y) / (p2.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p1.y - y) / (p1.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p1.z;
+				leftZ = CalcZSides(p0, p2, y);
+				rightZ = CalcZSides(p0, p1, y);
 			}
 			//now we have left z and right z
 
@@ -545,7 +714,8 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			for (float x = left; x < right; x++)
 			{
 				float alphaMiddle = ((right - x) / (right - left));
-				float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				//float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				float zOfPixel = CalcZX(left, leftZ, right, rightZ, x);
 				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= zOfPixel)
 				{
@@ -566,17 +736,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			{
 				right = x02[i];
 				left = x12[k];
-				alphaLeft = ((p2.y - y) / (p2.y - p1.y));
-				leftZ = alphaLeft * p1.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p2.y - y) / (p2.y - p0.y));
-				rightZ = alphaRight * p0.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p1, p2, y);
+				rightZ = CalcZSides(p0, p2, y);
 			}
 			else //right order
 			{
-				alphaLeft = ((p2.y - y) / (p2.y - p0.y));
-				leftZ = alphaLeft * p0.z + (1.0f - alphaLeft) * p2.z;
-				alphaRight = ((p2.y - y) / (p2.y - p1.y));
-				rightZ = alphaRight * p1.z + (1.0f - alphaRight) * p2.z;
+				leftZ = CalcZSides(p0, p2, y);
+				rightZ = CalcZSides(p1, p2, y);
 			}
 			//now we have left z and right z
 
@@ -584,7 +750,8 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			for (float x = left; x < right; x++)
 			{
 				float alphaMiddle = ((right - x) / (right - left));
-				float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				//float zOfPixel = alphaMiddle * leftZ + (1.0f - alphaMiddle) * rightZ;
+				float zOfPixel = CalcZX(left, leftZ, right, rightZ, x);
 				float zbuufel = zBuffer[x][y];
 				if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= zOfPixel)
 				{
@@ -598,7 +765,6 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	}
 }
 */
-
 
 void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
 {
