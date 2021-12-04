@@ -24,7 +24,7 @@ public:
 	void UpdateScalingModel(const glm::vec3& vec);
 	const std::vector<float> GetUpDownVals();
 	const std::vector<float> GetLeftRightVals();
-	const std::vector<float> GetNearFarVals();
+	const std::vector<float> GetNearFarVals() const;
 	const std::vector<glm::vec3> GetCameraLookAt() const;
 	const std::vector<glm::mat4>& GetCurrentRotations() const;
 	void UpdateProjType(bool type);

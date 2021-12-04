@@ -84,7 +84,7 @@ const std::vector<float> Camera::GetLeftRightVals()
 	return leftRight;
 }
 
-const std::vector<float> Camera::GetNearFarVals()
+const std::vector<float> Camera::GetNearFarVals() const
 {
 	std::vector<float> nearFar;
 	nearFar.push_back(nearZ);
@@ -198,7 +198,7 @@ glm::vec3 Camera::GetTransformedVertex(const glm::vec3 vec) const
 	glm::vec3 tVec = HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 	tVec.x = (1.0f + tVec.x) * (window_width / 2.0f);
 	tVec.y = (1.0f + tVec.y) * (window_height / 2.0f);
-	tVec.z = (1.0f + tVec.z) * (abs(farZ - nearZ));
+	tVec.z = (1.0f + tVec.z) * (abs(farZ - nearZ) / 2.0f);
 	return tVec;
 	//return HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 }

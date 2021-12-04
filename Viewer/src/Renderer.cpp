@@ -212,6 +212,7 @@ std::vector<float> interpolate(float y0, float x0, float y1, float x1)
 
 	if (xCords.size() != 0)
 	{
+		xCords[0] = x0;
 		xCords[xCords.size() - 1] = x1;
 	}
 
@@ -306,7 +307,7 @@ float CalcZX(float left, float leftZ, float right,float rightZ, float x)
 }
 
 
-void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color)
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar)
 {
 	glm::vec3 p0 = pnt0;
 	glm::vec3 p1 = pnt1;
@@ -326,6 +327,15 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	int x12OGSize = x12.size();
 	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
 	int x02OGSize = x02.size();
+
+	/*
+	if (x01.size() != 0 && x12.size() != 0 && x01.size() + x12.size() != x02.size())
+	{
+		if (int(x01[x01.size() - 1]) == int(x12[0]))
+			x12.erase(x12.begin());
+
+	}
+	*/
 
 	x01.insert(x01.end(), x12.begin(), x12.end());
 
@@ -378,9 +388,12 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 
 		for (float x = left; x <= right; x++) // drawing the horizontal line of the triangle (the filling)
 		{
-			float z = CalcZX(left, leftZ, right, rightZ, x);
-			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] > z)
+			//float z = CalcZX(left, leftZ, right, rightZ, x);
+			float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
+			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 			{
+				//float ratio = 1 - (z / zfar);
+				//glm::vec3 color(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
 				zBuffer[x][y] = z;
 				PutPixel(x, y, color);
 			}
@@ -404,7 +417,7 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 
-		DrawTriangle(v1, v2, v3, colors[i]);
+		DrawTriangle(v1, v2, v3, colors[i], camera.GetNearFarVals()[1]);
 		//cout << "END OF TRIANGLE" << endl;
 	}
 
