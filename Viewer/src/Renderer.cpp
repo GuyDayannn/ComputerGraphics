@@ -194,7 +194,7 @@ std::vector<float> interpolate(float y0, float x0, float y1, float x1)
 		float m = (y1 - y0) / (x1 - x0);
 		float c = y0 - m * x0;
 
-		for (float y = y0; y < y1; y++)
+		for (float y = y0; y <= y1; y++)
 		{
 			float xCord = (y - c) / m;
 			xCords.push_back(xCord);
@@ -203,16 +203,23 @@ std::vector<float> interpolate(float y0, float x0, float y1, float x1)
 	}
 	else
 	{
-		for (float y = y0; y < y1; y++)
+		for (float y = y0; y <= y1; y++)
 		{
 			xCords.push_back(x0);
 		}
 
 	}
+
+	if (xCords.size() != 0)
+	{
+		xCords[xCords.size() - 1] = x1;
+	}
+
 	return xCords;
 
 }
 
+/*
 std::vector<float> interpolate(glm::vec3 p0, glm::vec3 p1)
 {
 	std::vector<float> xCords;
@@ -239,6 +246,7 @@ std::vector<float> interpolate(glm::vec3 p0, glm::vec3 p1)
 	return xCords;
 
 }
+*/
 
 std::vector<std::vector<float>> mergeVectorsOfSameSize(const std::vector<float>& v0, const std::vector<float>& v1)
 {
@@ -371,7 +379,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 		for (float x = left; x <= right; x++) // drawing the horizontal line of the triangle (the filling)
 		{
 			float z = CalcZX(left, leftZ, right, rightZ, x);
-			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
+			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] > z)
 			{
 				zBuffer[x][y] = z;
 				PutPixel(x, y, color);
