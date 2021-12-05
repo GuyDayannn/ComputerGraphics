@@ -269,20 +269,20 @@ std::vector<std::vector<float>> mergeVectorsOfSameSize(const std::vector<float>&
 
 }
 
-float CalculateTriangleArea(const glm::vec2& v1, const glm::vec2& v2, const glm::vec2& v3)
+float CalculateTriangleArea(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3)
 {
-	float area = abs((v1.x * (v2.y - v3.y) + v2.x * (v3.y - v1.y) + v3.x * (v1.y - v2.y)) / 2.0f);
+	float area = abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2.0f);
 	return area;
 }
 
 
-float CalculateZ(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec2& cord)
+float CalculateZ(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec2& cord)
 {
-	float A1 = CalculateTriangleArea(v2, v3, cord);
-	float A2 = CalculateTriangleArea(v1, v3, cord);
-	float A3 = CalculateTriangleArea(v2, v1, cord);
+	float A1 = CalculateTriangleArea(p2, p3, cord);
+	float A2 = CalculateTriangleArea(p1, p3, cord);
+	float A3 = CalculateTriangleArea(p2, p1, cord);
 	float A = A1 + A2 + A3;
-	float z = (A1 / A) * v1.z + (A2 / A) * v2.z + (A3 / A) * v3.z;
+	float z = (A1 / A) * p1.z + (A2 / A) * p2.z + (A3 / A) * p3.z;
 
 	return z;
 }
@@ -307,7 +307,7 @@ float CalcZX(float left, float leftZ, float right,float rightZ, float x)
 }
 
 
-void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar)
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray)
 {
 	glm::vec3 p0 = pnt0;
 	glm::vec3 p1 = pnt1;
@@ -318,7 +318,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	if (p1.y < p0.y) swapPoints(p1, p0);
 	if (p2.y < p0.y) swapPoints(p2, p0);
 	if (p2.y < p1.y) swapPoints(p2, p1);
-	//now yo<=y1<=y2
+	//now y0<=y1<=y2
 
 	//interpolating to get x values of the edges
 	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
@@ -333,7 +333,6 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	{
 		if (int(x01[x01.size() - 1]) == int(x12[0]))
 			x12.erase(x12.begin());
-
 	}
 	*/
 
@@ -392,10 +391,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
 			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
 			{
-				//float ratio = 1 - (z / zfar);
-				//glm::vec3 color(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
+				float ratio = 1 - (z / zfar);
+				glm::vec3 gcolor(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
 				zBuffer[x][y] = z;
-				PutPixel(x, y, color);
+				if (gray == true)
+					PutPixel(x, y, gcolor);
+				else
+					PutPixel(x, y, color);
 			}
 		}
 	}
@@ -417,7 +419,7 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 
-		DrawTriangle(v1, v2, v3, colors[i], camera.GetNearFarVals()[1]);
+		DrawTriangle(v1, v2, v3, colors[i], camera.GetNearFarVals()[1], camera.gray);
 		//cout << "END OF TRIANGLE" << endl;
 	}
 

@@ -101,6 +101,7 @@ static int camdegreesY = 0;
 static int camdegreesX = 0;
 static int camdegreesZ = 0;
 static bool camWorld = false;
+static bool gray = false;
 
 /**
  * Function declarations
@@ -1040,6 +1041,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			camxyzAddition[0] = cameraWorldAdditions[active_camera_index][0];
 			camxyzAddition[1] = cameraWorldAdditions[active_camera_index][1];
 			camxyzAddition[2] = cameraWorldAdditions[active_camera_index][2];
+		}
+
+		if (ImGui::Checkbox("Gray", &gray))
+		{
+			scene.GetCamera(active_camera_index).gray = gray;
 		}
 
 		if (ImGui::SliderFloat3("Translation", camxyzAddition, -10.0f, 10.0f))

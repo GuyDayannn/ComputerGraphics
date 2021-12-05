@@ -22,6 +22,7 @@ Camera::Camera(int window_width, int window_height, int num): window_width(windo
 	currentScalingMat.push_back(glm::mat4(1.0f));
 	currentScalingMat.push_back(glm::mat4(1.0f));
 	camName = "Camera " + std::to_string(num);
+	gray = false;
 }
 
 Camera::~Camera()
@@ -198,7 +199,7 @@ glm::vec3 Camera::GetTransformedVertex(const glm::vec3 vec) const
 	glm::vec3 tVec = HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 	tVec.x = (1.0f + tVec.x) * (window_width / 2.0f);
 	tVec.y = (1.0f + tVec.y) * (window_height / 2.0f);
-	tVec.z = (1.0f + tVec.z) * (abs(farZ - nearZ) / 2.0f);
+	tVec.z = (1.0f + tVec.z) * (abs(farZ - nearZ));
 	return tVec;
 	//return HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 }

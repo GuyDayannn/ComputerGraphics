@@ -35,6 +35,8 @@ public:
 	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
 	glm::vec3 GetTransformedVertex(const glm::vec3 vec) const;
 
+	bool gray;
+
 private:
 	glm::mat4x4 view_transformation;
 	glm::mat4x4 projection_transformation;
