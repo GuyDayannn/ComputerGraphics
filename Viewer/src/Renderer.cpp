@@ -194,7 +194,7 @@ std::vector<float> interpolate(float y0, float x0, float y1, float x1)
 		float m = (y1 - y0) / (x1 - x0);
 		float c = y0 - m * x0;
 
-		for (float y = y0; y <= y1; y++)
+		for (float y = y0; y <= y1; y+= 0.5f)
 		{
 			float xCord = (y - c) / m;
 			xCords.push_back(xCord);
@@ -203,7 +203,7 @@ std::vector<float> interpolate(float y0, float x0, float y1, float x1)
 	}
 	else
 	{
-		for (float y = y0; y <= y1; y++)
+		for (float y = y0; y <= y1; y+= 0.5f)
 		{
 			xCords.push_back(x0);
 		}
@@ -344,7 +344,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	else tricase = 2;
 
 	float y = p0.y;
-	for (y = p0.y; i < x02.size(); y++, i++) //looping from triangle bottom to top
+	for (y = p0.y; i < x02.size(); y+= 0.5f, i++) //looping from triangle bottom to top
 	{
 		//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
 
