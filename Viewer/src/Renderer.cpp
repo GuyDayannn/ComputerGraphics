@@ -306,7 +306,6 @@ float CalcZX(float left, float leftZ, float right,float rightZ, float x)
 
 }
 
-
 void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray)
 {
 	glm::vec3 p0 = pnt0;
@@ -403,6 +402,125 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	}
 }
 
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray, const Scene& scene)
+{
+	glm::vec3 p0 = pnt0;
+	glm::vec3 p1 = pnt1;
+	glm::vec3 p2 = pnt2;
+	int i = 0, j = 0, k = 0;
+	int tricase = 0;
+
+	if (p1.y < p0.y) swapPoints(p1, p0);
+	if (p2.y < p0.y) swapPoints(p2, p0);
+	if (p2.y < p1.y) swapPoints(p2, p1);
+	//now y0<=y1<=y2
+
+	//interpolating to get x values of the edges
+	std::vector<float> x01 = interpolate(p0.y, p0.x, p1.y, p1.x);
+	int x01OGsize = x01.size();
+	std::vector<float> x12 = interpolate(p1.y, p1.x, p2.y, p2.x);
+	int x12OGSize = x12.size();
+	std::vector<float> x02 = interpolate(p0.y, p0.x, p2.y, p2.x);
+	int x02OGSize = x02.size();
+
+	/*
+	if (x01.size() != 0 && x12.size() != 0 && x01.size() + x12.size() != x02.size())
+	{
+		if (int(x01[x01.size() - 1]) == int(x12[0]))
+			x12.erase(x12.begin());
+	}
+	*/
+
+	x01.insert(x01.end(), x12.begin(), x12.end());
+
+	// save triangle case
+	if (p0.y == p1.y) tricase = 0;
+	else if (p1.y == p2.y) tricase = 1;
+	else tricase = 2;
+
+	float y = p0.y;
+	for (y = p0.y; i < x02.size(); y += 0.5f, i++) //looping from triangle bottom to top
+	{
+		//DrawLine(glm::vec2(x02[i], y), glm::vec2(x12[k], y), color);
+
+		float left = x02[i], right = x01[i];
+		float alphaLeft, alphaRight, leftZ, rightZ;
+		if (left > right) //not the right order
+		{
+			right = x02[i];
+			left = x01[i];
+			rightZ = CalcZSides(p0, p2, y);
+
+			if (tricase == 0)
+				leftZ = CalcZSides(p1, p2, y);
+			else if (tricase == 1)
+				leftZ = CalcZSides(p0, p1, y);
+			else
+			{
+				if (i < x01OGsize)
+					leftZ = CalcZSides(p0, p1, y);
+				else
+					leftZ = CalcZSides(p1, p2, y);
+			}
+		}
+		else //right order
+		{
+			leftZ = CalcZSides(p0, p2, y);
+			if (tricase == 0) // drawing from 02 to 12
+				rightZ = CalcZSides(p1, p2, y);
+			else if (tricase == 1) // drawing from 02 to 01
+				rightZ = CalcZSides(p0, p1, y);
+			else // explanation inside
+			{
+				if (i < x01OGsize) // drawing from 02 to 01
+					rightZ = CalcZSides(p0, p1, y);
+				else // drawing from 02 to 12
+					rightZ = CalcZSides(p1, p2, y);
+			}
+
+		}
+
+		for (float x = left; x <= right; x++) // drawing the horizontal line of the triangle (the filling)
+		{
+			//float z = CalcZX(left, leftZ, right, rightZ, x);
+			float z = CalculateZ(p0, p1, p2, glm::vec2(x, y));
+			if (x >= 0 && x < viewport_width && y >= 0 && y < viewport_height && zBuffer[x][y] >= z)
+			{
+				float ratio = 1 - (z / zfar);
+				glm::vec3 gcolor(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
+				glm::vec3 acolor = color * scene.GetLight(0).GetAmbientColor();
+				zBuffer[x][y] = z;
+				if (gray == true)
+					PutPixel(x, y, gcolor);
+				else
+					PutPixel(x, y, acolor);
+			}
+		}
+	}
+}
+
+void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera, const Scene& scene) //drawing all triangles
+{
+	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
+	glm::mat4x4 view_transformation = camera.GetViewTransformation();
+	glm::mat4x4 projection_transformation = camera.GetProjectionTransformation();
+	std::vector<glm::mat4> rotations = camera.GetCurrentRotations();
+	glm::mat4 invertedRotationMats = glm::inverse(rotations[0] * rotations[1]);
+	std::vector<glm::vec3> colors = meshModel.GetFaceColors();
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		std::vector<glm::vec3> triangle = triangles[i];
+		glm::vec3 v1 = camera.GetTransformedVertex(triangle[0]);
+		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
+		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
+
+		DrawTriangle(v1, v2, v3, color, camera.GetNearFarVals()[1], camera.gray, scene);
+		//cout << "END OF TRIANGLE" << endl;
+	}
+
+}
+
 void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera) //drawing all triangles
 {
 	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
@@ -419,7 +537,7 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 
-		DrawTriangle(v1, v2, v3, colors[i], camera.GetNearFarVals()[1], camera.gray);
+		DrawTriangle(v1, v2, v3, color, camera.GetNearFarVals()[1], camera.gray);
 		//cout << "END OF TRIANGLE" << endl;
 	}
 
@@ -852,8 +970,9 @@ void Renderer::Render(const Scene& scene)
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());
 		for (int i = 0; i < modelCount; i++)
 		{
-			DrawColorMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
+			//DrawColorMeshModel(scene.GetModel(i), scene.GetModel(i).GetMaterial().ambientColor, cam);
 			//DrawMeshModel(scene.GetModel(i), glm::vec3(0, 0, 0), cam);
+			DrawColorMeshModel(scene.GetModel(i), scene.GetModel(i).GetMaterial().ambientColor, cam, scene);
 			if(scene.GetModel(i).displayBoundingRec) DrawTrainglesBoundings(scene.GetModel(i), glm::vec3(0.5, 0.5, 0.5), cam);
 			if (scene.GetModel(i).GetWorldAxisShowState()) DrawMeshModelAxisWorld(scene.GetModel(i), glm::vec3(0, 0, 1), cam);
 			if (scene.GetModel(i).GetModelAxisShowState()) DrawMeshModelAxisModel(scene.GetModel(i), glm::vec3(0, 0, 1), cam);

@@ -3,6 +3,16 @@
 #include <string>
 #include "Face.h"
 
+
+struct Material
+{
+	glm::vec3 ambientColor;
+	glm::vec3 diffuseColor;
+	glm::vec3 specularColor;
+};
+
+
+
 class MeshModel
 {
 public:
@@ -49,6 +59,8 @@ public:
 	void ShowVertexNormals();
 	void HideVertexNormals();
 	void UpdateAxisScale(bool perspectiveProj);
+	Material& GetMaterial();
+
 
 	bool displayBoundingBox;
 	bool displayBoundingRec;
@@ -71,4 +83,5 @@ private:
 	float vertexNormalSize;
 	bool showFaceNormals;
 	bool showVertexNormals;
+	Material material;
 };

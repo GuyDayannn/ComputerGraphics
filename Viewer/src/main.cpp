@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Utils.h"
+#include "LightSource.h"
 
 #include <iostream>
 
@@ -21,6 +22,7 @@
 float STARTSCALE = 1.0f;
 bool show_demo_window = false;
 bool show_camera_window = false;
+bool show_lighting_window = false;
 glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
 glm::vec3 transAxis = glm::vec3(0.0f, 0.0f, 0.0f);
 std::vector< glm::vec3> modelAdditions;
@@ -56,6 +58,9 @@ static bool showFaceNormals = false;
 static bool showVertexNormals = false;
 static bool showBoundingBox = false;
 static bool showBoundingRec = false;
+static float ambientModelColor[3] = { 1.0f, 1.0f, 1.0f };
+static float diffuseModelColor[3] = { 1.0f, 1.0f, 1.0f };
+static float specularModelColor[3] = { 1.0f, 1.0f, 1.0f };
 /**
 * Fields for controling camera
 */
@@ -102,6 +107,18 @@ static int camdegreesX = 0;
 static int camdegreesZ = 0;
 static bool camWorld = false;
 static bool gray = false;
+
+
+/**
+* Fields for lights
+*/
+int lightCount = 0;
+static int active_light_index = 0;
+static float lightPos[3] = { 1.0f, 1.0f, 1.0f };
+static float ambientLightColor[3] = { 1.0f, 1.0f, 1.0f };
+static float diffuseLightColor[3] = { 1.0f, 1.0f, 1.0f };
+static float specularLightColor[3] = { 1.0f, 1.0f, 1.0f };
+
 
 /**
  * Function declarations
@@ -570,6 +587,12 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				cameraWorldScale.push_back(1.0f);
 			}
 
+			if (ImGui::MenuItem("Add Light", "CTRL+L"))
+			{
+				std::shared_ptr<LightSource> light = std::make_shared<LightSource>(scene.GetLightCount());
+				scene.AddLight(light);	
+			}
+
 			
 			ImGui::EndMenu();
 		}
@@ -597,6 +620,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 		modelCount = scene.GetModelCount();
 		camCount = scene.GetCameraCount();
+		lightCount = scene.GetLightCount();
 
 		if (perspectiveProj == 0)
 			STARTSCALE = 200.0f;
@@ -634,6 +658,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 		ImGui::Checkbox("Camera Window", &show_camera_window);
+		ImGui::Checkbox("Lighting Window", &show_lighting_window);
 		//ImGui::Checkbox("Demo", &show_demo_window);
 
 		// TODO: Add more menubar items (if you want to)
@@ -693,6 +718,20 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						showVertexNormals = vertexNormals[active_model_index];
 						showBoundingBox = boundingBox[active_model_index];
 						showBoundingRec = boundingRec[active_model_index];
+
+						ambientModelColor[0] = scene.GetModel(i).GetMaterial().ambientColor[0];
+						ambientModelColor[1] = scene.GetModel(i).GetMaterial().ambientColor[1];
+						ambientModelColor[2] = scene.GetModel(i).GetMaterial().ambientColor[2];
+
+						diffuseModelColor[0] = scene.GetModel(i).GetMaterial().diffuseColor[0];
+						diffuseModelColor[1] = scene.GetModel(i).GetMaterial().diffuseColor[1];
+						diffuseModelColor[2] = scene.GetModel(i).GetMaterial().diffuseColor[2];
+
+						specularModelColor[0] = scene.GetModel(i).GetMaterial().specularColor[0];
+						specularModelColor[1] = scene.GetModel(i).GetMaterial().specularColor[1];
+						specularModelColor[2] = scene.GetModel(i).GetMaterial().specularColor[2];
+
+
 					}
 					if (selectedModel)
 						ImGui::SetItemDefaultFocus();
@@ -869,6 +908,27 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		}
 
 
+		if (ImGui::ColorEdit3("Ambient Color", ambientModelColor))
+		{
+			scene.GetModel(active_model_index).GetMaterial().ambientColor = glm::vec3(ambientModelColor[0], ambientModelColor[1], ambientModelColor[2]);
+
+		}
+
+		if (ImGui::ColorEdit3("Diffuse Color", diffuseModelColor))
+		{
+			scene.GetModel(active_model_index).GetMaterial().diffuseColor = glm::vec3(diffuseModelColor[0], diffuseModelColor[1], diffuseModelColor[2]);
+
+		}
+
+		if (ImGui::ColorEdit3("Specular Color", specularModelColor))
+		{
+			scene.GetModel(active_model_index).GetMaterial().specularColor = glm::vec3(specularModelColor[0], specularModelColor[1], specularModelColor[2]);
+
+		}
+
+		
+		//ImGui::ColorEdit3("Specular Color", specularModelColor);
+
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
@@ -1017,7 +1077,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			nearFarVec[active_camera_index][1] = nearFar[1];
 		}
 
-
 		if (ImGui::SliderFloat3("Camera Position xyz", cameraPos, -10.0f, 10.0f))
 		{
 			std::vector<glm::vec3> prop = scene.GetCamera(active_camera_index).GetCameraLookAt();
@@ -1081,6 +1140,28 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		//ImGui::Text("Hello from another window!");
 		//if (ImGui::Button("Close Me"))
 			//show_camera_window = false;
+		ImGui::End();
+	}
+
+	if (show_lighting_window && lightCount > 0)
+	{
+		ImGui::Begin("Lighting Window", &show_lighting_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+
+		if (ImGui::ColorEdit3("Ambient Color", ambientLightColor))
+		{
+			scene.GetLight(active_light_index).UpdateAmbientColor(glm::vec3(ambientLightColor[0], ambientLightColor[1], ambientLightColor[2]));
+		}
+
+		if (ImGui::ColorEdit3("Diffuse Color", diffuseLightColor))
+		{
+			scene.GetLight(active_light_index).UpdateDiffuseColor(glm::vec3(diffuseLightColor[0], diffuseLightColor[1], diffuseLightColor[2]));
+		}
+
+		if (ImGui::ColorEdit3("Specular Color", specularLightColor))
+		{
+			scene.GetLight(active_light_index).UpdateSpecularColor(glm::vec3(specularLightColor[0], specularLightColor[1], specularLightColor[2]));
+		}
+		
 		ImGui::End();
 	}
 }

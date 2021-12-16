@@ -50,6 +50,10 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 
 		colors.push_back(glm::vec3(r, g, b));
 	}
+
+	material.ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	material.diffuseColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	material.specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 MeshModel::~MeshModel()
@@ -552,4 +556,10 @@ void MeshModel::UpdateAxisScale(bool perspectiveProj)
 	}
 
 
+}
+
+
+Material& MeshModel::GetMaterial()
+{
+	return material;
 }

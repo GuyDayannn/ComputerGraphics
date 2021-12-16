@@ -18,7 +18,9 @@ private:
 	void PutPixel(const int i, const int j, const glm::vec3& color);
 	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
 	void DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray);
+	void DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray, const Scene& scene);
 	void DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
+	void DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera, const Scene& scene);
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color);
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawTrainglesBoundings(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
