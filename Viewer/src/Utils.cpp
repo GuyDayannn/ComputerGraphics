@@ -70,6 +70,57 @@ std::shared_ptr<MeshModel> Utils::LoadMeshModel(const std::string& filePath)
 	return std::make_shared<MeshModel>(faces, vertices, normals, Utils::GetFileName(filePath));
 }
 
+std::shared_ptr<LightSource> Utils::LoadLightSource(const std::string& filePath)
+{
+	std::vector<Face> faces;
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
+	std::ifstream ifile(filePath.c_str());
+
+	// while not end of file
+	while (!ifile.eof())
+	{
+		// get line
+		std::string curLine;
+		std::getline(ifile, curLine);
+
+		// read the type of the line
+		std::istringstream issLine(curLine);
+		std::string lineType;
+
+		issLine >> std::ws >> lineType;
+
+		// based on the type parse data
+		if (lineType == "v")
+		{
+			vertices.push_back(Utils::Vec3fFromStream(issLine));
+		}
+		else if (lineType == "vn")
+		{
+			normals.push_back(Utils::Vec3fFromStream(issLine));
+		}
+		else if (lineType == "vt")
+		{
+			// TODO: Handle texture coordinates
+		}
+		else if (lineType == "f")
+		{
+			faces.push_back(Face(issLine));
+		}
+		else if (lineType == "#" || lineType == "")
+		{
+			// comment / empty line
+		}
+		else
+		{
+			std::cout << "Found unknown line Type \"" << lineType << "\"";
+		}
+	}
+
+	return std::make_shared<LightSource>(faces, vertices, normals, Utils::GetFileName(filePath));
+}
+
+
 std::string Utils::GetFileName(const std::string& filePath)
 {
 	if (filePath.empty()) {

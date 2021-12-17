@@ -3,25 +3,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include "Face.h"
+#include "MeshModel.h"
 #include <iostream>
 
-class LightSource
+class LightSource: public MeshModel
 {
 public:
-	LightSource(int num);
+	LightSource(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name, int num = 0);
 	virtual ~LightSource();
 
-	std::string GetName() const;
-
-	//Utils
-	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
-	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
-	void UpdateRotationWorld(float degrees, std::string axis);
-	void UpdateRotationModel(float degrees, std::string axis);
-	void UpdateTranslationWorld(const glm::vec3& vec);
-	void UpdateTranslationModel(const glm::vec3& vec);
-	void UpdateScalingWorld(const glm::vec3& vec);
-	void UpdateScalingModel(const glm::vec3& vec);
+	const std::string& GetName() const;
+	void UpdateName(std::string n);
 
 	glm::vec3 GetPosition() const;
 	void UpdatePosition(const glm::vec3& pos);
@@ -35,16 +27,22 @@ public:
 	void UpdateSpecularColor(const glm::vec3& color);
 	const glm::vec3& GetSpecularColor() const;
 
+	void ActivateAmbient();
+	void ActivateDiffuse();
+	void ActivateSpecular();
 
+	const glm::vec3 GetActiveColor() const;
+	glm::vec3 GetCenter() const;
+	glm::vec3 GetTransformedPosition();
+
+
+	int activeLightType; // 0 - ambient , 1 - diffuse, 2 - specular
 private:
 	std::string name;
 	glm::vec3 position;
 	glm::vec3 ambientColor;
 	glm::vec3 diffuseColor;
 	glm::vec3 specularColor;
-
-	std::vector<glm::mat4> currentTranslationMat;
-	std::vector<glm::mat4> currentRotationMat; //[0] world - [1] - light itself
-	std::vector<glm::mat4> currentScalingMat;
+	glm::vec3 activeColor;
 
 };

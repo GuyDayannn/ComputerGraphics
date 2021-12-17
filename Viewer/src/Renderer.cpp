@@ -402,7 +402,8 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 	}
 }
 
-void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray, const Scene& scene)
+//Drawing with light
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray, const Scene& scene, const Material& material)
 {
 	glm::vec3 p0 = pnt0;
 	glm::vec3 p1 = pnt1;
@@ -488,17 +489,27 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 			{
 				float ratio = 1 - (z / zfar);
 				glm::vec3 gcolor(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
-				glm::vec3 acolor = color * scene.GetLight(0).GetAmbientColor();
+				glm::vec3 acolor(0.0f, 0.0f, 0.0f);
+
 				zBuffer[x][y] = z;
 				if (gray == true)
 					PutPixel(x, y, gcolor);
 				else
+				{
+					for (int l = 0; l < scene.GetLightCount(); l++)
+					{
+						acolor += Illuminate(glm::vec3(x, y, z), scene.GetLight(l), material);
+					}
+
 					PutPixel(x, y, acolor);
+
+				}
 			}
 		}
 	}
 }
 
+//Drawing with lights
 void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera, const Scene& scene) //drawing all triangles
 {
 	std::vector<std::vector<glm::vec3>> triangles = meshModel.GetTriangles();
@@ -515,7 +526,7 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 
-		DrawTriangle(v1, v2, v3, color, camera.GetNearFarVals()[1], camera.gray, scene);
+		DrawTriangle(v1, v2, v3, color, camera.GetNearFarVals()[1], camera.gray,scene, meshModel.GetMaterial());
 		//cout << "END OF TRIANGLE" << endl;
 	}
 
@@ -816,6 +827,42 @@ void Renderer::DrawMeshModelBoundigBox(const MeshModel& meshModel, const glm::ve
 
 }
 
+
+void Renderer::DrawLightSource(const LightSource& lightSource, const glm::vec3& color, const Camera& camera)
+{
+	glm::vec3 pos = lightSource.GetPosition();
+	glm::vec3 transPos = camera.GetTransformedVertex(pos);
+
+	float up = transPos.y + 1.0f;
+	float down = transPos.y - 1.0f;
+	float left = transPos.x - 1.0f;
+	float right = transPos.x + 1.0f;
+
+	PutPixel(left, down, color);
+	PutPixel(transPos.x, down, color);
+	PutPixel(right, down, color);
+
+	PutPixel(left, transPos.y, color);
+	PutPixel(transPos.x, transPos.y, color);
+	PutPixel(right, transPos.y, color);
+
+	PutPixel(left, up, color);
+	PutPixel(transPos.x, up, color);
+	PutPixel(right, up, color);
+}
+
+glm::vec3 Renderer::Illuminate(glm::vec3 pnt, const LightSource& lightSource, const Material& matriel)
+{
+	//Ambient
+	glm::vec3 color(1.0f, 1.0f, 1.0f);
+	if (lightSource.activeLightType == 0)
+	{
+		color = lightSource.GetAmbientColor() * matriel.ambientColor;
+	}
+	return color;
+
+}
+
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
@@ -957,6 +1004,8 @@ void Renderer::Render(const Scene& scene)
 	
 	int camCount = scene.GetCameraCount();
 
+	int lightCount = scene.GetLightCount();
+
 	for (int i = 0; i < viewport_width; i++) //1280
 	{
 		for (int j = 0; j < viewport_height; j++) //720
@@ -965,6 +1014,16 @@ void Renderer::Render(const Scene& scene)
 		}
 	}
 
+
+
+	if (camCount != 0)
+	{
+		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());
+		for (int i = 0; i < lightCount; i++)
+		{
+			DrawColorMeshModel(scene.GetLight(i), scene.GetLight(i).GetActiveColor(), cam);
+		}
+	}
 	if (camCount != 0)
 	{
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());

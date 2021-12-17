@@ -60,6 +60,9 @@ public:
 	void HideVertexNormals();
 	void UpdateAxisScale(bool perspectiveProj);
 	Material& GetMaterial();
+	const Material& GetMaterial() const;
+	std::vector<glm::vec3> GetScale() const;
+	std::vector<glm::vec3> GetTranslation() const;
 
 
 	bool displayBoundingBox;
@@ -69,9 +72,7 @@ private:
 	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
 	std::vector<glm::vec3> rotation; // degrees
 	std::vector<glm::vec3> scaling;
-	std::vector<glm::mat4> currentRotationMat;
 	std::vector<Face> faces;
-	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::string model_name;
 	std::vector<std::vector<glm::vec3>> modelAxis;
@@ -84,4 +85,8 @@ private:
 	bool showFaceNormals;
 	bool showVertexNormals;
 	Material material;
+
+protected:
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::mat4> currentRotationMat;
 };

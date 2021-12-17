@@ -563,3 +563,19 @@ Material& MeshModel::GetMaterial()
 {
 	return material;
 }
+
+const Material& MeshModel::GetMaterial() const
+{
+	return material;
+}
+
+
+std::vector<glm::vec3> MeshModel::GetScale() const
+{
+	return scaling;
+}
+
+std::vector<glm::vec3> MeshModel::GetTranslation() const
+{
+	return translation;
+}

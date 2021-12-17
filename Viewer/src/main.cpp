@@ -112,12 +112,18 @@ static bool gray = false;
 /**
 * Fields for lights
 */
+static float lightxyzAddition[3] = { 0.0f, 0.0f, 0.0f }; //xyz addition
+static float lightxyzWorld[3] = { 0.0f, 0.0f, 0.0f };
+static const char* choosenLight = nullptr;
 int lightCount = 0;
 static int active_light_index = 0;
 static float lightPos[3] = { 1.0f, 1.0f, 1.0f };
 static float ambientLightColor[3] = { 1.0f, 1.0f, 1.0f };
 static float diffuseLightColor[3] = { 1.0f, 1.0f, 1.0f };
 static float specularLightColor[3] = { 1.0f, 1.0f, 1.0f };
+static bool ambientLight = true;
+static bool diffuseLight = false;
+static bool specularLight = false;
 
 
 /**
@@ -589,7 +595,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 			if (ImGui::MenuItem("Add Light", "CTRL+L"))
 			{
-				std::shared_ptr<LightSource> light = std::make_shared<LightSource>(scene.GetLightCount());
+				std::shared_ptr<LightSource> light = Utils::LoadLightSource("..\\Data\\cube.obj");
+				std::string nme = "Light" + std::to_string(scene.GetLightCount());
+				light->UpdateName(nme);
 				scene.AddLight(light);	
 			}
 
@@ -1146,6 +1154,97 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	if (show_lighting_window && lightCount > 0)
 	{
 		ImGui::Begin("Lighting Window", &show_lighting_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+
+		//Model choosing
+		if (ImGui::BeginCombo("Light Source", choosenLight))
+		{
+			for (int i = 0; i < lightCount; i++)
+			{
+				bool selectedLight = (scene.GetLight(i).GetName().c_str() == choosenLight);
+				if (ImGui::Selectable(scene.GetLight(i).GetName().c_str(), selectedLight))
+				{
+					choosenLight = scene.GetLight(i).GetName().c_str();
+					active_light_index = i;
+					scene.SetActiveLightIndex(i);
+
+					lightxyzAddition[0] = scene.GetLight(i).GetTranslation()[1][0];
+					lightxyzAddition[1] = scene.GetLight(i).GetTranslation()[1][1];
+					lightxyzAddition[2] = scene.GetLight(i).GetTranslation()[1][2];
+
+					ambientLightColor[0] = scene.GetLight(i).GetAmbientColor()[0];
+					ambientLightColor[1] = scene.GetLight(i).GetAmbientColor()[1];
+					ambientLightColor[2] = scene.GetLight(i).GetAmbientColor()[2];
+
+					diffuseLightColor[0] = scene.GetLight(i).GetDiffuseColor()[0];
+					diffuseLightColor[1] = scene.GetLight(i).GetDiffuseColor()[1];
+					diffuseLightColor[2] = scene.GetLight(i).GetDiffuseColor()[2];
+
+					specularLightColor[0] = scene.GetLight(i).GetSpecularColor()[0];
+					specularLightColor[1] = scene.GetLight(i).GetSpecularColor()[1];
+					specularLightColor[2] = scene.GetLight(i).GetSpecularColor()[2];
+
+					if (scene.GetLight(i).activeLightType == 0) //ambient Light
+					{
+						ambientLight = true;
+						diffuseLight = false;
+						specularLight = false;
+					}
+					else if (scene.GetLight(i).activeLightType == 1) // diffuse light
+					{
+						ambientLight = false;
+						diffuseLight = true;
+						specularLight = false;
+
+					}
+					else // sepcualr light
+					{
+						ambientLight = false;
+						diffuseLight = false;
+						specularLight = true;
+					}
+
+
+				}
+				if (selectedLight)
+					ImGui::SetItemDefaultFocus();
+			}
+			
+			ImGui::EndCombo();
+		}
+		glm::vec3 tempPos = scene.GetCamera(active_camera_index).GetTransformedVertex(scene.GetLight(active_light_index).GetTransformedPosition());
+		ImGui::Text("Position: %.3f , %3.f , %3.f", tempPos.x, tempPos.y, tempPos.z);
+
+
+		if (ImGui::Checkbox("Ambient", &ambientLight))
+		{
+			diffuseLight = false;
+			specularLight = false;
+			if (ambientLight) scene.GetLight(active_light_index).ActivateAmbient();
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Diffuse", &diffuseLight))
+		{
+			ambientLight = false;
+			specularLight = false;
+			if (diffuseLight) scene.GetLight(active_light_index).ActivateDiffuse();
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Specular", &specularLight))
+		{
+			ambientLight = false;
+			diffuseLight = false;
+			if (specularLight) scene.GetLight(active_light_index).ActivateSpecular();
+		}
+
+
+
+		if (ImGui::SliderFloat3("Translation", lightxyzAddition, -10.0f, 10.0f))
+		{
+			glm::vec3 scale = scene.GetLight(active_light_index).GetScale()[1];
+			scene.GetLight(active_light_index).UpdateModelTransformations(scale, glm::vec3(0.0f, 0.0f, 0.0f), "x", glm::vec3(lightxyzAddition[0], lightxyzAddition[1], lightxyzAddition[2]));
+		}
+
+
 
 		if (ImGui::ColorEdit3("Ambient Color", ambientLightColor))
 		{

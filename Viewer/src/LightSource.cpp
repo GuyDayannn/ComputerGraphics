@@ -1,17 +1,16 @@
 #include "LightSource.h"
 
-LightSource::LightSource(int num)
+LightSource::LightSource(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name, int num):
+	MeshModel(faces, vertices, normals, model_name)
 {
+	activeLightType = 0;
+	UpdateModelTransformations(glm::vec3(0.1, 0.1f, 0.1f), glm::vec3(0.0f, 0.0f, 0.0f), "x", glm::vec3(0.0f, 0.0f, 0.0f));
 	ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	diffuseColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	ActivateAmbient();
+	position = GetCenter();
 
-	currentRotationMat.push_back(glm::mat4(1.0f));
-	currentRotationMat.push_back(glm::mat4(1.0f));
-	currentTranslationMat.push_back(glm::mat4(1.0f));
-	currentTranslationMat.push_back(glm::mat4(1.0f));
-	currentScalingMat.push_back(glm::mat4(1.0f));
-	currentScalingMat.push_back(glm::mat4(1.0f));
 	name = "Light " + std::to_string(num);
 }
 
@@ -19,63 +18,14 @@ LightSource::~LightSource()
 {
 }
 
-std::string LightSource::GetName() const
+const std::string& LightSource::GetName() const
 {
 	return name;
 }
 
-
-glm::vec4 LightSource::Vec3ToHomogeneousVec(const glm::vec3& vec)
+void LightSource::UpdateName(std::string n) 
 {
-	return glm::vec4(vec.x, vec.y, vec.z, 1.0f);
-}
-
-//converting Homogeneous Vector to vec3
-glm::vec3 LightSource::HomogeneousVecToVec3(const glm::vec4& vec)
-{
-	if (vec.w == 0)
-		return glm::vec3(vec.x, vec.y, vec.z);
-	return glm::vec3(vec.x / vec.w, vec.y / vec.w, vec.z / vec.w);
-}
-
-void LightSource::UpdateRotationWorld(float degrees, std::string axis)
-{
-	glm::vec3 rotateAround;
-	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
-	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
-	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
-
-	currentRotationMat[0] = glm::rotate(currentRotationMat[0], glm::radians(degrees), rotateAround);
-}
-
-void LightSource::UpdateRotationModel(float degrees, std::string axis)
-{
-	glm::vec3 rotateAround;
-	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
-	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
-	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
-
-	currentRotationMat[1] = glm::rotate(currentRotationMat[1], glm::radians(degrees), rotateAround);
-}
-
-void LightSource::UpdateTranslationWorld(const glm::vec3& vec)
-{
-	currentTranslationMat[0] = glm::translate(glm::mat4(1.0f), vec);
-}
-
-void LightSource::UpdateTranslationModel(const glm::vec3& vec)
-{
-	currentTranslationMat[1] = glm::translate(glm::mat4(1.0f), vec);
-}
-
-void LightSource::UpdateScalingWorld(const glm::vec3& vec)
-{
-	currentScalingMat[0] = glm::scale(glm::mat4(1.0f), vec);
-}
-
-void LightSource::UpdateScalingModel(const glm::vec3& vec)
-{
-	currentScalingMat[1] = glm::scale(glm::mat4(1.0f), vec);
+	name = n;
 }
 
 glm::vec3 LightSource::GetPosition() const
@@ -91,6 +41,7 @@ void LightSource::UpdatePosition(const glm::vec3& pos)
 void LightSource::UpdateAmbientColor(const glm::vec3& color)
 {
 	ambientColor = color;
+	if (activeLightType == 0) activeColor = color;
 }
 
 const glm::vec3& LightSource:: GetAmbientColor() const
@@ -101,6 +52,7 @@ const glm::vec3& LightSource:: GetAmbientColor() const
 void LightSource::UpdateDiffuseColor(const glm::vec3& color)
 {
 	diffuseColor = color;
+	if (activeLightType == 1) activeColor = color;
 }
 
 const glm::vec3& LightSource::GetDiffuseColor() const
@@ -111,9 +63,74 @@ const glm::vec3& LightSource::GetDiffuseColor() const
 void LightSource::UpdateSpecularColor(const glm::vec3& color)
 {
 	specularColor = color;
+	if (activeLightType == 2) activeColor = color;
 }
 
 const glm::vec3& LightSource::GetSpecularColor() const
 {
 	return specularColor;
+}
+
+void LightSource::ActivateAmbient()
+{
+	activeLightType = 0;
+	activeColor = ambientColor;
+}
+
+void LightSource::ActivateDiffuse()
+{
+	activeLightType = 1;
+	activeColor = diffuseColor;
+}
+
+void LightSource::ActivateSpecular()
+{
+	activeLightType = 2;
+	activeColor = specularColor;
+}
+
+const glm::vec3 LightSource::GetActiveColor() const
+{
+	return activeColor;
+}
+
+glm::vec3 LightSource::GetCenter() const
+{
+	float minX = vertices[0].x, minY = vertices[0].y, minZ = vertices[0].z;
+	float maxX = minX, maxY = minY, maxZ = minZ;
+
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		if (vertices[i].x > maxX)
+			maxX = vertices[i].x;
+
+		if (vertices[i].x < minX)
+			minX = vertices[i].x;
+
+		if (vertices[i].y > maxY)
+			maxY = vertices[i].y;
+
+		if (vertices[i].y < minY)
+			minY = vertices[i].y;
+
+		if (vertices[i].z > maxZ)
+			maxZ = vertices[i].z;
+
+		if (vertices[i].z < minZ)
+			minZ = vertices[i].z;
+
+	}
+	return glm::vec3((minX + maxX) / 2.0f, (minY + maxY) / 2.0f, (minZ + maxZ) / 2.0f);
+}
+
+glm::vec3 LightSource::GetTransformedPosition()
+{
+	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
+	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
+	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * currentRotationMat[1] * scalingMats[1];
+
+	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(position));
+
 }
