@@ -33,7 +33,7 @@ public:
 
 	const glm::vec3 GetActiveColor() const;
 	glm::vec3 GetCenter() const;
-	glm::vec3 GetTransformedPosition();
+	const glm::vec3 GetTransformedPosition() const;
 
 
 	int activeLightType; // 0 - ambient , 1 - diffuse, 2 - specular

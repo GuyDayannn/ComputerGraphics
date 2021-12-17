@@ -18,7 +18,7 @@ private:
 	void PutPixel(const int i, const int j, const glm::vec3& color);
 	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
 	void DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray);
-	void DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, float zfar, bool gray, const Scene& scene, const Material& material);
+	void DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, const Camera& camera,float zfar, bool gray, const Scene& scene, const Material& material, glm::vec3 faceNormal);
 	void DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera, const Scene& scene);
 	void DrawMeshModel(const MeshModel& meshModel, const glm::vec3& color);
@@ -30,7 +30,7 @@ private:
 	void DrawMeshModelFaceNormals(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawMeshModelBoundigBox(const MeshModel& meshModel, const glm::vec3& color, const Camera& camera);
 	void DrawLightSource(const LightSource& lightSource, const glm::vec3& color, const Camera& camera);
-	glm::vec3 Illuminate(glm::vec3 pnt, const LightSource& lightSource, const Material& matriel);
+	glm::vec3 Illuminate(glm::vec3 pnt, const LightSource& lightSource, const Material& matriel, glm::vec3 faceNormal, const Camera& camera);
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();

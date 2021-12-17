@@ -123,7 +123,7 @@ glm::vec3 LightSource::GetCenter() const
 	return glm::vec3((minX + maxX) / 2.0f, (minY + maxY) / 2.0f, (minZ + maxZ) / 2.0f);
 }
 
-glm::vec3 LightSource::GetTransformedPosition()
+const glm::vec3 LightSource::GetTransformedPosition() const
 {
 	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
 	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
