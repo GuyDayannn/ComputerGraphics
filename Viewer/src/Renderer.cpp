@@ -908,13 +908,16 @@ glm::vec3 Renderer::Illuminate(glm::vec3 pnt, const LightSource& lightSource, co
 	glm::vec3 p3Normal = glm::normalize(fverticesNormals[2][1] - fverticesNormals[2][0]);
 	//pntNoraml for Gouraud Shaidng
 	glm::vec3 pntNormal = CalculateNormal(fverticesNormals[0][0], p1Normal, fverticesNormals[1][0], p2Normal, fverticesNormals[2][0], p3Normal, glm::vec2(pnt.x, pnt.y));
+	pntNormal = glm::normalize(pntNormal);
 	glm::vec3 lightPos = camera.GetTransformedVertex(lightSource.GetTransformedPosition());
-	glm::vec3 lightNormDir = glm::normalize(lightPos - pnt);
+	glm::vec3 lightPntDir = glm::normalize(lightPos - pnt);
 	float dotPro;
-	if(lightSource.IsFlat()) dotPro = glm::dot(lightNormDir, nFaceNormal);
-	else if(lightSource.IsGouraud()) dotPro = glm::dot(lightNormDir, pntNormal);
+	if(lightSource.IsFlat()) dotPro = glm::dot(lightPntDir, nFaceNormal);
+	else if(lightSource.IsGouraud()) dotPro = glm::dot(lightPntDir, pntNormal);
 
+	//if (cosf(dotPro) > 90) dotPro = 0.0f;
 	glm::vec3 diffuseColor = lightSource.GetDiffuseColor() * dotPro * matriel.diffuseColor;
+	
 
 
 
