@@ -112,7 +112,6 @@ const std::vector<std::vector<std::vector<glm::vec3>>> MeshModel::GetVerticesNor
 
 	return faceVeticesNormals;
 }
-
 void MeshModel::SetVertexNormalSize(float size)
 {
 	vertexNormalSize = size;
@@ -340,6 +339,19 @@ const glm::vec3& MeshModel::GetTransformedVertex(int index) const
 	
 	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(vertices[index - 1]));
 }
+
+const glm::vec3& MeshModel::GetTransformedVertex(const glm::vec3& v) const
+{
+	std::vector<glm::mat4> scalingMats = GetScalingMatrices();
+	std::vector<glm::mat4> rotationMats = GetRotationMatrices();
+	std::vector<glm::mat4> translationMats = GetTranslationMatrices();
+	glm::mat4 worldTransformationMat = translationMats[0] * currentRotationMat[0] * scalingMats[0];
+	glm::mat4 modelTransformationMat = translationMats[1] * currentRotationMat[1] * scalingMats[1];
+
+	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(v));
+}
+
+
 
 const glm::vec3& MeshModel::GetTransformedNormal(int index) const
 {

@@ -35,6 +35,12 @@ public:
 	glm::vec3 GetCenter() const;
 	const glm::vec3 GetTransformedPosition() const;
 
+	void UpdateShadingType(int type);
+	const bool IsFlat() const;
+	const bool IsGouraud() const;
+	const bool IsPhong() const;
+
+
 
 	int activeLightType; // 0 - ambient , 1 - diffuse, 2 - specular
 private:
@@ -44,5 +50,6 @@ private:
 	glm::vec3 diffuseColor;
 	glm::vec3 specularColor;
 	glm::vec3 activeColor;
+	int shadingType;
 
 };

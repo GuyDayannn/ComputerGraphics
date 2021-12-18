@@ -124,6 +124,9 @@ static float specularLightColor[3] = { 1.0f, 1.0f, 1.0f };
 static bool ambientLight = true;
 static bool diffuseLight = false;
 static bool specularLight = false;
+static bool flatShading = true;
+static bool gouraudShading = false;
+static bool phongShading = false;
 
 
 /**
@@ -1203,6 +1206,25 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						specularLight = true;
 					}
 
+					if (scene.GetLight(i).IsFlat())
+					{
+						flatShading = true;
+						gouraudShading = false;
+						phongShading = false;
+					}
+					else if (scene.GetLight(i).IsGouraud())
+					{
+						flatShading = false;
+						gouraudShading = true;
+						phongShading = false;
+					}
+					else
+					{
+						flatShading = false;
+						gouraudShading = false;
+						phongShading = true;
+					}
+
 
 				}
 				if (selectedLight)
@@ -1214,7 +1236,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		glm::vec3 tempPos = scene.GetCamera(active_camera_index).GetTransformedVertex(scene.GetLight(active_light_index).GetTransformedPosition());
 		ImGui::Text("Position: %.3f , %3.f , %3.f", tempPos.x, tempPos.y, tempPos.z);
 
-
+		/*
 		if (ImGui::Checkbox("Ambient", &ambientLight))
 		{
 			diffuseLight = false;
@@ -1235,8 +1257,28 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			diffuseLight = false;
 			if (specularLight) scene.GetLight(active_light_index).ActivateSpecular();
 		}
+		*/
 
-
+		if (ImGui::Checkbox("Flat Shading", &flatShading))
+		{
+			gouraudShading = false;
+			phongShading = false;
+			if (flatShading) scene.GetLight(active_light_index).UpdateShadingType(0);
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Gouraud Shading", &gouraudShading))
+		{
+			flatShading = false;
+			phongShading = false;
+			if (gouraudShading) scene.GetLight(active_light_index).UpdateShadingType(1);
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Phong Shading", &phongShading))
+		{
+			flatShading = false;
+			gouraudShading = false;
+			if (phongShading) scene.GetLight(active_light_index).UpdateShadingType(2);
+		}
 
 		if (ImGui::SliderFloat3("Translation", lightxyzAddition, -10.0f, 10.0f))
 		{

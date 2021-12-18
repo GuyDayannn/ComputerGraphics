@@ -26,6 +26,7 @@ public:
 	const std::vector<std::vector<glm::vec3>> GetFacesNormals() const;
 	const glm::vec3& GetPureVertex(int index) const;
 	const glm::vec3& GetTransformedVertex(int index) const;
+	const glm::vec3& GetTransformedVertex(const glm::vec3& v) const;
 	const glm::vec3& GetPureNormal(int index) const;
 	const glm::vec3& GetTransformedNormal(int index) const;
 	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);

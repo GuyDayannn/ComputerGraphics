@@ -10,6 +10,8 @@ LightSource::LightSource(std::vector<Face> faces, std::vector<glm::vec3> vertice
 	specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	ActivateAmbient();
 	position = GetCenter();
+	shadingType = 0;
+
 
 	name = "Light " + std::to_string(num);
 }
@@ -133,4 +135,24 @@ const glm::vec3 LightSource::GetTransformedPosition() const
 
 	return HomogeneousVecToVec3(worldTransformationMat * modelTransformationMat * Vec3ToHomogeneousVec(position));
 
+}
+
+void LightSource::UpdateShadingType(int type)
+{
+	shadingType = type;
+}
+
+const bool LightSource::IsFlat() const
+{
+	return shadingType == 0;
+}
+
+const bool LightSource::IsGouraud() const
+{
+	return shadingType == 1;
+}
+
+const bool LightSource::IsPhong() const
+{
+	return shadingType == 2;
 }
