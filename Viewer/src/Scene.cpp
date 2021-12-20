@@ -7,7 +7,7 @@ Scene::Scene() :
 	active_model_index(0),
 	active_light_index(0)
 {
-
+	showLights = true;
 }
 
 void Scene::AddModel(const std::shared_ptr<MeshModel>& mesh_model)
@@ -99,4 +99,19 @@ void Scene::SetActiveLightIndex(int index)
 int Scene::GetActiveLightIndex() const
 {
 	return active_light_index;
+}
+
+void Scene::ShowLights()
+{
+	showLights = true;
+}
+
+void Scene::HideLights()
+{
+	showLights = false;
+}
+
+const bool Scene::GetShowLights() const
+{
+	return showLights;
 }

@@ -36,6 +36,10 @@ public:
 
 	void SetActiveLightIndex(int index);
 	int GetActiveLightIndex() const;
+
+	void ShowLights();
+	void HideLights();
+	const bool GetShowLights() const;
 	
 private:
 	vector<shared_ptr<MeshModel>> mesh_models;
@@ -45,4 +49,5 @@ private:
 	int active_camera_index;
 	int active_model_index;
 	int active_light_index;
+	bool showLights;
 };

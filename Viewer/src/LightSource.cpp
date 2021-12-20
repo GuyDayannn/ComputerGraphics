@@ -11,8 +11,9 @@ LightSource::LightSource(std::vector<Face> faces, std::vector<glm::vec3> vertice
 	ActivateAmbient();
 	position = GetCenter();
 	shadingType = 0;
-
-
+	ambientIntensity = 0.5f;
+	diffusiveIntensity = 0.5f;
+	specularIntensity = 0.5f;
 	name = "Light " + std::to_string(num);
 }
 
@@ -155,4 +156,34 @@ const bool LightSource::IsGouraud() const
 const bool LightSource::IsPhong() const
 {
 	return shadingType == 2;
+}
+
+void LightSource::UpdateAmbientIntensity(float val)
+{
+	ambientIntensity = val;
+}
+
+void LightSource::UpdateDiffusiveIntensity(float val)
+{
+	diffusiveIntensity = val;
+}
+
+void LightSource::UpdateSpecularIntensity(float val)
+{
+	specularIntensity = val;
+}
+
+float LightSource::GetAmbientIntensity() const
+{
+	return ambientIntensity;
+}
+
+float LightSource::GetDiffusiveIntensity() const
+{
+	return diffusiveIntensity;
+}
+
+float LightSource::GetSpecularIntensity() const
+{
+	return specularIntensity;
 }

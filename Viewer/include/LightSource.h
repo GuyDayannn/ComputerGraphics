@@ -40,6 +40,14 @@ public:
 	const bool IsGouraud() const;
 	const bool IsPhong() const;
 
+	void UpdateAmbientIntensity(float val);
+	void UpdateDiffusiveIntensity(float val);
+	void UpdateSpecularIntensity(float val);
+
+	float GetAmbientIntensity() const;
+	float GetDiffusiveIntensity() const;
+	float GetSpecularIntensity() const;
+
 
 
 	int activeLightType; // 0 - ambient , 1 - diffuse, 2 - specular
@@ -50,6 +58,9 @@ private:
 	glm::vec3 diffuseColor;
 	glm::vec3 specularColor;
 	glm::vec3 activeColor;
+	float ambientIntensity;
+	float diffusiveIntensity;
+	float specularIntensity;
 	int shadingType;
 
 };

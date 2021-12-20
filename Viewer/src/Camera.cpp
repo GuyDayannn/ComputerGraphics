@@ -5,7 +5,7 @@ Camera::Camera(int window_width, int window_height, int num): window_width(windo
 	camPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	atPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	upPos = glm::vec3(0.0f, 1.0f, 0.0f);
-	nearZ = 15.0f;
+	nearZ = 5.0f;
 	farZ = 100.0f;
 	left = -(window_width / 2.0f);
 	right = window_width / 2.0f;
@@ -199,7 +199,7 @@ glm::vec3 Camera::GetTransformedVertex(const glm::vec3 vec) const
 	glm::vec3 tVec = HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 	tVec.x = (1.0f + tVec.x) * (window_width / 2.0f);
 	tVec.y = (1.0f + tVec.y) * (window_height / 2.0f);
-	tVec.z = (1.0f + tVec.z) * (abs(farZ - nearZ));
+	tVec.z = (1.0f + tVec.z) * (abs(farZ));
 	return tVec;
 	//return HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
 }

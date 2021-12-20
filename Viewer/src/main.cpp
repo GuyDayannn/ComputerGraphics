@@ -61,6 +61,7 @@ static bool showBoundingRec = false;
 static float ambientModelColor[3] = { 1.0f, 1.0f, 1.0f };
 static float diffuseModelColor[3] = { 1.0f, 1.0f, 1.0f };
 static float specularModelColor[3] = { 1.0f, 1.0f, 1.0f };
+static float shininess = 100.0f;
 /**
 * Fields for controling camera
 */
@@ -76,7 +77,7 @@ static float nearZ = 0.1f;
 static float farZ = 100.0f;
 static float upDown[2] = { windowHeight / 2.0f , -(windowHeight / 2.0f) };
 static float leftRight[2] = { -(windowWidth / 2.0f) , windowWidth / 2.0f };
-static float nearFar[2] = { 15.0f , 100.0f };
+static float nearFar[2] = { 5.0f , 100.0f };
 static float cameraPos[3] = { 0.0f,0.0f,3.0f };
 static float lookAtPos[3] = { 0.0f,0.0f,0.0f };
 static float upPos[3] = { 0.0f,1.0f,0.f };
@@ -119,14 +120,18 @@ int lightCount = 0;
 static int active_light_index = 0;
 static float lightPos[3] = { 1.0f, 1.0f, 1.0f };
 static float ambientLightColor[3] = { 1.0f, 1.0f, 1.0f };
+float ambientIntensity = 0.5f;
 static float diffuseLightColor[3] = { 1.0f, 1.0f, 1.0f };
+float diffusiveIntensity = 0.5f;
 static float specularLightColor[3] = { 1.0f, 1.0f, 1.0f };
+float specularIntensity = 0.5f;
 static bool ambientLight = true;
 static bool diffuseLight = false;
 static bool specularLight = false;
 static bool flatShading = true;
 static bool gouraudShading = false;
 static bool phongShading = false;
+static bool showLights = true;
 
 
 /**
@@ -742,6 +747,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						specularModelColor[1] = scene.GetModel(i).GetMaterial().specularColor[1];
 						specularModelColor[2] = scene.GetModel(i).GetMaterial().specularColor[2];
 
+						shininess = scene.GetModel(i).GetMaterial().shininess;
 
 					}
 					if (selectedModel)
@@ -937,6 +943,12 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		}
 
+		if (ImGui::SliderFloat("Shininess:", &shininess, 0.0f, 150.0f))
+		{
+			scene.GetModel(active_model_index).GetMaterial().shininess = shininess;
+
+		}
+
 		
 		//ImGui::ColorEdit3("Specular Color", specularModelColor);
 
@@ -992,7 +1004,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		{
 			if (ImGui::SliderFloat("FOV y", &fovy, 45.0f, 120.0f))
 			{
-				scene.GetCamera(active_camera_index).UpdateViewVolume(upDownVec[active_camera_index][0], upDownVec[active_camera_index][1], leftRightVec[active_camera_index][0], leftRightVec[active_camera_index][1], nearFarVec[active_camera_index][0], nearFarVec[active_camera_index][1], fovy);
+				std::vector<float> nearFar = scene.GetCamera(active_camera_index).GetNearFarVals();
+				scene.GetCamera(active_camera_index).UpdateViewVolume(upDownVec[active_camera_index][0], upDownVec[active_camera_index][1], leftRightVec[active_camera_index][0], leftRightVec[active_camera_index][1], nearFar[0], nearFar[1], fovy);
 				fovyVec[active_camera_index] = fovy;
 			}
 		}
@@ -1225,6 +1238,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						phongShading = true;
 					}
 
+					ambientIntensity = scene.GetLight(i).GetAmbientIntensity();
+					diffusiveIntensity = scene.GetLight(i).GetDiffusiveIntensity();
+					specularIntensity = scene.GetLight(i).GetSpecularIntensity();
+
 
 				}
 				if (selectedLight)
@@ -1258,6 +1275,13 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			if (specularLight) scene.GetLight(active_light_index).ActivateSpecular();
 		}
 		*/
+
+		if (ImGui::Checkbox("Show Lights", &showLights))
+		{
+			if (showLights) scene.ShowLights();
+			else scene.HideLights();
+		}
+
 
 		if (ImGui::Checkbox("Flat Shading", &flatShading))
 		{
@@ -1293,9 +1317,19 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			scene.GetLight(active_light_index).UpdateAmbientColor(glm::vec3(ambientLightColor[0], ambientLightColor[1], ambientLightColor[2]));
 		}
 
+		if (ImGui::SliderFloat("Ambient Intenisty: ", &ambientIntensity, 0.0f, 1.0f))
+		{
+			scene.GetLight(active_light_index).UpdateAmbientIntensity(ambientIntensity);
+		}
+
 		if (ImGui::ColorEdit3("Diffuse Color", diffuseLightColor))
 		{
 			scene.GetLight(active_light_index).UpdateDiffuseColor(glm::vec3(diffuseLightColor[0], diffuseLightColor[1], diffuseLightColor[2]));
+		}
+
+		if (ImGui::SliderFloat("Diffusive Intenisty: ", &diffusiveIntensity, 0.0f, 1.0f))
+		{
+			scene.GetLight(active_light_index).UpdateAmbientIntensity(diffusiveIntensity);
 		}
 
 		if (ImGui::ColorEdit3("Specular Color", specularLightColor))
@@ -1303,6 +1337,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			scene.GetLight(active_light_index).UpdateSpecularColor(glm::vec3(specularLightColor[0], specularLightColor[1], specularLightColor[2]));
 		}
 		
+		if (ImGui::SliderFloat("Specular Intenisty: ", &specularIntensity, 0.0f, 1.0f))
+		{
+			scene.GetLight(active_light_index).UpdateAmbientIntensity(specularIntensity);
+		}
+
 		ImGui::End();
 	}
 }

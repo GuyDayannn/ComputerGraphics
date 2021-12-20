@@ -298,6 +298,17 @@ glm::vec3 CalculateNormal(const glm::vec3& p1, const glm::vec3& p1n, const glm::
 	return cordn;
 }
 
+glm::vec3 CalculateColor(const glm::vec3& p1, const glm::vec3& p1c, const glm::vec3& p2, const glm::vec3& p2c, const glm::vec3& p3, const glm::vec3& p3c, const glm::vec2& cord)
+{
+	float A1 = CalculateTriangleArea(p2, p3, cord);
+	float A2 = CalculateTriangleArea(p1, p3, cord);
+	float A3 = CalculateTriangleArea(p2, p1, cord);
+	float A = A1 + A2 + A3;
+	glm::vec3 cordc = (A1 / A) * p1c + (A2 / A) * p2c + (A3 / A) * p3c;
+
+	return cordc;
+}
+
 float Alpha(float p0, float p1, float cord)
 {
 	return (p1 - cord) / (p1 - p0);
@@ -414,7 +425,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 }
 
 //Drawing with light
-void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& color, const Camera& camera,float zfar, bool gray, const Scene& scene, const Material& material, glm::vec3 faceNormal, std::vector<std::vector<glm::vec3>> fverticesNormals)
+void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const glm::vec3& pnt2, const glm::vec3& faceMiddle,const glm::vec3& color, const Camera& camera,float zfar, bool gray, const Scene& scene, const Material& material, glm::vec3 faceNormal, std::vector<glm::vec3> pointsNormals)
 {
 	glm::vec3 p0 = pnt0;
 	glm::vec3 p1 = pnt1;
@@ -509,7 +520,7 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 				{
 					for (int l = 0; l < scene.GetLightCount(); l++)
 					{
-						acolor += Illuminate(glm::vec3(x, y, z), scene.GetLight(l), material, faceNormal, fverticesNormals, camera);
+						acolor += Illuminate(pnt0, pnt1, pnt2, glm::vec3(x, y, z), faceMiddle, scene.GetLight(l), material, faceNormal, pointsNormals, camera);
 					}
 
 					PutPixel(x, y, acolor);
@@ -551,6 +562,11 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 			fverticesNormals[j][0] = camera.GetTransformedVertex(meshModel.GetTransformedVertex(fverticesNormals[j][0]));
 			fverticesNormals[j][1] = camera.GetTransformedVertex(meshModel.GetTransformedVertex(fverticesNormals[j][1]));
 		}
+
+		std::vector<glm::vec3> pointsNormals;
+		pointsNormals.push_back(glm::normalize(fverticesNormals[0][1] - fverticesNormals[0][0]));
+		pointsNormals.push_back(glm::normalize(fverticesNormals[1][1] - fverticesNormals[1][0]));
+		pointsNormals.push_back(glm::normalize(fverticesNormals[2][1] - fverticesNormals[2][0]));
 		//converted
 
 		// <{x,y,z}, {x,y,z}}>
@@ -568,7 +584,7 @@ void Renderer::DrawColorMeshModel(const MeshModel& meshModel, const glm::vec3& c
 		glm::vec3 v2 = camera.GetTransformedVertex(triangle[1]);
 		glm::vec3 v3 = camera.GetTransformedVertex(triangle[2]);
 
-		DrawTriangle(v1, v2, v3, color, camera,camera.GetNearFarVals()[1], camera.gray,scene, meshModel.GetMaterial(), vnf, fverticesNormals);
+		DrawTriangle(v1, v2, v3, vn1, color, camera,camera.GetNearFarVals()[1], camera.gray,scene, meshModel.GetMaterial(), vnf, pointsNormals);
 		//cout << "END OF TRIANGLE" << endl;
 	}
 
@@ -893,36 +909,78 @@ void Renderer::DrawLightSource(const LightSource& lightSource, const glm::vec3& 
 	PutPixel(right, up, color);
 }
 
-glm::vec3 Renderer::Illuminate(glm::vec3 pnt, const LightSource& lightSource, const Material& matriel, glm::vec3 faceNormal, std::vector<std::vector<glm::vec3>> fverticesNormals, const Camera& camera)
+glm::vec3 Renderer::Illuminate(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 pnt, glm::vec3 faceMiddle, const LightSource& lightSource, const Material& matriel, glm::vec3 faceNormal, std::vector<glm::vec3> pointsNormals, const Camera& camera)
 {
 	//Ambient
 	glm::vec3 ambientColor;
-	ambientColor = lightSource.GetAmbientColor() * matriel.ambientColor;
+	ambientColor =  lightSource.GetAmbientIntensity() * lightSource.GetAmbientColor() * matriel.ambientColor;
 	
 
 	//Diffuse
 	//nFaceNormal for Flat Shading
-	glm::vec3 nFaceNormal = glm::normalize(faceNormal);
-	glm::vec3 p1Normal = glm::normalize(fverticesNormals[0][1] - fverticesNormals[0][0]);
-	glm::vec3 p2Normal = glm::normalize(fverticesNormals[1][1] - fverticesNormals[1][0]);
-	glm::vec3 p3Normal = glm::normalize(fverticesNormals[2][1] - fverticesNormals[2][0]);
-	//pntNoraml for Gouraud Shaidng
-	glm::vec3 pntNormal = CalculateNormal(fverticesNormals[0][0], p1Normal, fverticesNormals[1][0], p2Normal, fverticesNormals[2][0], p3Normal, glm::vec2(pnt.x, pnt.y));
-	pntNormal = glm::normalize(pntNormal);
-	glm::vec3 lightPos = camera.GetTransformedVertex(lightSource.GetTransformedPosition());
-	glm::vec3 lightPntDir = glm::normalize(lightPos - pnt);
+	glm::vec3 nFaceNormal, p1Normal, p2Normal, p3Normal, pntNormal, lightPntDir;
 	float dotPro;
+	glm::vec3 lightPos = camera.GetTransformedVertex(lightSource.GetTransformedPosition());
+	
+	if (lightSource.IsFlat())
+	{
+		lightPntDir = glm::normalize(lightPos - faceMiddle);// one calculation per face
+		nFaceNormal = glm::normalize(faceNormal); // one calculation per face
+		dotPro = glm::dot(lightPntDir, nFaceNormal); // one calucaltion per face
+	}
+
+	glm::vec3 p1Color, p2Color, p3Color, pntColor;
+
+	if (lightSource.IsPhong())
+	{
+		lightPntDir = glm::normalize(lightPos - pnt);
+		//p1Normal = glm::normalize(fverticesNormals[0][1] - fverticesNormals[0][0]); // one per face
+		//p2Normal = glm::normalize(fverticesNormals[1][1] - fverticesNormals[1][0]); // one per face
+		//p3Normal = glm::normalize(fverticesNormals[2][1] - fverticesNormals[2][0]); // one per face
+		p1Normal = pointsNormals[0];
+		p2Normal = pointsNormals[1];
+		p3Normal = pointsNormals[2];
+		//pntNoraml for Gouraud Shaidng
+		pntNormal = CalculateNormal(p1, p1Normal, p2, p2Normal, p3, p3Normal, glm::vec2(pnt.x, pnt.y));
+		pntNormal = glm::normalize(pntNormal);
+		dotPro = glm::dot(lightPntDir, pntNormal);
+	}
+	/*
 	if(lightSource.IsFlat()) dotPro = glm::dot(lightPntDir, nFaceNormal);
 	else if(lightSource.IsGouraud()) dotPro = glm::dot(lightPntDir, pntNormal);
+	*/
 
 	//if (cosf(dotPro) > 90) dotPro = 0.0f;
-	glm::vec3 diffuseColor = lightSource.GetDiffuseColor() * dotPro * matriel.diffuseColor;
+	glm::vec3 diffuseColor =  lightSource.GetDiffusiveIntensity() * lightSource.GetDiffuseColor() * dotPro * matriel.diffuseColor;
+
+	//Specular
+	glm::vec3 reflection, eyeTransformed, eyeToPoint, specularColor;
+	float dotProSpec;
+	eyeTransformed = camera.GetTransformedVertex(camera.GetCameraLookAt()[0]);
+	if (lightSource.IsFlat())
+	{
+		eyeToPoint = glm::normalize(eyeTransformed - faceMiddle); // v in formula
+		reflection = glm::normalize(glm::reflect(-lightPntDir, nFaceNormal)); //reflection = 2.0f * nFaceNormal * dot(nFaceNormal, lightPntDir) - lightPntDir;
+		dotProSpec = pow(std::max(glm::dot(reflection, eyeToPoint), 0.0f), matriel.shininess);
+		//DrawLine(lightPos, faceMiddle, glm::vec3(1, 0, 0));
+		//DrawLine(faceMiddle, faceMiddle + (40.0f * reflection), glm::vec3(1,0,0));
+	}
+
+	if (lightSource.IsPhong())
+	{
+		eyeToPoint = glm::normalize(eyeTransformed - pnt); // v in formula
+		reflection = glm::normalize(glm::reflect(-lightPntDir, pntNormal)); //reflection = 2.0f * nFaceNormal * dot(nFaceNormal, lightPntDir) - lightPntDir;
+		dotProSpec = pow(std::max(glm::dot(reflection, eyeToPoint), 0.0f), matriel.shininess);
+	}
+	specularColor =  lightSource.GetSpecularIntensity() * lightSource.GetSpecularColor() * dotProSpec * matriel.specularColor;
+
+
 	
 
 
 
 
-	return (ambientColor + diffuseColor);
+	return (ambientColor + diffuseColor + specularColor);
 
 }
 
@@ -1082,11 +1140,15 @@ void Renderer::Render(const Scene& scene)
 	if (camCount != 0)
 	{
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());
-		for (int i = 0; i < lightCount; i++)
+		if (scene.GetShowLights())
 		{
-			DrawColorMeshModel(scene.GetLight(i), scene.GetLight(i).GetActiveColor(), cam);
+			for (int i = 0; i < lightCount; i++)
+			{
+				DrawColorMeshModel(scene.GetLight(i), scene.GetLight(i).GetActiveColor(), cam);
+			}
 		}
 	}
+
 	if (camCount != 0)
 	{
 		Camera cam = scene.GetCamera(scene.GetActiveCameraIndex());
