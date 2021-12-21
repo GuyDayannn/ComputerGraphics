@@ -10,6 +10,8 @@ LightSource::LightSource(std::vector<Face> faces, std::vector<glm::vec3> vertice
 	specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	ActivateAmbient();
 	position = GetCenter();
+	direction = glm::vec3(1.0f, 1.0f, 1.0f);
+	type = 0; //type = 0 is point light, 1 is directional
 	shadingType = 0;
 	ambientIntensity = 0.5f;
 	diffusiveIntensity = 0.5f;
@@ -186,4 +188,30 @@ float LightSource::GetDiffusiveIntensity() const
 float LightSource::GetSpecularIntensity() const
 {
 	return specularIntensity;
+}
+
+
+void LightSource::UpdateLightType(int t)
+{
+	type = t;
+}
+
+bool LightSource::IsPointLight() const
+{
+	return type == 0;
+}
+
+bool LightSource::IsDirectionalLight() const
+{
+	return type == 1;
+}
+
+void LightSource::UpdateDirection(const glm::vec3& dir)
+{
+	direction = dir;
+}
+
+glm::vec3 LightSource::GetDirection() const
+{
+	return direction;
 }

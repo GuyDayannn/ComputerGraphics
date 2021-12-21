@@ -48,12 +48,20 @@ public:
 	float GetDiffusiveIntensity() const;
 	float GetSpecularIntensity() const;
 
+	void UpdateLightType(int t);
+	bool IsPointLight() const;
+	bool IsDirectionalLight() const;
+
+	void UpdateDirection(const glm::vec3& dir);
+	glm::vec3 GetDirection() const;
+
 
 
 	int activeLightType; // 0 - ambient , 1 - diffuse, 2 - specular
 private:
 	std::string name;
 	glm::vec3 position;
+	glm::vec3 direction;
 	glm::vec3 ambientColor;
 	glm::vec3 diffuseColor;
 	glm::vec3 specularColor;
@@ -62,5 +70,6 @@ private:
 	float diffusiveIntensity;
 	float specularIntensity;
 	int shadingType;
+	int type;
 
 };

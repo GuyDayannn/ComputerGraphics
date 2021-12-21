@@ -15,6 +15,8 @@
 #include "LightSource.h"
 
 #include <iostream>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 
 /**
  * Fields
@@ -77,7 +79,7 @@ static float nearZ = 0.1f;
 static float farZ = 100.0f;
 static float upDown[2] = { windowHeight / 2.0f , -(windowHeight / 2.0f) };
 static float leftRight[2] = { -(windowWidth / 2.0f) , windowWidth / 2.0f };
-static float nearFar[2] = { 5.0f , 100.0f };
+static float nearFar[2] = { 1.6f , 100.0f };
 static float cameraPos[3] = { 0.0f,0.0f,3.0f };
 static float lookAtPos[3] = { 0.0f,0.0f,0.0f };
 static float upPos[3] = { 0.0f,1.0f,0.f };
@@ -114,6 +116,7 @@ static bool gray = false;
 * Fields for lights
 */
 static float lightxyzAddition[3] = { 0.0f, 0.0f, 0.0f }; //xyz addition
+static float lightDir[3] = { 1.0f, 1.0f, 1.0f }; //xyz addition
 static float lightxyzWorld[3] = { 0.0f, 0.0f, 0.0f };
 static const char* choosenLight = nullptr;
 int lightCount = 0;
@@ -132,6 +135,8 @@ static bool flatShading = true;
 static bool gouraudShading = false;
 static bool phongShading = false;
 static bool showLights = true;
+static bool pointLight = true;
+static bool directionalLight = false;
 
 
 /**
@@ -1242,6 +1247,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					diffusiveIntensity = scene.GetLight(i).GetDiffusiveIntensity();
 					specularIntensity = scene.GetLight(i).GetSpecularIntensity();
 
+					lightDir[0] = scene.GetLight(i).GetDirection()[0];
+					lightDir[1] = scene.GetLight(i).GetDirection()[1];
+					lightDir[2] = scene.GetLight(i).GetDirection()[2];
+
 
 				}
 				if (selectedLight)
@@ -1250,8 +1259,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			
 			ImGui::EndCombo();
 		}
-		glm::vec3 tempPos = scene.GetCamera(active_camera_index).GetTransformedVertex(scene.GetLight(active_light_index).GetTransformedPosition());
-		ImGui::Text("Position: %.3f , %3.f , %3.f", tempPos.x, tempPos.y, tempPos.z);
+		glm::vec3 tempPos = (scene.GetCamera(active_camera_index).GetTransformedLight(scene.GetLight(active_light_index).GetTransformedPosition()));
+		ImGui::Text("Position: %.3f , %.3f , %.3f", tempPos.x, tempPos.y, -tempPos.z);
 
 		/*
 		if (ImGui::Checkbox("Ambient", &ambientLight))
@@ -1282,7 +1291,28 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			else scene.HideLights();
 		}
 
+		if (ImGui::Checkbox("Point Light", &pointLight))
+		{
+			if (pointLight)
+			{
+				directionalLight = false;
+				scene.GetLight(active_light_index).UpdateLightType(0);
+			}
 
+		}
+		ImGui::SameLine();
+		if (ImGui::Checkbox("Directional Light", &directionalLight))
+		{
+			if (pointLight)
+			{
+				pointLight = false;
+				scene.GetLight(active_light_index).UpdateLightType(1);
+			}
+
+		}
+		
+
+		
 		if (ImGui::Checkbox("Flat Shading", &flatShading))
 		{
 			gouraudShading = false;
@@ -1304,11 +1334,27 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			if (phongShading) scene.GetLight(active_light_index).UpdateShadingType(2);
 		}
 
-		if (ImGui::SliderFloat3("Translation", lightxyzAddition, -10.0f, 10.0f))
+
+		//if (scene.GetLight(active_light_index).IsPointLight())
+		//{
+			if (ImGui::SliderFloat3("Translation / Direction", lightxyzAddition, -10.0f, 10.0f))
+			{
+				glm::vec3 scale = scene.GetLight(active_light_index).GetScale()[1];
+				scene.GetLight(active_light_index).UpdateModelTransformations(scale, glm::vec3(0.0f, 0.0f, 0.0f), "x", glm::vec3(lightxyzAddition[0], lightxyzAddition[1], lightxyzAddition[2]));
+			}
+
+		//}
+		/*
+		else
 		{
-			glm::vec3 scale = scene.GetLight(active_light_index).GetScale()[1];
-			scene.GetLight(active_light_index).UpdateModelTransformations(scale, glm::vec3(0.0f, 0.0f, 0.0f), "x", glm::vec3(lightxyzAddition[0], lightxyzAddition[1], lightxyzAddition[2]));
+			if (ImGui::SliderFloat3("Direction", lightDir, -10.0f, 10.0f))
+			{
+				scene.GetLight(active_light_index).UpdateDirection(glm::vec3(lightDir[0], lightDir[1], lightDir[2]));
+			}
+
 		}
+		*/
+		
 
 
 

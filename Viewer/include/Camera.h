@@ -34,6 +34,7 @@ public:
 	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
 	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
 	glm::vec3 GetTransformedVertex(const glm::vec3 vec) const;
+	glm::vec3 GetTransformedLight(const glm::vec3 vec) const;
 
 	bool gray;
 
