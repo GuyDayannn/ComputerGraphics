@@ -137,6 +137,11 @@ static bool phongShading = false;
 static bool showLights = true;
 static bool pointLight = true;
 static bool directionalLight = false;
+static bool fogActivated = false;
+static float fogDistance = 2.0f;
+static float fogDensity = 1.0f;
+static bool blur = false;
+static int numOfBlurs = 1;
 
 
 /**
@@ -1247,10 +1252,20 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					diffusiveIntensity = scene.GetLight(i).GetDiffusiveIntensity();
 					specularIntensity = scene.GetLight(i).GetSpecularIntensity();
 
+					if (scene.GetLight(i).IsPointLight())
+					{
+						pointLight = true;
+						directionalLight = false;
+					}
+					else
+					{
+						pointLight = false;
+						directionalLight = true;
+					}
+
 					lightDir[0] = scene.GetLight(i).GetDirection()[0];
 					lightDir[1] = scene.GetLight(i).GetDirection()[1];
 					lightDir[2] = scene.GetLight(i).GetDirection()[2];
-
 
 				}
 				if (selectedLight)
@@ -1259,8 +1274,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			
 			ImGui::EndCombo();
 		}
-		glm::vec3 tempPos = (scene.GetCamera(active_camera_index).GetTransformedLight(scene.GetLight(active_light_index).GetTransformedPosition()));
-		ImGui::Text("Position: %.3f , %.3f , %.3f", tempPos.x, tempPos.y, -tempPos.z);
+		glm::vec3 tempPos = (scene.GetCamera(active_camera_index).GetTransformedVertex(scene.GetLight(active_light_index).GetTransformedPosition()));
+		ImGui::Text("Position: %.3f , %.3f , %.3f", tempPos.x, tempPos.y, tempPos.z);
 
 		/*
 		if (ImGui::Checkbox("Ambient", &ambientLight))
@@ -1386,6 +1401,31 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		if (ImGui::SliderFloat("Specular Intenisty: ", &specularIntensity, 0.0f, 1.0f))
 		{
 			scene.GetLight(active_light_index).UpdateAmbientIntensity(specularIntensity);
+		}
+
+		if (ImGui::Checkbox("Fog Effect", &fogActivated))
+		{
+			scene.UpdateFogStatus(fogActivated);
+		}
+
+		if (ImGui::SliderFloat("Fog Distance", &fogDistance, -10.0f, 10.0f))
+		{
+			scene.UpdateFogDistance(fogDistance);
+		}
+
+		if (ImGui::SliderFloat("Fog Density", &fogDensity, -10.0f, 10.0f))
+		{
+			scene.UpdateFogDensity(fogDensity);
+		}
+
+		if (ImGui::Checkbox("Blur", &blur))
+		{
+			scene.UpdateBlur(blur);
+		}
+
+		if (ImGui::SliderInt("Blur intensity", &numOfBlurs, 0, 5))
+		{
+			scene.UpdateNumOfBlurs(numOfBlurs);
 		}
 
 		ImGui::End();

@@ -40,6 +40,19 @@ public:
 	void ShowLights();
 	void HideLights();
 	const bool GetShowLights() const;
+
+	const bool IsFog() const;
+	void UpdateFogStatus(bool s);
+	void UpdateFogDistance(float d);
+	const float GetFogDistance() const;
+	void UpdateFogDensity(float de);
+	const float GetFogDensity() const;
+
+	const bool IsBlur() const;
+	void UpdateBlur(bool b);
+
+	const int GetNumOfBlurs() const;
+	void UpdateNumOfBlurs(int n);
 	
 private:
 	vector<shared_ptr<MeshModel>> mesh_models;
@@ -50,4 +63,10 @@ private:
 	int active_model_index;
 	int active_light_index;
 	bool showLights;
+	bool fog;
+	float fogDistance;
+	bool blur;
+	int numOfBlurs;
+	float fogDensity;
+	bool bloom;
 };

@@ -23,6 +23,17 @@ Renderer::Renderer(int viewport_width, int viewport_height) :
 		zBuffer.push_back(zy);
 	}
 
+	/*
+	for (int i = 0; i < viewport_width; i++) //1280
+	{
+		std::vector<glm::vec3> cl;
+		for (int j = 0; j < viewport_height; j++) //720
+		{
+			cl.push_back(glm::vec3(0, 0, 0));
+		}
+		colorsBuffer.push_back(cl);
+	}
+	*/
 
 	InitOpenglRendering();
 	CreateBuffers(viewport_width, viewport_height);
@@ -37,6 +48,8 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 {
 	if (i < 0) return; if (i >= viewport_width) return;
 	if (j < 0) return; if (j >= viewport_height) return;
+
+	//colorsBuffer[i][j] = color;
 	
 	color_buffer[INDEX(viewport_width, i, j, 0)] = color.x;
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
@@ -512,6 +525,8 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 				float ratio = 1 - (z / zfar);
 				glm::vec3 gcolor(1.0f * ratio, 1.0f * ratio, 1.0f * ratio);
 				glm::vec3 acolor(0.0f, 0.0f, 0.0f);
+				glm::vec3 fogColor(0.8f, 0.8f, 0.8f);
+				float f = 1.0f;
 
 				zBuffer[x][y] = z;
 				if (gray == true)
@@ -521,6 +536,13 @@ void Renderer::DrawTriangle(const glm::vec3& pnt0, const glm::vec3& pnt1, const 
 					for (int l = 0; l < scene.GetLightCount(); l++)
 					{
 						acolor += Illuminate(pnt0, pnt1, pnt2, glm::vec3(x, y, z), faceMiddle, scene.GetLight(l), material, faceNormal, pointsNormals, camera);
+					}
+
+					if (scene.IsFog())
+					{
+						float distance = abs(camera.GetNearFarVals()[0] - z) / abs(camera.GetNearFarVals()[1]);
+						f = exp((-distance) * scene.GetFogDensity());
+						acolor = (1.0f - f) * fogColor + f * acolor;
 					}
 
 					PutPixel(x, y, acolor);
@@ -1209,6 +1231,23 @@ void Renderer::Render(const Scene& scene)
 			if (scene.GetModel(i).GetFaceNormalsShowState()) DrawMeshModelFaceNormals(scene.GetModel(i), glm::vec3(0, 1, 1), cam);
 			if (scene.GetModel(i).GetVertexNormalsShowState()) DrawMeshModelVerticesNormals(scene.GetModel(i), glm::vec3(1, 0, 1), cam);
 			if (scene.GetModel(i).displayBoundingBox) DrawMeshModelBoundigBox(scene.GetModel(i), glm::vec3(1, 0.5, 0), cam);
+		}
+	}
+
+	if (scene.IsBlur())
+	{
+		for (int i = 0; i < scene.GetNumOfBlurs(); i++)
+		{
+			for (int i = 1; i < viewport_width - 1; i++)
+			{
+				for (int j = 1; j < viewport_height - 1; j++)
+				{
+					color_buffer[INDEX(viewport_width, i, j, 0)] = (color_buffer[INDEX(viewport_width, i - 1, j, 0)] + color_buffer[INDEX(viewport_width, i + 1, j, 0)] + color_buffer[INDEX(viewport_width, i, j - 1, 0)] + color_buffer[INDEX(viewport_width, i, j + 1, 0)]) / 4.0f;
+					color_buffer[INDEX(viewport_width, i, j, 1)] = (color_buffer[INDEX(viewport_width, i - 1, j, 1)] + color_buffer[INDEX(viewport_width, i + 1, j, 1)] + color_buffer[INDEX(viewport_width, i, j - 1, 1)] + color_buffer[INDEX(viewport_width, i, j + 1, 1)]) / 4.0f;
+					color_buffer[INDEX(viewport_width, i, j, 2)] = (color_buffer[INDEX(viewport_width, i - 1, j, 2)] + color_buffer[INDEX(viewport_width, i + 1, j, 2)] + color_buffer[INDEX(viewport_width, i, j - 1, 2)] + color_buffer[INDEX(viewport_width, i, j + 1, 2)]) / 4.0f;
+				}
+
+			}
 		}
 	}
 

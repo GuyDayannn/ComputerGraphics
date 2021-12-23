@@ -42,6 +42,7 @@ private:
 	int viewport_width;
 	int viewport_height;
 	std::vector<std::vector<float>> zBuffer;
+	//std::vector<std::vector<glm::vec3>> colorsBuffer;
 	GLuint gl_screen_tex;
 	GLuint gl_screen_vtc;
 };

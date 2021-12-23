@@ -8,6 +8,11 @@ Scene::Scene() :
 	active_light_index(0)
 {
 	showLights = true;
+	fog = false;
+	fogDistance = 2.0f;
+	fogDensity = 1.0f;
+	blur = false;
+	numOfBlurs = 1;
 }
 
 void Scene::AddModel(const std::shared_ptr<MeshModel>& mesh_model)
@@ -114,4 +119,54 @@ void Scene::HideLights()
 const bool Scene::GetShowLights() const
 {
 	return showLights;
+}
+
+const bool Scene::IsFog() const
+{
+	return fog;
+}
+
+void Scene::UpdateFogStatus(bool s)
+{
+	fog = s;
+}
+
+void Scene::UpdateFogDistance(float d)
+{
+	fogDistance = d;
+}
+
+const float Scene::GetFogDistance() const
+{
+	return fogDistance;
+}
+
+void Scene::UpdateFogDensity(float de)
+{
+	fogDensity = de;
+}
+
+const float Scene::GetFogDensity() const
+{
+	return fogDensity;
+}
+
+const bool Scene::IsBlur() const
+{
+	return blur;
+}
+
+void Scene::UpdateBlur(bool b)
+{
+	blur = b;
+}
+
+const int Scene::GetNumOfBlurs() const
+{
+	return numOfBlurs;
+}
+
+void Scene::UpdateNumOfBlurs(int n)
+{
+	numOfBlurs = n;
 }
