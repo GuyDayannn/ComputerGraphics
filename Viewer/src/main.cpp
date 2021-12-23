@@ -1408,11 +1408,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			scene.UpdateFogStatus(fogActivated);
 		}
 
-		if (ImGui::SliderFloat("Fog Distance", &fogDistance, -10.0f, 10.0f))
-		{
-			scene.UpdateFogDistance(fogDistance);
-		}
-
 		if (ImGui::SliderFloat("Fog Density", &fogDensity, -10.0f, 10.0f))
 		{
 			scene.UpdateFogDensity(fogDensity);
