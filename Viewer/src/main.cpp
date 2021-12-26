@@ -1177,7 +1177,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::End();
 	}
 
-	if (show_lighting_window && lightCount > 0)
+	if (show_lighting_window && lightCount > 0 && camCount > 0)
 	{
 		ImGui::Begin("Lighting Window", &show_lighting_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 
