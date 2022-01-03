@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include "PointLight.h"
+#include <sstream>
 
 Renderer::Renderer()
 {
@@ -35,7 +37,25 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("model", currentModel->GetWorldTransformation() * currentModel->GetModelTransformation());
 			colorShader.setUniform("view", camera.GetViewTransformation());
 			colorShader.setUniform("projection", camera.GetProjectionTransformation());
-			colorShader.setUniform("modelColor", currentModel->GetColor());
+			colorShader.setUniform("material.textureMap", 0);
+			colorShader.setUniform("camPos", camera.GetEye()); // active camera position
+			colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
+
+			std::shared_ptr<PointLight> pLight;
+			for (int i = 0; i < scene->GetLightCount(); i++)
+			{
+				std::shared_ptr<Light> lght = scene->GetLight(i);
+				pLight = std::dynamic_pointer_cast<PointLight>(lght);
+
+				if (pLight != NULL) //pointLight
+				{
+					std::ostringstream plts;
+					plts << "lightTransfomation[" << i << "]";
+					std::string mystring = plts.str();
+					colorShader.setUniform(mystring.c_str(), pLight->GetWorldTransformation() * pLight->GetModelTransformation());
+				}
+
+			}
 
 			// Set 'texture1' as the active texture at slot #0
 			texture1.bind(0);
