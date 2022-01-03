@@ -3,41 +3,25 @@
 #include <string>
 
 Scene::Scene() :
-	active_camera_index(0),
-	active_model_index(0),
-	active_light_index(0)
+	activeCameraIndex(0),
+	activeModelIndex(0)
 {
-	showLights = true;
-	fog = false;
-	fogDistance = 2.0f;
-	fogDensity = 1.0f;
-	blur = false;
-	numOfBlurs = 1;
+
 }
 
-void Scene::AddModel(const std::shared_ptr<MeshModel>& mesh_model)
+void Scene::AddModel(const std::shared_ptr<MeshModel>& model)
 {
-	mesh_models.push_back(mesh_model);
+	models.push_back(model);
+}
+
+void Scene::AddCamera(const Camera& camera)
+{
+	cameras.push_back(camera);
 }
 
 int Scene::GetModelCount() const
 {
-	return mesh_models.size();
-}
-
-MeshModel& Scene::GetModel(int index) const
-{
-	return *mesh_models[index];
-}
-
-MeshModel& Scene::GetActiveModel() const
-{
-	return *mesh_models[active_model_index];
-}
-
-void Scene::AddCamera(const std::shared_ptr<Camera>& camera)
-{
-	cameras.push_back(camera);
+	return models.size();
 }
 
 int Scene::GetCameraCount() const
@@ -45,19 +29,62 @@ int Scene::GetCameraCount() const
 	return cameras.size();
 }
 
-Camera& Scene::GetCamera(int index) const
+std::shared_ptr<MeshModel> Scene::GetModel(int index) const
 {
-	return *cameras[index];
+	return models[index];
+}
+
+Camera& Scene::GetCamera(int index)
+{
+	return cameras[index];
+}
+
+const Camera& Scene::GetCamera(int index) const
+{
+	return cameras[index];
+}
+
+const Camera& Scene::GetActiveCamera() const
+{
+	return cameras[activeCameraIndex];
 }
 
 Camera& Scene::GetActiveCamera()
 {
-	return *cameras[active_camera_index];
+	return cameras[activeCameraIndex];
 }
 
-void Scene::AddLight(const std::shared_ptr<LightSource>& light_source)
+void Scene::SetActiveCameraIndex(int index)
 {
-	lights.push_back(light_source);
+	if (index >= 0 && index < cameras.size())
+	{
+		activeCameraIndex = index;
+	}
+}
+
+const int Scene::GetActiveCameraIndex() const
+{
+	return activeCameraIndex;
+}
+
+void Scene::SetActiveModelIndex(int index)
+{
+	activeModelIndex = index;
+}
+
+const int Scene::GetActiveModelIndex() const
+{
+	return activeModelIndex;
+}
+
+const std::shared_ptr<MeshModel>& Scene::GetActiveModel() const
+{
+	return models[activeModelIndex];
+}
+
+void Scene::AddLight(const std::shared_ptr<PointLight>& light)
+{
+	lights.push_back(light);
 }
 
 int Scene::GetLightCount() const
@@ -65,108 +92,17 @@ int Scene::GetLightCount() const
 	return lights.size();
 }
 
-LightSource& Scene::GetLight(int index) const
+std::shared_ptr<PointLight> Scene::GetLight(int index) const
 {
-	return *lights[index];
+	return lights[index];
 }
 
-LightSource& Scene::GetActiveLight() const
+const std::vector<std::shared_ptr<PointLight>>& Scene::GetActiveLights() const
 {
-	return *lights[active_light_index];
+	return lights;
 }
 
-
-void Scene::SetActiveCameraIndex(int index)
+const AmbientLight& Scene::GetAmbientLight()
 {
-	active_camera_index = index;
-}
-
-int Scene::GetActiveCameraIndex() const
-{
-	return active_camera_index;
-}
-
-void Scene::SetActiveModelIndex(int index)
-{
-	active_model_index = index;
-}
-
-int Scene::GetActiveModelIndex() const
-{
-	return active_model_index;
-}
-
-void Scene::SetActiveLightIndex(int index)
-{
-	active_light_index = index;
-}
-
-int Scene::GetActiveLightIndex() const
-{
-	return active_light_index;
-}
-
-void Scene::ShowLights()
-{
-	showLights = true;
-}
-
-void Scene::HideLights()
-{
-	showLights = false;
-}
-
-const bool Scene::GetShowLights() const
-{
-	return showLights;
-}
-
-const bool Scene::IsFog() const
-{
-	return fog;
-}
-
-void Scene::UpdateFogStatus(bool s)
-{
-	fog = s;
-}
-
-void Scene::UpdateFogDistance(float d)
-{
-	fogDistance = d;
-}
-
-const float Scene::GetFogDistance() const
-{
-	return fogDistance;
-}
-
-void Scene::UpdateFogDensity(float de)
-{
-	fogDensity = de;
-}
-
-const float Scene::GetFogDensity() const
-{
-	return fogDensity;
-}
-
-const bool Scene::IsBlur() const
-{
-	return blur;
-}
-
-void Scene::UpdateBlur(bool b)
-{
-	blur = b;
-}
-
-const int Scene::GetNumOfBlurs() const
-{
-	return numOfBlurs;
-}
-
-void Scene::UpdateNumOfBlurs(int n)
-{
-	numOfBlurs = n;
+	return ambientLight;
 }

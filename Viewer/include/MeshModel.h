@@ -1,8 +1,10 @@
 #pragma once
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
+#include <memory>
+#include "MeshModel.h"
 #include "Face.h"
-
 
 struct Material
 {
@@ -12,83 +14,71 @@ struct Material
 	float shininess;
 };
 
-
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 textureCoords;
+};
 
 class MeshModel
 {
-public:
-	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name);
-	virtual ~MeshModel();
-	const Face& GetFace(int index) const;
-	int GetFacesCount() const;
-	int GetVerticesCount() const;
-	const std::string& GetModelName() const;
-	const std::vector<std::vector<std::vector<glm::vec3>>> GetVerticesNormals() const;
-	const std::vector<std::vector<glm::vec3>> GetFacesNormals() const;
-	const glm::vec3& GetPureVertex(int index) const;
-	const glm::vec3& GetTransformedVertex(int index) const;
-	const glm::vec3& GetTransformedVertex(const glm::vec3& v) const;
-	const glm::vec3& GetPureNormal(int index) const;
-	const glm::vec3& GetTransformedNormal(int index) const;
-	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
-	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
-	//const std::vector<glm::vec3> FitToWindow(int viewport_width, int viewport_height) const; //[0] - scale fit, [1] - translate fit
-	void UpdateWorldTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
-	void UpdateModelTransformations(const glm::vec3& scale, const glm::vec3& rotate, std::string axis, const glm::vec3& translate);
-	const std::vector<glm::mat4> GetScalingMatrices() const;
-	std::vector<glm::mat4> GetScalingMatricesChangeable() const;
-	const std::vector<glm::mat4> GetTranslationMatrices() const;
-	//rotation around "axis" to grid system "grid" (geid system means model grid or world grid)
-	const std::vector<glm::mat4> GetRotationMatrices(const std::string axis = "z", const int grid = 1) const;
-	const std::vector<std::vector<glm::vec3>> GetTriangles() const;
-	const std::vector<glm::vec3>& GetFaceColors() const;
-	const std::vector<std::vector<glm::vec3>> GetModelAxis() const;
-	const std::vector<std::vector<glm::vec3>> GetTransformedModelAxisWorld() const;
-	const std::vector<std::vector<glm::vec3>> GetTransformedModelAxisModel() const;
-	void ShowWorldAxis();
-	void HideWorldAxis();
-	const bool GetWorldAxisShowState() const;
-	void ShowModelAxis();
-	void HideModelAxis();
-	const bool GetModelAxisShowState() const;
-	const std::vector<glm::mat4> GetCurrentRotation() const;
-	void SetVertexNormalSize(float size);
-	void SetFaceNormalSize(float size);
-	bool GetFaceNormalsShowState();
-	void ShowFaceNormals();
-	void HideFaceNormals();
-	bool GetVertexNormalsShowState();
-	void ShowVertexNormals();
-	void HideVertexNormals();
-	void UpdateAxisScale(bool perspectiveProj);
-	Material& GetMaterial();
-	const Material& GetMaterial() const;
-	std::vector<glm::vec3> GetScale() const;
-	std::vector<glm::vec3> GetTranslation() const;
-
-
-	bool displayBoundingBox;
-	bool displayBoundingRec;
-
-private:
-	std::vector<glm::vec3> translation; //vec.size() = 2 [0] - world, [1] - model , scaling[i] = {xscale, yscale, zscale}
-	std::vector<glm::vec3> rotation; // degrees
-	std::vector<glm::vec3> scaling;
-	std::vector<Face> faces;
-	std::vector<glm::vec3> normals;
-	std::string model_name;
-	std::vector<std::vector<glm::vec3>> modelAxis;
-	std::vector<std::vector<glm::vec3>> modelAxisModel;
-	std::vector<glm::vec3> colors; //color for each face / triangle
-	bool showAxisWorld;
-	bool showAxisModel;
-	float faceNormalSize;
-	float vertexNormalSize;
-	bool showFaceNormals;
-	bool showVertexNormals;
-	Material material;
-
 protected:
+	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::mat4> currentRotationMat;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> textureCoords;
+
+	std::vector<Vertex> modelVertices;
+
+	glm::mat4x4 modelTransform;
+	glm::mat4x4 worldTransform;
+
+	std::string modelName;
+
+	glm::vec3 color;
+	Material matriel;
+
+	GLuint vbo;
+	GLuint vao;
+
+public:
+	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");
+	virtual ~MeshModel();
+
+	const glm::mat4x4& GetWorldTransformation() const;
+	const glm::mat4x4& GetModelTransformation() const;
+
+	void SetWorldTransformation(const glm::mat4x4& worldTransform);
+	void SetModelTransformation(const glm::mat4x4& modelTransform);
+
+	const glm::vec3& GetColor() const;
+	void SetColor(const glm::vec3& color);
+
+	const std::string& GetModelName();
+
+	const std::vector<Vertex>& GetModelVertices();
+
+	void TranslateModel(const glm::vec3& translationVector);
+	void TranslateWorld(const glm::vec3& translationVector);
+
+	void RotateXModel(float angle);
+	void RotateYModel(float angle);
+	void RotateZModel(float angle);
+	void ScaleXModel(float factor);
+	void ScaleYModel(float factor);
+	void ScaleZModel(float factor);
+	void ScaleModel(float factor);
+
+	void RotateXWorld(float angle);
+	void RotateYWorld(float angle);
+	void RotateZWorld(float angle);
+	void ScaleXWorld(float factor);
+	void ScaleYWorld(float factor);
+	void ScaleZWorld(float factor);
+	void ScaleWorld(float factor);
+
+	GLuint GetVAO() const;
+
+	Material& GetMaterial();
 };

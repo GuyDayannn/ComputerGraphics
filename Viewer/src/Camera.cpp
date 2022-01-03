@@ -1,216 +1,188 @@
 #include "Camera.h"
+#include "Utils.h"
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-Camera::Camera(int window_width, int window_height, int num): window_width(window_width), window_height(window_height)
+Camera::Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up, const float aspectRatio) :
+	zoom(1.0f),
+	fovy(glm::pi<float>() / 4.0f),
+	height(5),
+	zNear(0.1f),
+	zFar(200.0f),
+	aspectRatio(aspectRatio),
+	prespective(true),
+	viewTransformation(1),
+	eye(eye),
+	at(at),
+	up(up)
 {
-	camPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	atPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	upPos = glm::vec3(0.0f, 1.0f, 0.0f);
-	nearZ = 1.6f;
-	farZ = 100.0f;
-	left = -(window_width / 2.0f);
-	right = window_width / 2.0f;
-	down = -(window_height / 2.0f);
-	up = window_height / 2.0f;
-	view_transformation = glm::lookAt(camPos, atPos, upPos);
-	projType = true;
-	fov = 100.0f;
-	UpdateViewVolume(up, down, left, right, nearZ, farZ, fov);
-	currentRotationMat.push_back(glm::mat4(1.0f));
-	currentRotationMat.push_back(glm::mat4(1.0f));
-	currentTranslationMat.push_back(glm::mat4(1.0f));
-	currentTranslationMat.push_back(glm::mat4(1.0f));
-	currentScalingMat.push_back(glm::mat4(1.0f));
-	currentScalingMat.push_back(glm::mat4(1.0f));
-	camName = "Camera " + std::to_string(num);
-	gray = false;
+	UpdateProjectionMatrix();
+	viewTransformation = glm::lookAt(eye, at, up);
 }
 
 Camera::~Camera()
 {
-	
-	
+}
+
+//void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up)
+//{
+//	this->eye = eye;
+//	this->at = at;
+//	this->up = up;
+//
+//	f = glm::normalize(eye - at);
+//	l = glm::normalize(glm::cross(up, f));
+//	u = glm::cross(f, l);
+//	
+//	cameraRotation[0] = glm::vec4(l, 0);
+//	cameraRotation[1] = glm::vec4(u, 0);
+//	cameraRotation[2] = glm::vec4(f, 0);
+//	cameraRotation[3] = glm::vec4(0, 0, 0, 1);
+//
+//	glm::mat4x4 cameraModelRotation;
+//	cameraModelRotation[0] = glm::vec4(-l, 0);
+//	cameraModelRotation[1] = glm::vec4(u, 0);
+//	cameraModelRotation[2] = glm::vec4(-f, 0);
+//	cameraModelRotation[3] = glm::vec4(0, 0, 0, 1);
+//
+//	cameraInverseRotation = glm::transpose(cameraRotation);
+//	cameraTranslation = Utils::TranslationMatrix(eye);
+//	cameraInverseTranslation = Utils::TranslationMatrix(-eye);
+//	cameraTransformation = cameraInverseRotation * cameraInverseTranslation;
+//	worldTransform = cameraTranslation * cameraModelRotation * Utils::ScalingMatrix(glm::vec3(0.2,0.2,0.2));
+//}
+
+void Camera::SetOrthographicProjection(
+	const float height,
+	const float aspectRatio,
+	const float zNear,
+	const float zFar)
+{
+	prespective = false;
+	float width = aspectRatio * height;
+	projectionTransformation = glm::ortho(-width / 2, width / 2, -height / 2, height / 2, zNear, zFar);
+}
+
+void Camera::SetPerspectiveProjection(
+	const float fovy,
+	const float aspectRatio,
+	const float zNear,
+	const float zFar)
+{
+	prespective = true;
+	projectionTransformation = glm::perspective(fovy, aspectRatio, zNear, zFar);
 }
 
 const glm::mat4x4& Camera::GetProjectionTransformation() const
 {
-	return projection_transformation;
+	return projectionTransformation;
 }
 
 const glm::mat4x4& Camera::GetViewTransformation() const
 {
-	return view_transformation;
+	return viewTransformation;
 }
 
-void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up)
+void Camera::Zoom(const float factor)
 {
-	camPos = eye;
-	atPos = at;
-	upPos = up;
+	fovy = fovy * factor;
+	if (fovy > glm::pi<float>())
+	{
+		fovy = glm::pi<float>();
+	}
 
-	view_transformation = glm::lookAt(eye, at, up);
+	UpdateProjectionMatrix();
 }
 
-void Camera::UpdateViewVolume(float up, float down, float left, float right, float near, float far, float fovy)	
+void Camera::SphericalRotate(const glm::vec2& sphericalDelta)
 {
-	this->up = up;
-	this->down = down;
-	this->left = left;
-	this->right = right;
-	this->nearZ = near;
-	this->farZ = far;
-	
-	if(projType == false)
-		projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
+	//glm::mat4x4 vAxisRotation = Utils::AxisRotationMatrix(u, sphericalDelta.x);
+	//glm::mat4x4 uAxisRotation = Utils::AxisRotationMatrix(l, sphericalDelta.y);
+	//eye = uAxisRotation * vAxisRotation * glm::vec4(eye,1);
+	//SetCameraLookAt(eye, at, glm::vec3(0, 1, 0));
+}
+
+void Camera::SetAspectRatio(float aspectRatio)
+{
+	this->aspectRatio = aspectRatio;
+	UpdateProjectionMatrix();
+}
+
+void Camera::UpdateProjectionMatrix()
+{
+	if (prespective)
+	{
+		SetPerspectiveProjection(fovy, aspectRatio, zNear, zFar);
+	}
 	else
 	{
-		fov = fovy;
-		float rFov = glm::radians(fov);
-		projection_transformation = glm::perspective(rFov, (right - left) / (up - down), nearZ, farZ);
+		SetOrthographicProjection(height, aspectRatio, zNear, zFar);
 	}
 }
 
-const std::vector<float> Camera::GetUpDownVals()
+void Camera::SwitchToPrespective()
 {
-	std::vector<float> upDown;
-	upDown.push_back(up);
-	upDown.push_back(down);
-	return upDown;
+	prespective = true;
+	UpdateProjectionMatrix();
 }
 
-const std::vector<float> Camera::GetLeftRightVals()
+void Camera::SwitchToOrthographic()
 {
-	std::vector<float> leftRight;
-	leftRight.push_back(left);
-	leftRight.push_back(right);
-	return leftRight;
+	prespective = false;
+	UpdateProjectionMatrix();
 }
 
-const std::vector<float> Camera::GetNearFarVals() const
+void Camera::SetNear(const float zNear)
 {
-	std::vector<float> nearFar;
-	nearFar.push_back(nearZ);
-	nearFar.push_back(farZ);
-	return nearFar;
+	this->zNear = zNear;
+	UpdateProjectionMatrix();
 }
 
-const std::vector<glm::vec3> Camera::GetCameraLookAt() const
+void Camera::SetFar(const float zFar)
 {
-	std::vector<glm::vec3> cameraLookAt;
-	cameraLookAt.push_back(camPos);
-	cameraLookAt.push_back(atPos);
-	cameraLookAt.push_back(upPos);
-	return cameraLookAt;
-
+	this->zFar = zFar;
+	UpdateProjectionMatrix();
 }
 
-const std::vector<glm::mat4>& Camera::GetCurrentRotations() const
+void Camera::SetHeight(const float height)
 {
-	return currentRotationMat;
+	this->height = height;
+	UpdateProjectionMatrix();
 }
 
-void Camera::UpdateRotationWorld(float degrees, std::string axis)
+void Camera::SetFovy(const float fovy)
 {
-	glm::vec3 rotateAround;
-	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
-	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
-	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
-
-	currentRotationMat[0] = glm::rotate(currentRotationMat[0], glm::radians(degrees), rotateAround);
+	this->fovy = fovy;
+	UpdateProjectionMatrix();
 }
 
-void Camera::UpdateRotationModel(float degrees, std::string axis)
+float Camera::GetNear()
 {
-	glm::vec3 rotateAround;
-	if (axis == "z") rotateAround = glm::vec3(0.0f, 0.0f, 1.0f);
-	else if (axis == "y") rotateAround = glm::vec3(0.0f, 1.0f, 0.0f);
-	else rotateAround = glm::vec3(1.0f, 0.0f, 0.0f);
-
-	currentRotationMat[1] = glm::rotate(currentRotationMat[1], glm::radians(degrees), rotateAround);
+	return zNear;
 }
 
-void Camera::UpdateTranslationWorld(const glm::vec3& vec)
+float Camera::GetFar()
 {
-	currentTranslationMat[0] = glm::translate(glm::mat4(1.0f), vec);
+	return zFar;
 }
 
-void Camera::UpdateTranslationModel(const glm::vec3& vec)
+float Camera::GetFovy()
 {
-	currentTranslationMat[1] = glm::translate(glm::mat4(1.0f), vec);
+	return fovy;
 }
 
-void Camera::UpdateScalingWorld(const glm::vec3& vec)
+float Camera::GetHeight()
 {
-	currentScalingMat[0] = glm::scale(glm::mat4(1.0f), vec);
+	return height;
 }
 
-void Camera::UpdateScalingModel(const glm::vec3& vec)
+bool Camera::IsPrespective()
 {
-	currentScalingMat[1] = glm::scale(glm::mat4(1.0f), vec);
+	return prespective;
 }
 
-
-void Camera::UpdateProjType(bool type)
+const glm::vec3& Camera::GetEye() const
 {
-	projType = type;
-
-	if (projType == false)
-		projection_transformation = glm::ortho(left, right, down, up, nearZ, farZ);
-	else
-	{
-		float rFov = glm::radians(fov);
-		projection_transformation = glm::perspective(rFov, (right - left) / (up - down), nearZ, farZ);
-	}
-}
-
-const bool Camera::GetProjType() const
-{
-	return projType;
-}
-const std::string& Camera::GetCamName() const
-{
-	return camName;
-}
-
-void Camera::SetWindowSize(const int gwindow_width, const int gwindow_height)
-{
-	if (projType == true) //Perspective
-	{
-		window_width = gwindow_width;
-		window_height = gwindow_height;
-		projection_transformation = glm::perspective(fov, window_width / window_height, nearZ, farZ);
-	}
-}
-
-glm::vec4 Camera::Vec3ToHomogeneousVec(const glm::vec3& vec)
-{
-	return glm::vec4(vec.x, vec.y, vec.z, 1.0f);
-}
-
-//converting Homogeneous Vector to vec3
-glm::vec3 Camera::HomogeneousVecToVec3(const glm::vec4& vec)
-{
-	if (vec.w == 0)
-		return glm::vec3(vec.x, vec.y, vec.z);
-	return glm::vec3(vec.x / vec.w, vec.y / vec.w, vec.z / vec.w);
-}
-
-glm::vec3 Camera::GetTransformedVertex(const glm::vec3 vec) const
-{
-	glm::vec3 tVec = HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
-	tVec.x = (1.0f + tVec.x) * (window_width / 2.0f);
-	tVec.y = (1.0f + tVec.y) * (window_height / 2.0f);
-	tVec.z = -(1.0f + tVec.z) * (window_width / 2.0f);
-	return tVec;
-	//return HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
-}
-
-glm::vec3 Camera::GetTransformedLight(const glm::vec3 vec) const
-{
-	glm::vec3 tVec = HomogeneousVecToVec3(projection_transformation * glm::inverse(currentTranslationMat[0] * currentRotationMat[0] * currentScalingMat[0] * currentTranslationMat[1] * currentRotationMat[1] * currentScalingMat[1]) * view_transformation * Vec3ToHomogeneousVec(vec));
-	return tVec;
-}
-
-float Camera::GetTransformedZ(const float z) const
-{
-	return (-(1.0f + z) * (abs(farZ - nearZ)));
+	return eye;
 }

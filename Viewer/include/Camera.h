@@ -1,67 +1,81 @@
 #pragma once
+#include <memory>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <vector>
-#include <string>
-
+#include "MeshModel.h"
+/*
+ * Camera class. This class takes care of all the camera transformations and manipulations.
+ */
 class Camera
 {
-public:
-	Camera(int window_width = 1280, int window_height = 720, int num=0);
-	virtual ~Camera();
+private:
+	glm::mat4x4 viewTransformation;
+	glm::mat4x4 projectionTransformation;
 
-	void SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up);
+	glm::vec3 eye;
+	glm::vec3 up;
+	glm::vec3 at;
+
+	glm::vec3 x;
+	glm::vec3 y;
+	glm::vec3 z;
+
+	float zoom;
+	float fovy;
+	float height;
+	float zNear;
+	float zFar;
+	float aspectRatio;
+
+	bool prespective;
+
+public:
+	Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up, const float aspectRatio);
+	~Camera();
+
+	void SetOrthographicProjection(
+		const float height,
+		const float aspectRatio,
+		const float zNear,
+		const float zFar);
+
+	void SetPerspectiveProjection(
+		const float fovy,
+		const float aspect,
+		const float zNear,
+		const float zFar);
+
+	void UpdateProjectionMatrix();
+
+	void SetNear(const float zNear);
+
+	void SetFar(const float zFar);
+
+	void SetFovy(const float fovy);
+
+	void SetHeight(const float height);
+
+	void Zoom(const float factor);
+
+	void SphericalRotate(const glm::vec2& sphericalDelta);
 
 	const glm::mat4x4& GetProjectionTransformation() const;
+
 	const glm::mat4x4& GetViewTransformation() const;
 
-	void UpdateViewVolume(float up, float down, float left, float right, float near, float far, float fovy);
-	void UpdateRotationWorld(float degrees, std::string axis);
-	void UpdateRotationModel(float degrees, std::string axis);
-	void UpdateTranslationWorld(const glm::vec3& vec);
-	void UpdateTranslationModel(const glm::vec3& vec);
-	void UpdateScalingWorld(const glm::vec3& vec);
-	void UpdateScalingModel(const glm::vec3& vec);
-	const std::vector<float> GetUpDownVals();
-	const std::vector<float> GetLeftRightVals();
-	const std::vector<float> GetNearFarVals() const;
-	const std::vector<glm::vec3> GetCameraLookAt() const;
-	const std::vector<glm::mat4>& GetCurrentRotations() const;
-	void UpdateProjType(bool type);
-	const bool GetProjType() const;
-	const std::string& GetCamName() const;
-	void SetWindowSize(const int gwindow_width, const int gwindow_height);
-	static glm::vec4 Vec3ToHomogeneousVec(const glm::vec3& vec);
-	static glm::vec3 HomogeneousVecToVec3(const glm::vec4& vec);
-	glm::vec3 GetTransformedVertex(const glm::vec3 vec) const;
-	glm::vec3 GetTransformedLight(const glm::vec3 vec) const;
-	float GetTransformedZ(const float z) const;
+	void SetAspectRatio(float aspectRatio);
 
-	bool gray;
+	void SwitchToPrespective();
+	void SwitchToOrthographic();
 
-private:
-	glm::mat4x4 view_transformation;
-	glm::mat4x4 projection_transformation;
-	std::vector<glm::mat4> currentTranslationMat;
-	std::vector<glm::mat4> currentRotationMat; //[0] world - [1] - camera itself
-	std::vector<glm::mat4> currentScalingMat;
+	float GetNear();
 
-	glm::vec3 camPos;
-	glm::vec3 atPos;
-	glm::vec3 upPos;
+	float GetFar();
 
-	std::string camName;
+	float GetFovy();
 
-	float window_width;
-	float window_height;
+	float GetHeight();
 
-	bool projType; //false - orth, true - perspec
-	float up;
-	float down;
-	float left;
-	float right;
-	float nearZ;
-	float farZ;
-	//float whereEverYouAre;
-	float fov;
+	bool IsPrespective();
+
+	const glm::vec3& GetEye() const;
 };
