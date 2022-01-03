@@ -186,3 +186,10 @@ const glm::vec3& Camera::GetEye() const
 {
 	return eye;
 }
+
+void Camera::SetEye(glm::vec3 pos)
+{
+	eye = pos;
+	UpdateProjectionMatrix();
+	viewTransformation = glm::lookAt(eye, at, up);
+}

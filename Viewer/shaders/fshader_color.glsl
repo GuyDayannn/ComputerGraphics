@@ -27,5 +27,5 @@ void main()
 	// Sample the texture-map at the UV coordinates given by 'fragTexCoords'
 	vec3 textureColor = vec3(texture(material.textureMap, fragTexCoords));
 
-	frag_color = vec4(mcolor,1);
+	frag_color = vec4(textureColor,1);
 }

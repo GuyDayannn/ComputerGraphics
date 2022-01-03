@@ -40,6 +40,10 @@ static float translation = 0.0f;
 static float rotation = 0.0f;
 static float scale = 1.0f;
 
+/*
+** Camera Fields for ImGui
+*/
+static float camPos[3] = { 0,0,10 };
 
 double zoomFactor = 1;
 int windowWidth = 1280;
@@ -85,7 +89,7 @@ int main(int argc, char **argv)
 
 	std::shared_ptr<MeshModel> firstLightM = Utils::LoadMeshModel("..\\Data\\crate.obj");
 	scene->AddLight(std::make_shared<PointLight>(*firstLightM, glm::vec3(0, 0, 0)));
-	scene->AddModel(Utils::LoadMeshModel("..\\Data\\bunny.obj"));
+	//scene->AddModel(Utils::LoadMeshModel("..\\Data\\bunny.obj"));
 	//scene->AddLight(std::make_shared<PointLight>(glm::vec3( 0, 0, 15), glm::vec3(1, 1, 1)));
 	//scene->AddLight(std::make_shared<PointLight>(glm::vec3( 0, 5, 5),  glm::vec3(0, 0, 0)));
 	//scene->AddLight(std::make_shared<PointLight>(glm::vec3(-5, 0, 0),  glm::vec3(0, 0, 0)));
@@ -365,9 +369,18 @@ void DrawImguiMenus()
 			{
 				scene->SetActiveCameraIndex(currentCamera);
 				scene->GetActiveCamera().SetAspectRatio(GetAspectRatio());
+				camPos[0] = scene->GetActiveCamera().GetEye()[0];
+				camPos[1] = scene->GetActiveCamera().GetEye()[1];
+				camPos[2] = scene->GetActiveCamera().GetEye()[2];
 			}
 
 			delete items;
+
+			if (ImGui::SliderFloat3("Eye", camPos, -10.0f, 10.0f))
+			{
+				scene->GetActiveCamera().SetEye(glm::vec3(camPos[0], camPos[1], camPos[2]));
+			}
+
 
 			int newProjectionType = scene->GetActiveCamera().IsPrespective() ? 0 : 1;
 			ImGui::RadioButton("Prespective", &newProjectionType, 0);
@@ -375,9 +388,9 @@ void DrawImguiMenus()
 
 			if (newProjectionType == 0)
 			{
-				float fovy;
-				float zNear;
-				float zFar;
+				static float fovy = 1.0f;
+				static float zNear = 0.1f;
+				static float zFar= 100.0f;
 
 				scene->GetActiveCamera().SwitchToPrespective();
 
@@ -398,9 +411,9 @@ void DrawImguiMenus()
 			}
 			else if (newProjectionType == 1)
 			{
-				float height;
-				float zNear;
-				float zFar;
+				static float height = 5.0f;
+				static float zNear = 0.1f;
+				float zFar = 100.0f;
 
 				scene->GetActiveCamera().SwitchToOrthographic();
 

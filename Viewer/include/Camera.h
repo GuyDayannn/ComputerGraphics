@@ -78,4 +78,6 @@ public:
 	bool IsPrespective();
 
 	const glm::vec3& GetEye() const;
+
+	void SetEye(glm::vec3 pos);
 };
