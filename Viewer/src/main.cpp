@@ -45,6 +45,13 @@ static float scale = 1.0f;
 */
 static float camPos[3] = { 0,0,10 };
 
+/*
+** Light Fields for ImGui
+*/
+static float lightTransformation[3] = {0.0,0.0,0.0};
+static int lightAxis = 0;
+static float lightTranslation = 0.0f;
+
 double zoomFactor = 1;
 int windowWidth = 1280;
 int windowHeight = 720;
@@ -461,12 +468,30 @@ void DrawImguiMenus()
 			}
 
 			delete items;
-
-			glm::vec3 modelColor = scene->GetActiveModel()->GetColor();
-			if (ImGui::ColorEdit3("Model Color", (float*)&modelColor))
+			glm::vec3 modelAmbientColor = scene->GetActiveModel()->GetMaterial().ambientColor;
+			if (ImGui::ColorEdit3("M Ambient Color", (float*)&modelAmbientColor))
 			{
-				scene->GetActiveModel()->SetColor(modelColor);
+				scene->GetActiveModel()->GetMaterial().ambientColor= modelAmbientColor;
 			}
+
+			glm::vec3 modelDiffuseColor = scene->GetActiveModel()->GetMaterial().diffuseColor;
+			if (ImGui::ColorEdit3("M Diffuse Color", (float*)&modelDiffuseColor))
+			{
+				scene->GetActiveModel()->GetMaterial().diffuseColor = modelDiffuseColor;
+			}
+
+			glm::vec3 modelSpecularColor = scene->GetActiveModel()->GetMaterial().specularColor;
+			if (ImGui::ColorEdit3("M Specular Color", (float*)&modelSpecularColor))
+			{
+				scene->GetActiveModel()->GetMaterial().specularColor = modelSpecularColor;
+			}
+
+			float shininess = scene->GetActiveModel()->GetMaterial().shininess;
+			if (ImGui::SliderFloat("Shininess", &shininess, 0.0f, 20.0f))
+			{
+				scene->GetActiveModel()->GetMaterial().shininess = shininess;
+			}
+
 
 			//Axis to work with
 			ImGui::RadioButton("x", &axis, X);
@@ -526,6 +551,105 @@ void DrawImguiMenus()
 				//}
 			}
 		}
+
+		if (ImGui::CollapsingHeader("Lights"))
+		{
+			if (ImGui::Button("Add Light"))
+			{
+				std::shared_ptr<MeshModel> LightM = Utils::LoadMeshModel("..\\Data\\crate.obj");
+				scene->AddLight(std::make_shared<PointLight>(*LightM, glm::vec3(0, 0, 0)));
+			}
+
+			glm::vec3 ambientLightColor = scene->GetActiveLight()->GetAmbientColor();
+			if (ImGui::ColorEdit3("L Ambient Color", (float*)&ambientLightColor))
+			{
+				scene->GetActiveLight()->SetAmbientColor(ambientLightColor);
+			}
+
+			float ambientLightIntnsity = scene->GetActiveLight()->GetAmbientIntensity();
+			if (ImGui::SliderFloat("L Ambient Intnsity", &ambientLightIntnsity, 0.0f, 1.0f))
+			{
+				scene->GetActiveLight()->SetAmbientIntensity(ambientLightIntnsity);
+			}
+
+			glm::vec3 diffuseLightColor = scene->GetActiveLight()->GetDiffuseColor();
+			if (ImGui::ColorEdit3("L Diffuse Color", (float*)&diffuseLightColor))
+			{
+				scene->GetActiveLight()->SetDiffuseColor(diffuseLightColor);
+			}
+
+			float diffuseLightIntnsity = scene->GetActiveLight()->GetDiffuseIntensity();
+			if (ImGui::SliderFloat("L Diffuse Intnsity", &diffuseLightIntnsity, 0.0f, 1.0f))
+			{
+				scene->GetActiveLight()->SetDiffuseIntensity(diffuseLightIntnsity);
+			}
+
+			glm::vec3 specualrLightColor = scene->GetActiveLight()->GetSpecularColor();
+			if (ImGui::ColorEdit3("L Specular Color", (float*)&specualrLightColor))
+			{
+				scene->GetActiveLight()->SetSpecularColor(specualrLightColor);
+			}
+
+			float specularLightIntnsity = scene->GetActiveLight()->GetSpecularIntensity();
+			if (ImGui::SliderFloat("L Specular Intnsity", &specularLightIntnsity, 0.0f, 1.0f))
+			{
+				scene->GetActiveLight()->SetSpecularIntensity(specularLightIntnsity);
+			}
+
+
+			const char** items;
+			std::vector<std::string> modelStrings;
+			items = new const char* [scene->GetLightCount()];
+			for (int i = 0; i < scene->GetLightCount(); i++)
+			{
+				std::ostringstream s;
+				s << "Light "<< i;
+				std::string mystring = s.str();
+				modelStrings.push_back(mystring);
+			}
+
+			for (int i = 0; i < scene->GetLightCount(); i++)
+			{
+				items[i] = modelStrings[i].c_str();
+			}
+
+			int currentLightIndex = scene->GetActiveLightIndex();
+			ImGui::Combo("Active Light", &currentLightIndex, items, scene->GetLightCount());
+
+			if (currentLightIndex != scene->GetActiveLightIndex())
+			{
+				scene->SetActiveLightIndex(currentLightIndex);
+			}
+
+			delete items;
+	
+			//Axis to work with
+			ImGui::RadioButton("lx", &lightAxis, X);
+			ImGui::SameLine();
+			ImGui::RadioButton("ly", &lightAxis, Y);
+			ImGui::SameLine();
+			ImGui::RadioButton("lz", &lightAxis, Z);
+
+			if (ImGui::SliderFloat("Light Translation", &lightTranslation, -0.02, 0.02))
+			{
+				if (lightAxis == X)
+				{
+					scene->GetActiveLight()->TranslateModel(glm::vec3(lightTranslation, 0, 0));
+				}
+				else if (lightAxis == Y)
+				{
+					scene->GetActiveLight()->TranslateModel(glm::vec3(0, lightTranslation, 0));
+				}
+				else // Z
+				{
+					scene->GetActiveLight()->TranslateModel(glm::vec3(0, 0, lightTranslation));
+				}
+				lightTranslation = 0.0f;
+			}
+
+		}
+
+
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();

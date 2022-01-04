@@ -21,6 +21,7 @@ out vec3 fragPos;
 out vec3 fragNormal;
 out vec2 fragTexCoords;
 out vec3 mcolor;
+out vec3 lightPos[LIGHTS_MAX];
 
 void main()
 {
@@ -30,6 +31,12 @@ void main()
 	fragPos = vec3(model * vec4(pos, 1.0f));
 	fragNormal = mat3(model) * normal;
 	mcolor = modelColor;
+
+	for(int i = 0; i < lightCount; i++)
+	{
+		lightPos[i] = vec3(lightTransfomation[i] * vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	}
+
 
 	// Pass the vertex texture coordinates property as it is. Its interpolated value
 	// will be avilable for us in the fragment shader

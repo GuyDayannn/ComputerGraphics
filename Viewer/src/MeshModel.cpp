@@ -41,9 +41,10 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 		}
 	}
 
-	matriel.ambientColor = glm::vec3(0.0, 0.0f, 0.0f);
-	matriel.diffuseColor = glm::vec3(0.0, 0.0f, 0.0f);
-	matriel.specularColor = glm::vec3(0.0, 0.0f, 0.0f);
+	matriel.ambientColor = glm::vec3(1.0, 1.0f, 1.0f);
+	matriel.diffuseColor = glm::vec3(1.0, 1.0f, 1.0f);
+	matriel.specularColor = glm::vec3(1.0, 1.0f, 1.0f);
+	matriel.shininess = 8.0f;
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);

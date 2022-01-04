@@ -3,9 +3,9 @@
 Light::Light() :
 	color(glm::vec3(1.0, 1.0, 1.0))
 {
-	ambientColor = glm::vec3(0.0f, 0.0f, 0.0f);
-	diffuseColor = glm::vec3(0.0f, 0.0f, 0.0f);
-	specularColor = glm::vec3(0.0f, 0.0f, 0.0f);
+	ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	diffuseColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	ambientIntensity = 0.5;
 	diffuseIntensity = 0.5;
 	specularIntensity = 0.5;
@@ -14,9 +14,9 @@ Light::Light() :
 Light::Light(const glm::vec3& color) :
 	color(color)
 {
-	ambientColor = glm::vec3(0.0f, 0.0f, 0.0f);
-	diffuseColor = glm::vec3(0.0f, 0.0f, 0.0f);
-	specularColor = glm::vec3(0.0f, 0.0f, 0.0f);
+	ambientColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	diffuseColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	ambientIntensity = 0.5;
 	diffuseIntensity = 0.5;
 	specularIntensity = 0.5;

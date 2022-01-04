@@ -19,6 +19,7 @@ private:
 
 	int activeCameraIndex;
 	int activeModelIndex;
+	int activeLightIndex;
 
 public:
 	Scene();
@@ -37,6 +38,9 @@ public:
 	std::shared_ptr<PointLight> GetLight(int index) const;
 	const std::vector<std::shared_ptr<PointLight>>& GetActiveLights() const;
 
+	const std::shared_ptr<PointLight> GetActiveLight() const;
+	std::shared_ptr<PointLight> GetActiveLight();
+
 	const AmbientLight& GetAmbientLight();
 
 	const Camera& GetActiveCamera() const;
@@ -49,4 +53,7 @@ public:
 
 	void SetActiveModelIndex(int index);
 	const int GetActiveModelIndex() const;
+
+	void SetActiveLightIndex(int index);
+	const int GetActiveLightIndex() const;
 };

@@ -41,6 +41,13 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 			colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
 
+			//Uniform variables for Matriel (model matriel)
+			colorShader.setUniform("material.shininess", currentModel->GetMaterial().shininess);
+			colorShader.setUniform("material.ambientColor", currentModel->GetMaterial().ambientColor);
+			colorShader.setUniform("material.diffuseColor", currentModel->GetMaterial().diffuseColor);
+			colorShader.setUniform("material.specularColor", currentModel->GetMaterial().specularColor);
+
+			
 			std::shared_ptr<PointLight> pLight;
 			for (int i = 0; i < scene->GetLightCount(); i++)
 			{
@@ -55,6 +62,24 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 					colorShader.setUniform(mystring.c_str(), pLight->GetWorldTransformation() * pLight->GetModelTransformation());
 				}
 
+				//creating and transfering everything needed for LightStruct (lightMatriel) and setting uniform variables
+				std::ostringstream s;
+				s << "lightMatriel[" << i << "]";
+				std::string matString = s.str();
+
+				std::string ambientC = matString + ".ambientColor";
+				std::string diffuseC = matString + ".diffuseColor";
+				std::string specularC = matString + ".specularColor";
+				std::string ambientI = matString + ".diffuseIntensity";
+				std::string diffuseI = matString + ".diffuseColor";
+				std::string specularI = matString + ".specularIntensity";
+
+				colorShader.setUniform(ambientC.c_str(), lght->GetAmbientColor());
+				colorShader.setUniform(diffuseC.c_str(), lght->GetDiffuseColor());
+				colorShader.setUniform(specularC.c_str(), lght->GetSpecularColor());
+				colorShader.setUniform(ambientI.c_str(), lght->GetAmbientIntensity());
+				colorShader.setUniform(diffuseI.c_str(), lght->GetDiffuseIntensity());
+				colorShader.setUniform(specularI.c_str(), lght->GetSpecularIntensity());
 			}
 
 			// Set 'texture1' as the active texture at slot #0
@@ -71,11 +96,13 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 
 			colorShader.setUniform("color", glm::vec3(0,0,0));
 
+			/*
 			// Drag our model's faces (triangles) in line mode (wireframe)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glBindVertexArray(currentModel->GetVAO());
 			glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
 			glBindVertexArray(0);
+			*/
 		}
 	}
 }

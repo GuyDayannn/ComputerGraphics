@@ -4,7 +4,8 @@
 
 Scene::Scene() :
 	activeCameraIndex(0),
-	activeModelIndex(0)
+	activeModelIndex(0),
+	activeLightIndex(0)
 {
 
 }
@@ -102,7 +103,28 @@ const std::vector<std::shared_ptr<PointLight>>& Scene::GetActiveLights() const
 	return lights;
 }
 
+const std::shared_ptr<PointLight> Scene::GetActiveLight() const
+{
+	return lights[activeLightIndex];
+}
+
+std::shared_ptr<PointLight> Scene::GetActiveLight()
+{
+	return lights[activeLightIndex];
+}
+
+
 const AmbientLight& Scene::GetAmbientLight()
 {
 	return ambientLight;
+}
+
+void Scene::SetActiveLightIndex(int index)
+{
+	activeLightIndex = index;
+}
+
+const int Scene::GetActiveLightIndex() const
+{
+	return activeLightIndex;
 }
