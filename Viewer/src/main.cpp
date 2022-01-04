@@ -560,6 +560,35 @@ void DrawImguiMenus()
 				scene->AddLight(std::make_shared<PointLight>(*LightM, glm::vec3(0, 0, 0)));
 			}
 
+
+
+			const char** items;
+			std::vector<std::string> modelStrings;
+			items = new const char* [scene->GetLightCount()];
+			for (int i = 0; i < scene->GetLightCount(); i++)
+			{
+				std::ostringstream s;
+				s << "Light "<< i;
+				std::string mystring = s.str();
+				modelStrings.push_back(mystring);
+			}
+
+			for (int i = 0; i < scene->GetLightCount(); i++)
+			{
+				items[i] = modelStrings[i].c_str();
+			}
+
+			int currentLightIndex = scene->GetActiveLightIndex();
+			ImGui::Combo("Active Light", &currentLightIndex, items, scene->GetLightCount());
+
+			if (currentLightIndex != scene->GetActiveLightIndex())
+			{
+				scene->SetActiveLightIndex(currentLightIndex);
+			}
+
+			delete items;
+
+	
 			glm::vec3 ambientLightColor = scene->GetActiveLight()->GetAmbientColor();
 			if (ImGui::ColorEdit3("L Ambient Color", (float*)&ambientLightColor))
 			{
@@ -596,33 +625,6 @@ void DrawImguiMenus()
 				scene->GetActiveLight()->SetSpecularIntensity(specularLightIntnsity);
 			}
 
-
-			const char** items;
-			std::vector<std::string> modelStrings;
-			items = new const char* [scene->GetLightCount()];
-			for (int i = 0; i < scene->GetLightCount(); i++)
-			{
-				std::ostringstream s;
-				s << "Light "<< i;
-				std::string mystring = s.str();
-				modelStrings.push_back(mystring);
-			}
-
-			for (int i = 0; i < scene->GetLightCount(); i++)
-			{
-				items[i] = modelStrings[i].c_str();
-			}
-
-			int currentLightIndex = scene->GetActiveLightIndex();
-			ImGui::Combo("Active Light", &currentLightIndex, items, scene->GetLightCount());
-
-			if (currentLightIndex != scene->GetActiveLightIndex())
-			{
-				scene->SetActiveLightIndex(currentLightIndex);
-			}
-
-			delete items;
-	
 			//Axis to work with
 			ImGui::RadioButton("lx", &lightAxis, X);
 			ImGui::SameLine();
