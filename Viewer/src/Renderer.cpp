@@ -38,6 +38,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("view", camera.GetViewTransformation());
 			colorShader.setUniform("projection", camera.GetProjectionTransformation());
 			colorShader.setUniform("material.textureMap", 0);
+			colorShader.setUniform("texType", currentModel->GetTextureMapKind());
 			colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 			colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
 
@@ -104,18 +105,59 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			glBindVertexArray(0);
 			*/
 		}
+
+
+		//Drawing Lights
+		if (scene->GetLightsStatus())
+		{
+			int lightC = scene->GetLightCount();
+			for (int i = 0; i < lightC; i++)
+			{
+				std::shared_ptr<Light> currentLight = scene->GetLight(i);
+				std::shared_ptr<PointLight> pLight;
+				pLight = std::dynamic_pointer_cast<PointLight>(currentLight);
+
+				if (pLight != NULL)
+				{
+					// Activate the 'lightShader' program (vertex and fragment shaders)
+					lightShader.use();
+
+					// Set the uniform variables
+					lightShader.setUniform("model", pLight->GetWorldTransformation() * pLight->GetModelTransformation());
+					lightShader.setUniform("view", camera.GetViewTransformation());
+					lightShader.setUniform("projection", camera.GetProjectionTransformation());
+					lightShader.setUniform("material.textureMap", 0);
+					lightShader.setUniform("camPos", camera.GetEye()); // active camera position
+
+					// Set 'texture1' as the active texture at slot #0
+					texture1.bind(0);
+
+					// Drag our model's faces (triangles) in fill mode
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					glBindVertexArray(pLight->GetVAO());
+					glDrawArrays(GL_TRIANGLES, 0, pLight->GetModelVertices().size());
+					glBindVertexArray(0);
+
+					// Unset 'texture1' as the active texture at slot #0
+					texture1.unbind(0);
+
+				}
+
+			}
+		}
 	}
 }
 
 void Renderer::LoadShaders()
 {
 	colorShader.loadShaders("vshader_color.glsl", "fshader_color.glsl");
+	lightShader.loadShaders("vshader_light.glsl", "fshader_light.glsl");
 }
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("C:\\Users\\guyda\\OneDrive\\Documents\\GitHub\\computer-graphics-2022-michael-guy\\Data\\crate.jpg", true))
+	if (!texture1.loadTexture("..\\Data\\TreeTexture.png", true))
 	{
-		texture1.loadTexture("C:\\Users\\guyda\\OneDrive\\Documents\\GitHub\\computer-graphics-2022-michael-guy\\Data\\crate.jpg", true);
+		texture1.loadTexture("..\\Data\\TreeTexture.png", true);
 	}
 }

@@ -468,6 +468,32 @@ void DrawImguiMenus()
 			}
 
 			delete items;
+
+			int texType = scene->GetActiveModel()->GetTextureMapKind();
+			if (ImGui::RadioButton("UV Map", &texType, UV))
+			{
+				scene->GetActiveModel()->SetTextureMapKind(UV);
+			}
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Planar", &texType, PLANE))
+			{
+				scene->GetActiveModel()->SetTextureMapKind(PLANE);
+			}
+
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Cylindrical ", &texType, CYLINDER))
+			{
+				scene->GetActiveModel()->SetTextureMapKind(CYLINDER);
+			}
+
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Spherical ", &texType, SPHERE))
+			{
+				scene->GetActiveModel()->SetTextureMapKind(SPHERE);
+			}
+
+			
+
 			glm::vec3 modelAmbientColor = scene->GetActiveModel()->GetMaterial().ambientColor;
 			if (ImGui::ColorEdit3("M Ambient Color", (float*)&modelAmbientColor))
 			{
@@ -559,7 +585,13 @@ void DrawImguiMenus()
 				std::shared_ptr<MeshModel> LightM = Utils::LoadMeshModel("..\\Data\\crate.obj");
 				scene->AddLight(std::make_shared<PointLight>(*LightM, glm::vec3(0, 0, 0)));
 			}
+			ImGui::SameLine();
 
+			bool toShow = scene->GetLightsStatus();
+			if (ImGui::Checkbox("Show Lights", &toShow))
+			{
+				scene->SetLightStatus(toShow);
+			}
 
 
 			const char** items;

@@ -46,6 +46,8 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	matriel.specularColor = glm::vec3(1.0, 1.0f, 1.0f);
 	matriel.shininess = 8.0f;
 
+	textureMapKind = UV;
+
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 
@@ -89,6 +91,17 @@ const std::string& MeshModel::GetModelName()
 {
 	return modelName;
 }
+
+const int MeshModel::GetTextureMapKind() const
+{
+	return textureMapKind;
+}
+
+void MeshModel::SetTextureMapKind(int kind) 
+{
+	textureMapKind = kind;
+}
+
 
 void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
 {

@@ -21,6 +21,8 @@ private:
 	int activeModelIndex;
 	int activeLightIndex;
 
+	bool showLights;
+
 public:
 	Scene();
 
@@ -56,4 +58,7 @@ public:
 
 	void SetActiveLightIndex(int index);
 	const int GetActiveLightIndex() const;
+
+	const bool GetLightsStatus() const;
+	void SetLightStatus(bool status);
 };

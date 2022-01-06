@@ -6,6 +6,8 @@
 #include "MeshModel.h"
 #include "Face.h"
 
+enum tex {UV, PLANE, CYLINDER, SPHERE};
+
 struct Material
 {
 	glm::vec3 ambientColor;
@@ -42,6 +44,8 @@ protected:
 	GLuint vbo;
 	GLuint vao;
 
+	int textureMapKind; // 0 - CORD 1 - PLANE 2 - CYLINDER 3 - SPHERE
+
 public:
 	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");
 	virtual ~MeshModel();
@@ -56,6 +60,9 @@ public:
 	void SetColor(const glm::vec3& color);
 
 	const std::string& GetModelName();
+
+	const int GetTextureMapKind() const;
+	void SetTextureMapKind(int kind);
 
 	const std::vector<Vertex>& GetModelVertices();
 

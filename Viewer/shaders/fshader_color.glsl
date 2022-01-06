@@ -71,5 +71,5 @@ void main()
 	vec3 finalColor = ambientFColor + diffuseFColor + specularFColor;
 
 
-	frag_color = vec4(finalColor,1);
+	frag_color = vec4(0.5*(finalColor + textureColor),1);
 }

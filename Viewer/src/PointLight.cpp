@@ -5,7 +5,7 @@ PointLight::PointLight(std::vector<Face> faces, std::vector<glm::vec3> vertices,
 	MeshModel(faces, vertices, normals, textureCoords, modelName),
 	Light()
 {
-	ScaleModel(0.2f);
+	ScaleModel(0.1f);
 	position = GetCenter();
 }
 
@@ -13,6 +13,7 @@ PointLight::PointLight(const MeshModel& model, const glm::vec3& color) :
 	MeshModel(model),
 	Light(color)
 {
+	ScaleModel(0.1f);
 	position = GetCenter();
 }
 

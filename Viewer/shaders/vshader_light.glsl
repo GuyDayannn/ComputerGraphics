@@ -1,7 +1,7 @@
 #version 330 core
 
 #define LIGHTS_MAX 10
-#define UV 0
+#define CORD 0
 #define PLANE 1
 #define CYLINDER 2
 #define SPHERE 3
@@ -16,10 +16,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 modelColor;
-uniform int texType;
 uniform vec3 camPos;
-uniform int lightCount;
-uniform mat4 lightTransfomation[LIGHTS_MAX];
 
 // These outputs will be available in the fragment shader as inputs
 out vec3 orig_fragPos;
@@ -38,23 +35,12 @@ void main()
 	fragNormal = mat3(model) * normal;
 	mcolor = modelColor;
 
-	for(int i = 0; i < lightCount; i++)
-	{
-		lightPos[i] = vec3(lightTransfomation[i] * vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	}
 
 
 	// Pass the vertex texture coordinates property as it is. Its interpolated value
 	// will be avilable for us in the fragment shader
-	if (texType == UV)
-		fragTexCoords = texCoords;
-	else if(texType == PLANE)
-		fragTexCoords = vec2(pos.x, pos.z);
-	else if(texType == CYLINDER)
-	{
-		float theta = atan(pos.x, pos.z) + 3.14159265359f;
-		fragTexCoords = vec2(theta, pos.y);
-	}
+	fragTexCoords = texCoords;
+
 
 	// This is an internal OpenGL variable, we must set a value to this variable
 	gl_Position = projection * view *  model * vec4(pos, 1.0f);

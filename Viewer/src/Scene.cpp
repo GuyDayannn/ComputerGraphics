@@ -5,7 +5,8 @@
 Scene::Scene() :
 	activeCameraIndex(0),
 	activeModelIndex(0),
-	activeLightIndex(0)
+	activeLightIndex(0),
+	showLights(true)
 {
 
 }
@@ -127,4 +128,14 @@ void Scene::SetActiveLightIndex(int index)
 const int Scene::GetActiveLightIndex() const
 {
 	return activeLightIndex;
+}
+
+const bool Scene::GetLightsStatus() const
+{
+	return showLights;
+}
+
+void Scene::SetLightStatus(bool status)
+{
+	showLights = status;
 }
