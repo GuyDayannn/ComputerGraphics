@@ -13,6 +13,13 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	worldTransform(1),
 	modelName(modelName)
 {
+	translation.push_back(glm::mat4x4(1.0f));
+	translation.push_back(glm::mat4x4(1.0f));
+	rotation.push_back(glm::mat4x4(1.0f));
+	rotation.push_back(glm::mat4x4(1.0f));
+	scale.push_back(glm::mat4x4(1.0f));
+	scale.push_back(glm::mat4x4(1.0f));
+
 	worldTransform = glm::mat4x4(1);
 	std::random_device rd;
 	std::mt19937 mt(rd());
@@ -135,82 +142,114 @@ const glm::mat4x4& MeshModel::GetModelTransformation() const
 
 void MeshModel::TranslateModel(const glm::vec3& translationVector)
 {
-	modelTransform = glm::translate(glm::mat4(1.0f), translationVector) * modelTransform;
+	translation[MODEL] = glm::translate(translation[MODEL], translationVector);
+	UpdateModelTransform();
+	//modelTransform = glm::translate(glm::mat4(1.0f), translationVector) * modelTransform;
 }
 
 void MeshModel::TranslateWorld(const glm::vec3& translationVector)
 {
-	worldTransform = glm::translate(glm::mat4(1.0f), translationVector) * worldTransform;
+	translation[WORLD] = glm::translate(translation[WORLD], translationVector);
+	UpdateWorldTransform();
+	//worldTransform = glm::translate(glm::mat4(1.0f), translationVector) * worldTransform;
 }
 
 void MeshModel::RotateXModel(float angle)
 {
-	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * modelTransform;
+	rotation[MODEL] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * rotation[MODEL];
+	UpdateModelTransform();
+	//modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * modelTransform;
 }
 
 void MeshModel::RotateYModel(float angle)
 {
-	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * modelTransform;
+	rotation[MODEL] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * rotation[MODEL];
+	UpdateModelTransform();
+	//modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * modelTransform;
 }
 
 void MeshModel::RotateZModel(float angle)
 {
-	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * modelTransform;
+	rotation[MODEL] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * rotation[MODEL];
+	UpdateModelTransform();
+	//modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * modelTransform;
 }
 
 void MeshModel::ScaleXModel(float factor)
 {
-	modelTransform = glm::scale(modelTransform, glm::vec3(factor, 1.0f, 1.0f));
+	scale[MODEL] = glm::scale(scale[MODEL], glm::vec3(factor, 1.0f, 1.0f));
+	UpdateModelTransform();
+	//modelTransform = glm::scale(modelTransform, glm::vec3(factor, 1.0f, 1.0f));
 }
 
 void MeshModel::ScaleYModel(float factor)
 {
-	modelTransform = glm::scale(modelTransform, glm::vec3( 1.0f, factor, 1.0f));
+	scale[MODEL] = glm::scale(scale[MODEL], glm::vec3(1.0f, factor, 1.0f));
+	UpdateModelTransform();
+	//modelTransform = glm::scale(modelTransform, glm::vec3( 1.0f, factor, 1.0f));
 }
 
 void MeshModel::ScaleZModel(float factor)
 {
-	modelTransform = glm::scale(modelTransform, glm::vec3(1.0f, 1.0f, factor));
+	scale[MODEL] = glm::scale(scale[MODEL], glm::vec3(1.0f, 1.0f, factor));
+	UpdateModelTransform();
+	//modelTransform = glm::scale(modelTransform, glm::vec3(1.0f, 1.0f, factor));
 }
 
 void MeshModel::ScaleModel(float factor)
 {
-	modelTransform = glm::scale(modelTransform, glm::vec3(factor, factor, factor));
+	scale[MODEL] = glm::scale(scale[MODEL], glm::vec3(factor, factor, factor));
+	UpdateModelTransform();
+	//modelTransform = glm::scale(modelTransform, glm::vec3(factor, factor, factor));
 }
 
 void MeshModel::RotateXWorld(float angle)
 {
-	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * worldTransform;
+	rotation[WORLD] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * rotation[WORLD];
+	UpdateWorldTransform();
+	//worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * worldTransform;
 }
 
 void MeshModel::RotateYWorld(float angle)
 {
-	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * worldTransform;
+	rotation[WORLD] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * rotation[WORLD];
+	UpdateWorldTransform();
+	//worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * worldTransform;
 }
 
 void MeshModel::RotateZWorld(float angle)
 {
-	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * worldTransform;
+	rotation[WORLD] = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * rotation[WORLD];
+	UpdateWorldTransform();
+	//worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * worldTransform;
 }
 
 void MeshModel::ScaleXWorld(float factor)
 {
-	worldTransform = glm::scale(worldTransform, glm::vec3(factor, 1.0f, 1.0f));
+	scale[WORLD] = glm::scale(scale[WORLD], glm::vec3(factor, 1.0f, 1.0f));
+	UpdateWorldTransform();
+	//worldTransform = glm::scale(worldTransform, glm::vec3(factor, 1.0f, 1.0f));
 }
 
 void MeshModel::ScaleYWorld(float factor)
 {
-	worldTransform = glm::scale(worldTransform, glm::vec3(1.0f, factor, 1.0f));
+	scale[WORLD] = glm::scale(scale[WORLD], glm::vec3(1.0f, factor, 1.0f));
+	UpdateWorldTransform();
+	//worldTransform = glm::scale(worldTransform, glm::vec3(1.0f, factor, 1.0f));
 }
 
 void MeshModel::ScaleZWorld(float factor)
 {
-	worldTransform = glm::scale(worldTransform, glm::vec3(1.0f, 1.0f, factor));
+	scale[WORLD] = glm::scale(scale[WORLD], glm::vec3(1.0f, 1.0f, factor));
+	UpdateWorldTransform();
+	//worldTransform = glm::scale(worldTransform, glm::vec3(1.0f, 1.0f, factor));
 }
 
 void MeshModel::ScaleWorld(float factor)
 {
-	worldTransform = glm::scale(worldTransform, glm::vec3(factor, factor, factor));
+	scale[WORLD] = glm::scale(scale[WORLD], glm::vec3(factor, factor, factor));
+	UpdateWorldTransform();
+	//worldTransform = glm::scale(worldTransform, glm::vec3(factor, factor, factor));
 }
 
 GLuint MeshModel::GetVAO() const
@@ -226,4 +265,14 @@ const std::vector<Vertex>& MeshModel::GetModelVertices()
 Material& MeshModel::GetMaterial()
 {
 	return matriel;
+}
+
+void MeshModel::UpdateModelTransform()
+{
+	modelTransform = translation[MODEL] * rotation[MODEL] * scale[MODEL];
+}
+
+void MeshModel::UpdateWorldTransform()
+{
+	worldTransform = translation[WORLD] * rotation[WORLD] * scale[WORLD];
 }

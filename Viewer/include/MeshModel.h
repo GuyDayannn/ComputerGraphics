@@ -8,6 +8,7 @@
 
 enum tex {UV, PLANE, CYLINDER, SPHERE};
 enum col {COLOR, TEXTURE};
+enum frame {WORLD, MODEL};
 
 struct Material
 {
@@ -36,6 +37,10 @@ protected:
 
 	glm::mat4x4 modelTransform;
 	glm::mat4x4 worldTransform;
+
+	std::vector<glm::mat4x4> translation;
+	std::vector<glm::mat4x4> rotation;
+	std::vector<glm::mat4x4> scale;
 
 	std::string modelName;
 
@@ -90,6 +95,9 @@ public:
 	void ScaleYWorld(float factor);
 	void ScaleZWorld(float factor);
 	void ScaleWorld(float factor);
+
+	void UpdateModelTransform();
+	void UpdateWorldTransform();
 
 	GLuint GetVAO() const;
 
