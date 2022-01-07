@@ -492,6 +492,17 @@ void DrawImguiMenus()
 				scene->GetActiveModel()->SetTextureMapKind(SPHERE);
 			}
 
+			int colType = scene->GetActiveModel()->GetColorKind();
+
+			if (ImGui::RadioButton("Color", &colType, COLOR))
+			{
+				scene->GetActiveModel()->SetColorKind(COLOR);
+			}
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Texture", &colType, TEXTURE))
+			{
+				scene->GetActiveModel()->SetColorKind(TEXTURE);
+			}
 			
 
 			glm::vec3 modelAmbientColor = scene->GetActiveModel()->GetMaterial().ambientColor;

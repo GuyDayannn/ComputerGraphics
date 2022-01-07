@@ -17,6 +17,7 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 modelColor;
 uniform int texType;
+uniform int colType;
 uniform vec3 camPos;
 uniform int lightCount;
 uniform mat4 lightTransfomation[LIGHTS_MAX];

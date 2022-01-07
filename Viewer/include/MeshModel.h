@@ -7,6 +7,7 @@
 #include "Face.h"
 
 enum tex {UV, PLANE, CYLINDER, SPHERE};
+enum col {COLOR, TEXTURE};
 
 struct Material
 {
@@ -45,6 +46,7 @@ protected:
 	GLuint vao;
 
 	int textureMapKind; // 0 - CORD 1 - PLANE 2 - CYLINDER 3 - SPHERE
+	int colorKind; // 0 - color - 1 - texture
 
 public:
 	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");
@@ -63,6 +65,10 @@ public:
 
 	const int GetTextureMapKind() const;
 	void SetTextureMapKind(int kind);
+
+
+	const int GetColorKind() const;
+	void SetColorKind(int kind);
 
 	const std::vector<Vertex>& GetModelVertices();
 

@@ -47,6 +47,7 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	matriel.shininess = 8.0f;
 
 	textureMapKind = UV;
+	colorKind = TEXTURE;
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
@@ -102,6 +103,15 @@ void MeshModel::SetTextureMapKind(int kind)
 	textureMapKind = kind;
 }
 
+const int MeshModel::GetColorKind() const
+{
+	return colorKind;
+}
+
+void MeshModel::SetColorKind(int kind)
+{
+	colorKind = kind;
+}
 
 void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
 {
@@ -135,17 +145,17 @@ void MeshModel::TranslateWorld(const glm::vec3& translationVector)
 
 void MeshModel::RotateXModel(float angle)
 {
-	modelTransform = glm::rotate(modelTransform, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * modelTransform;
 }
 
 void MeshModel::RotateYModel(float angle)
 {
-	modelTransform = glm::rotate(modelTransform, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * modelTransform;
 }
 
 void MeshModel::RotateZModel(float angle)
 {
-	modelTransform = glm::rotate(modelTransform, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+	modelTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * modelTransform;
 }
 
 void MeshModel::ScaleXModel(float factor)
@@ -170,17 +180,17 @@ void MeshModel::ScaleModel(float factor)
 
 void MeshModel::RotateXWorld(float angle)
 {
-	worldTransform = glm::rotate(worldTransform, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(1.0f, 0.0f, 0.0f)) * worldTransform;
 }
 
 void MeshModel::RotateYWorld(float angle)
 {
-	worldTransform = glm::rotate(worldTransform, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f)) * worldTransform;
 }
 
 void MeshModel::RotateZWorld(float angle)
 {
-	worldTransform = glm::rotate(worldTransform, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+	worldTransform = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f)) * worldTransform;
 }
 
 void MeshModel::ScaleXWorld(float factor)

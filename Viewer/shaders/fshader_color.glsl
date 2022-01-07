@@ -1,5 +1,8 @@
 #version 330 core
 #define LIGHTS_MAX 10
+#define COLOR 0
+#define TEXTURE 1
+
 
 struct Material
 {
@@ -27,6 +30,7 @@ struct LightMaterial
 uniform Material material; //model matriel
 uniform LightMaterial lightMatriel[LIGHTS_MAX]; // array of light properties
 uniform int lightCount;
+uniform int colType;
 uniform vec3 camPos;
 
 // Inputs from vertex shader (after interpolation was applied)
@@ -44,6 +48,17 @@ void main()
 	// Sample the texture-map at the UV coordinates given by 'fragTexCoords'
 	vec3 textureColor = vec3(texture(material.textureMap, fragTexCoords));
 
+	vec3 mAmbientColor = material.ambientColor;
+	vec3 mDiffuseColor = material.diffuseColor;
+	vec3 mSpecularColor = material.specularColor;
+	if( colType == TEXTURE)
+	{
+		mAmbientColor = textureColor;
+		mDiffuseColor = textureColor;
+		mSpecularColor = textureColor;
+	}
+
+
 	vec3 ambientFColor = vec3(0.0f, 0.0f, 0.0f);
 	vec3 diffuseFColor = vec3(0.0f, 0.0f, 0.0f);
 	vec3 specularFColor = vec3(0.0f, 0.0f, 0.0f);
@@ -51,17 +66,17 @@ void main()
 	for(int i = 0; i < lightCount; i++)
 	{
 		//Ambient
-		vec3 ambientCo = lightMatriel[i].ambientIntensity * lightMatriel[i].ambientColor * material.ambientColor;
+		vec3 ambientCo = lightMatriel[i].ambientIntensity * lightMatriel[i].ambientColor * mAmbientColor;
 		//Diffuse
 		vec3 pntNormal = normalize(fragNormal);
 		vec3 lightPntDir = normalize(lightPos[i] - fragPos);
 		float dotPro = dot(lightPntDir, pntNormal);
-		vec3 diffuseCo = lightMatriel[i].diffuseIntensity * lightMatriel[i].diffuseColor * dotPro * material.diffuseColor;
+		vec3 diffuseCo = lightMatriel[i].diffuseIntensity * lightMatriel[i].diffuseColor * dotPro * mDiffuseColor;
 		//Specular
 		vec3 eyeToPoint = normalize(camPos - fragPos);
 		vec3 reflection = normalize(reflect(-lightPntDir, fragNormal));
 		float dotProSpec = pow(max(dot(reflection, eyeToPoint), 0.0f), material.shininess);
-		vec3 specularCo = lightMatriel[i].specularIntensity * lightMatriel[i].specularColor * dotProSpec * material.specularColor;
+		vec3 specularCo = lightMatriel[i].specularIntensity * lightMatriel[i].specularColor * dotProSpec * mSpecularColor;
 
 		ambientFColor += ambientCo;
 		diffuseFColor += diffuseCo;
@@ -71,5 +86,5 @@ void main()
 	vec3 finalColor = ambientFColor + diffuseFColor + specularFColor;
 
 
-	frag_color = vec4(0.5*(finalColor + textureColor),1);
+	frag_color = vec4(finalColor,1);
 }

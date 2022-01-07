@@ -39,6 +39,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("projection", camera.GetProjectionTransformation());
 			colorShader.setUniform("material.textureMap", 0);
 			colorShader.setUniform("texType", currentModel->GetTextureMapKind());
+			colorShader.setUniform("colType", currentModel->GetColorKind());
 			colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 			colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
 
@@ -156,8 +157,8 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("..\\Data\\TreeTexture.png", true))
+	if (!texture1.loadTexture("..\\Data\\mars.png", true))
 	{
-		texture1.loadTexture("..\\Data\\TreeTexture.png", true);
+		texture1.loadTexture("..\\Data\\mars.png", true);
 	}
 }
