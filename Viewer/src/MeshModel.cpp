@@ -30,6 +30,46 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	for (int i = 0; i < faces.size(); i++)
 	{
 		Face currentFace = faces.at(i);
+
+		glm::vec3 tangent = glm::vec3(1,1,1), bitangent = glm::vec3(1,1,1);
+		if (textureCoords.size() > 0)//textures exist
+		{
+
+			//Calculating tangents and bitangents for normal map - learnt from learnopengl.com
+			//positions
+			int p1i = currentFace.GetVertexIndex(0) - 1;
+			int p2i = currentFace.GetVertexIndex(1) - 1;
+			int p3i = currentFace.GetVertexIndex(2) - 1;
+			glm::vec3 p1 = vertices[p1i];
+			glm::vec3 p2 = vertices[p2i];
+			glm::vec3 p3 = vertices[p3i];
+			//texture cordinates
+			int p1ti = currentFace.GetTextureIndex(0) - 1;
+			int p2ti = currentFace.GetTextureIndex(1) - 1;
+			int p3ti = currentFace.GetTextureIndex(2) - 1;
+			glm::vec2 uv1 = textureCoords[p1ti];
+			glm::vec2 uv2 = textureCoords[p2ti];
+			glm::vec2 uv3 = textureCoords[p3ti];
+			//normal vector
+			//triangle's edges and delta UV coordinates
+			glm::vec3 edge1 = p2 - p1;
+			glm::vec3 edge2 = p3 - p1;
+			glm::vec2 deltaUV1 = uv2 - uv1;
+			glm::vec2 deltaUV2 = uv3 - uv1;
+			//actual tangent and bitangent calculations
+			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+
+			bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+			bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+			bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+		}
+
+
+
 		for (int j = 0; j < 3; j++)
 		{
 			int vertexIndex = currentFace.GetVertexIndex(j) - 1;
@@ -42,6 +82,9 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 			{
 				int textureCoordsIndex = currentFace.GetTextureIndex(j) - 1;
 				vertex.textureCoords = textureCoords[textureCoordsIndex];
+
+				vertex.tangent = tangent;
+				vertex.bitangent = bitangent;
 			}
 
 			modelVertices.push_back(vertex);
@@ -55,6 +98,7 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 
 	textureMapKind = UV;
 	colorKind = TEXTURE;
+	normalMap = false;
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
@@ -74,6 +118,16 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	// Vertex Texture Coords
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
+
+	// Tangents
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(8 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(3);
+
+	// BiTangents
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(11 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(4);
+
+
 
 	// unbind to make sure other code does not change it somewhere else
 	glBindVertexArray(0);
@@ -275,4 +329,14 @@ void MeshModel::UpdateModelTransform()
 void MeshModel::UpdateWorldTransform()
 {
 	worldTransform = translation[WORLD] * rotation[WORLD] * scale[WORLD];
+}
+
+const bool MeshModel::GetNormalMapStatus() const
+{
+	return normalMap;
+}
+
+void MeshModel::SetNormalMapStatus(bool status)
+{
+	normalMap = status;
 }

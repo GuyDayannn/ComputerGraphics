@@ -51,6 +51,7 @@ static float camPos[3] = { 0,0,10 };
 static float lightTransformation[3] = {0.0,0.0,0.0};
 static int lightAxis = 0;
 static float lightTranslation = 0.0f;
+std::vector<std::shared_ptr<MeshModel>> lightMesh;
 
 double zoomFactor = 1;
 int windowWidth = 1280;
@@ -492,6 +493,12 @@ void DrawImguiMenus()
 				scene->GetActiveModel()->SetTextureMapKind(SPHERE);
 			}
 
+			bool normalType = scene->GetActiveModel()->GetNormalMapStatus();
+			if (ImGui::Checkbox("Use normal map", &(normalType)))
+			{
+				scene->GetActiveModel()->SetNormalMapStatus(normalType);
+			}
+
 			int colType = scene->GetActiveModel()->GetColorKind();
 
 			if (ImGui::RadioButton("Color", &colType, COLOR))
@@ -594,6 +601,7 @@ void DrawImguiMenus()
 			if (ImGui::Button("Add Light"))
 			{
 				std::shared_ptr<MeshModel> LightM = Utils::LoadMeshModel("..\\Data\\crate.obj");
+				lightMesh.push_back(LightM);
 				scene->AddLight(std::make_shared<PointLight>(*LightM, glm::vec3(0, 0, 0)));
 			}
 			ImGui::SameLine();

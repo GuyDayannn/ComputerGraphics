@@ -38,7 +38,9 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("view", camera.GetViewTransformation());
 			colorShader.setUniform("projection", camera.GetProjectionTransformation());
 			colorShader.setUniform("material.textureMap", 0);
+			colorShader.setUniform("material.normalMap", 1);
 			colorShader.setUniform("texType", currentModel->GetTextureMapKind());
+			colorShader.setUniform("normalType", currentModel->GetNormalMapStatus());
 			colorShader.setUniform("colType", currentModel->GetColorKind());
 			colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 			colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
@@ -86,6 +88,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 
 			// Set 'texture1' as the active texture at slot #0
 			texture1.bind(0);
+			normalTextrue1.bind(1);
 
 			// Drag our model's faces (triangles) in fill mode
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -95,6 +98,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 
 			// Unset 'texture1' as the active texture at slot #0
 			texture1.unbind(0);
+			normalTextrue1.unbind(1);
 
 			colorShader.setUniform("color", glm::vec3(0,0,0));
 
@@ -161,4 +165,10 @@ void Renderer::LoadTextures()
 	{
 		texture1.loadTexture("..\\Data\\mars.png", true);
 	}
+
+	if (!normalTextrue1.loadTexture("..\\Data\\normalwall.png", true))
+	{
+		normalTextrue1.loadTexture("..\\Data\\normalwall.png", true);
+	}
+
 }

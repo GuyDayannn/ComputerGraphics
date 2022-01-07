@@ -23,6 +23,8 @@ struct Vertex
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 textureCoords;
+	glm::vec3 tangent;
+	glm::vec3 bitangent;
 };
 
 class MeshModel
@@ -52,6 +54,7 @@ protected:
 
 	int textureMapKind; // 0 - CORD 1 - PLANE 2 - CYLINDER 3 - SPHERE
 	int colorKind; // 0 - color - 1 - texture
+	bool normalMap;
 
 public:
 	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");
@@ -96,10 +99,14 @@ public:
 	void ScaleZWorld(float factor);
 	void ScaleWorld(float factor);
 
-	void UpdateModelTransform();
-	void UpdateWorldTransform();
-
 	GLuint GetVAO() const;
 
 	Material& GetMaterial();
+
+	void UpdateModelTransform();
+	void UpdateWorldTransform();
+
+	const bool GetNormalMapStatus() const;
+	void SetNormalMapStatus(bool status);
+
 };

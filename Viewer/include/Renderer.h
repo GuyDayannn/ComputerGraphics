@@ -15,7 +15,7 @@ private:
 	ShaderProgram lightShader;
 	ShaderProgram colorShader;
 	Texture2D texture1;
-	Texture2D normalTextrue;
+	Texture2D normalTextrue1;
 
 public:
 	Renderer();
