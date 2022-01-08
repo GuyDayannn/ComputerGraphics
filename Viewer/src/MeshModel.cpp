@@ -63,9 +63,11 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 			tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
 			tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
 
+			/*
 			bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
 			bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
 			bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+			*/
 		}
 
 
@@ -123,10 +125,11 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(8 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(3);
 
+	/*
 	// BiTangents
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(11 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(4);
-
+	*/
 
 
 	// unbind to make sure other code does not change it somewhere else

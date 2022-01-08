@@ -166,9 +166,9 @@ void Renderer::LoadTextures()
 		texture1.loadTexture("..\\Data\\mars.png", true);
 	}
 
-	if (!normalTextrue1.loadTexture("..\\Data\\normalwall.png", true))
+	if (!normalTextrue1.loadTexture("..\\Data\\pyramidshipnormalmap.png", true))
 	{
-		normalTextrue1.loadTexture("..\\Data\\normalwall.png", true);
+		normalTextrue1.loadTexture("..\\Data\\pyramidshipnormalmap.png", true);
 	}
 
 }
