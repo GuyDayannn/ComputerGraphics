@@ -84,6 +84,42 @@ bool Texture2D::loadTexture(const string& fileName, bool generateMipMaps)
 	return true;
 }
 
+void Texture2D::loadCubeMap()
+{
+	std::vector<std::string> faces;
+	faces.push_back("..\\Data\\lightblue\\right.png");
+	faces.push_back("..\\Data\\lightblue\\left.png");
+	faces.push_back("..\\Data\\lightblue\\top.png");
+	faces.push_back("..\\Data\\lightblue\\bottom.png");
+	faces.push_back("..\\Data\\lightblue\\front.png");
+	faces.push_back("..\\Data\\lightblue\\back.png");
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+}
+
+
 //-----------------------------------------------------------------------------
 // Bind the texture unit passed in as the active texture in the shader
 //-----------------------------------------------------------------------------

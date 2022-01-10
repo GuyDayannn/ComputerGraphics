@@ -6,7 +6,9 @@ Scene::Scene() :
 	activeCameraIndex(0),
 	activeModelIndex(0),
 	activeLightIndex(0),
-	showLights(true)
+	showLights(true),
+	showSkyBox(true),
+	mirror(false)
 {
 
 }
@@ -139,3 +141,25 @@ void Scene::SetLightStatus(bool status)
 {
 	showLights = status;
 }
+
+const bool Scene::GetSkyBoxStatus() const
+{
+	return showSkyBox;
+}
+
+void Scene::SetSkyBoxStatus(bool status)
+{
+	showSkyBox = status;
+}
+
+const bool Scene::GetMirrorStatus() const
+{
+	return mirror;
+}
+
+void Scene::SetMirrorStatus(bool status)
+{
+	mirror = status;
+}
+
+

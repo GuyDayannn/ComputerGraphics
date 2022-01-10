@@ -97,10 +97,6 @@ int main(int argc, char **argv)
 
 	std::shared_ptr<MeshModel> firstLightM = Utils::LoadMeshModel("..\\Data\\crate.obj");
 	scene->AddLight(std::make_shared<PointLight>(*firstLightM, glm::vec3(0, 0, 0)));
-	//scene->AddModel(Utils::LoadMeshModel("..\\Data\\bunny.obj"));
-	//scene->AddLight(std::make_shared<PointLight>(glm::vec3( 0, 0, 15), glm::vec3(1, 1, 1)));
-	//scene->AddLight(std::make_shared<PointLight>(glm::vec3( 0, 5, 5),  glm::vec3(0, 0, 0)));
-	//scene->AddLight(std::make_shared<PointLight>(glm::vec3(-5, 0, 0),  glm::vec3(0, 0, 0)));
 
 	Renderer renderer;
 	renderer.LoadShaders();
@@ -335,6 +331,19 @@ void DrawImguiMenus()
 		{
 			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		}
+
+		bool skybox = scene->GetSkyBoxStatus();
+		if (ImGui::Checkbox("Skybox", &skybox))
+		{
+			scene->SetSkyBoxStatus(skybox);
+		}
+
+		bool mirror = scene->GetMirrorStatus();
+		if (ImGui::Checkbox("Mirror World", &mirror))
+		{
+			scene->SetMirrorStatus(mirror);
+		}
+
 
 		if (ImGui::CollapsingHeader("Cameras"))
 		{

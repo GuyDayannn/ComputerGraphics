@@ -7,6 +7,7 @@
 #define SPHERE 3
 #define REGULAR false
 #define NORMAL_MAP true
+#define PI 3.14159265359f
 
 
 layout(location = 0) in vec3 pos;
@@ -81,13 +82,14 @@ void main()
 		fragTexCoords = vec2(pos.x, pos.z);
 	else if(texType == CYLINDER)
 	{
-		float theta = atan(pos.x, pos.z) + 3.14159265359f;
+		float theta = (atan(pos.z, pos.x) + PI);
 		fragTexCoords = vec2(theta, pos.y);
 	}
 	else	//SPHERE
 	{
-		float phi = atan(pos.y, pos.z);
-		float theta = atan(pos.z, pos.x);
+		vec3 posn = normalize(pos);
+		float theta = ((atan(posn.x, posn.z) / PI) + 1.0f) * 0.5f;
+		float phi = ((asin(posn.y) / PI) + 0.5f);
 		fragTexCoords = vec2(theta, phi);
 	}
 

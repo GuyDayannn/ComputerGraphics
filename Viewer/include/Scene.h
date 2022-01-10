@@ -22,6 +22,8 @@ private:
 	int activeLightIndex;
 
 	bool showLights;
+	bool showSkyBox;
+	bool mirror;
 
 public:
 	Scene();
@@ -61,4 +63,10 @@ public:
 
 	const bool GetLightsStatus() const;
 	void SetLightStatus(bool status);
+
+	const bool GetSkyBoxStatus() const;
+	void SetSkyBoxStatus(bool status);
+
+	const bool GetMirrorStatus() const;
+	void SetMirrorStatus(bool status);
 };

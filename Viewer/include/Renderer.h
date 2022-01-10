@@ -14,8 +14,12 @@ class Renderer
 private:
 	ShaderProgram lightShader;
 	ShaderProgram colorShader;
+	ShaderProgram cubeMapShader;
+	ShaderProgram mirrorShader;
 	Texture2D texture1;
 	Texture2D normalTextrue1;
+	Texture2D cubeMapTexture;
+	std::shared_ptr<MeshModel> cubeModel;
 
 public:
 	Renderer();
