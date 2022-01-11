@@ -337,11 +337,28 @@ void DrawImguiMenus()
 		{
 			scene->SetSkyBoxStatus(skybox);
 		}
-
+		ImGui::SameLine();
 		bool mirror = scene->GetMirrorStatus();
 		if (ImGui::Checkbox("Mirror World", &mirror))
 		{
 			scene->SetMirrorStatus(mirror);
+		}
+
+
+		bool toonShading = scene->GetToonShadingStatus();
+		if (ImGui::Checkbox("Toon Shading", &toonShading))
+		{
+			scene->SetToonShadingStatus(toonShading);
+		}
+		
+		if (toonShading)
+		{
+			ImGui::SameLine();
+			int toonLevels = scene->GetToonShadingLevels();
+			if (ImGui::SliderInt("Toon Levels", &toonLevels, 3, 10))
+			{
+				scene->SetToonShadingLevels(toonLevels);
+			}
 		}
 
 

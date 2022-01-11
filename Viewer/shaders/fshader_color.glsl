@@ -36,6 +36,8 @@ uniform LightMaterial lightMatriel[LIGHTS_MAX]; // array of light properties
 uniform int lightCount;
 uniform int colType;
 uniform vec3 camPos;
+uniform bool toonShading;
+uniform int toonLevels;
 
 // Inputs from vertex shader (after interpolation was applied)
 in vec3 fragPos;
@@ -53,10 +55,12 @@ out vec4 frag_color;
 
 void main()
 {
+	
 	// Sample the texture-map at the UV coordinates given by 'fragTexCoords'
 	vec3 textureColor = vec3(texture(material.textureMap, fragTexCoords));
 	vec3 texNormal = vec3(texture(material.normalMap, fragTexCoords));
 	texNormal = normalize(texNormal * 2.0f - 1.0f);
+	float toonLvl = float(toonLevels);
 
 	vec3 mAmbientColor = material.ambientColor;
 	vec3 mDiffuseColor = material.diffuseColor;
@@ -72,6 +76,7 @@ void main()
 	vec3 ambientFColor = vec3(0.0f, 0.0f, 0.0f);
 	vec3 diffuseFColor = vec3(0.0f, 0.0f, 0.0f);
 	vec3 specularFColor = vec3(0.0f, 0.0f, 0.0f);
+	vec3 finalColor = vec3(0.0f, 0.0f, 0.0f);
 
 	for(int i = 0; i < lightCount; i++)
 	{
@@ -87,8 +92,13 @@ void main()
 		if(normalType == NORMAL_MAP) 
 			texlightPntDir = normalize(TangentLightPos[i] - TangentFragPos); // lightPntDir for normal map
 		float dotPro = dot(lightPntDir, pntNormal);
+		if(toonShading) // for toonShading
+			dotPro = floor(dotPro * toonLvl) / toonLvl;
 		if(normalType == NORMAL_MAP) 
+		{
 			texdotPro = dot(texlightPntDir, texNormal); // dotPro for normal map
+			if(toonShading) texdotPro = floor(texdotPro * toonLvl) / toonLvl;
+		}
 		if(normalType == REGULAR)
 			diffuseCo = lightMatriel[i].diffuseIntensity * lightMatriel[i].diffuseColor * dotPro * mDiffuseColor;
 		else // NORMAL_MAP
@@ -102,20 +112,23 @@ void main()
 		if(normalType == NORMAL_MAP)
 			texreflection = normalize(reflect(-texlightPntDir, texNormal)); // reflection for normal map
 		float dotProSpec = pow(max(dot(reflection, eyeToPoint), 0.0f), material.shininess);
+		if(toonShading) // for toonShading
+			dotProSpec = floor(dotProSpec * toonLvl) / toonLvl;
 		if(normalType == NORMAL_MAP)
+		{
 			texdotProSpec = pow(max(dot(texreflection, texeyeToPoint), 0.0f), material.shininess); // dotProSpec for normal map
+			if (toonShading) texdotProSpec = floor(texdotProSpec * toonLvl) / toonLvl;
+		}
 		if(normalType == REGULAR)
 			specularCo = lightMatriel[i].specularIntensity * lightMatriel[i].specularColor * dotProSpec * mSpecularColor;
 		else
 			specularCo = lightMatriel[i].specularIntensity * lightMatriel[i].specularColor * texdotProSpec * mSpecularColor;
 
-		ambientFColor += ambientCo;
-		diffuseFColor += diffuseCo;
-		specularFColor += specularCo;
+
+
+		vec3 tempColor = ambientCo + diffuseCo + specularCo;
+		finalColor += tempColor;
 	}
-
-	vec3 finalColor = ambientFColor + diffuseFColor + specularFColor;
-
 
 	frag_color = vec4(finalColor,1);
 }

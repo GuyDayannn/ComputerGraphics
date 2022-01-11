@@ -72,6 +72,8 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 				colorShader.setUniform("colType", currentModel->GetColorKind());
 				colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 				colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
+				colorShader.setUniformSampler("toonShading", scene->GetToonShadingStatus());
+				colorShader.setUniformSampler("toonLevels", scene->GetToonShadingLevels());
 
 				//Uniform variables for Matriel (model matriel)
 				colorShader.setUniform("material.shininess", currentModel->GetMaterial().shininess);

@@ -24,6 +24,8 @@ private:
 	bool showLights;
 	bool showSkyBox;
 	bool mirror;
+	bool toonShading;
+	int toonLevels;
 
 public:
 	Scene();
@@ -69,4 +71,10 @@ public:
 
 	const bool GetMirrorStatus() const;
 	void SetMirrorStatus(bool status);
+
+	const bool GetToonShadingStatus() const;
+	void SetToonShadingStatus(bool status);
+
+	const int GetToonShadingLevels() const;
+	void SetToonShadingLevels(int levels);
 };

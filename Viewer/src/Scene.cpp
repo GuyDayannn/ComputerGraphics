@@ -8,7 +8,9 @@ Scene::Scene() :
 	activeLightIndex(0),
 	showLights(true),
 	showSkyBox(true),
-	mirror(false)
+	mirror(false),
+	toonShading(false),
+	toonLevels(4)
 {
 
 }
@@ -162,4 +164,22 @@ void Scene::SetMirrorStatus(bool status)
 	mirror = status;
 }
 
+const bool Scene::GetToonShadingStatus() const
+{
+	return toonShading;
+}
 
+void Scene::SetToonShadingStatus(bool status)
+{
+	toonShading = status;
+}
+
+const int Scene::GetToonShadingLevels() const
+{
+	return toonLevels;
+}
+
+void Scene::SetToonShadingLevels(int levels)
+{
+	toonLevels = levels;
+}

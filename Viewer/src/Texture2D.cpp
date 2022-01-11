@@ -86,6 +86,7 @@ bool Texture2D::loadTexture(const string& fileName, bool generateMipMaps)
 
 void Texture2D::loadCubeMap()
 {
+	//learnopengl.com guide used
 	std::vector<std::string> faces;
 	faces.push_back("..\\Data\\lightblue\\right.png");
 	faces.push_back("..\\Data\\lightblue\\left.png");
