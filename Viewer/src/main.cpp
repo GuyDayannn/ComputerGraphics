@@ -39,7 +39,6 @@ static bool zAxis = false;
 static float translation = 0.0f;
 static float rotation = 0.0f;
 static float scale = 1.0f;
-static bool aRotate = false;
 
 /*
 ** Camera Fields for ImGui
@@ -571,9 +570,21 @@ void DrawImguiMenus()
 			ImGui::SameLine();
 			ImGui::RadioButton("z", &axis, Z);
 
-			ImGui::Checkbox("Auto Rotate", &aRotate);
-			if(aRotate)
-				scene->GetActiveModel()->RotateYModel(glm::radians(0.025f));
+
+			bool aRotate = scene->GetActiveModel()->GetARotate();
+			if (ImGui::Checkbox("Auto Rotate", &aRotate))
+			{
+				scene->GetActiveModel()->SetArotate(aRotate);
+			}
+			
+			
+			for (int i = 0; i < scene->GetModelCount(); i++)
+			{
+				if (scene->GetModel(i)->GetARotate())
+				{
+					scene->GetModel(i)->RotateYModel(glm::radians(0.025f));
+				}
+			}
 
 			if (ImGui::SliderFloat("Translation", &translation, -0.02, 0.02))
 			{

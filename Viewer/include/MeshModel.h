@@ -55,6 +55,8 @@ protected:
 	int textureMapKind; // 0 - CORD 1 - PLANE 2 - CYLINDER 3 - SPHERE
 	int colorKind; // 0 - color - 1 - texture
 	bool normalMap;
+	bool aRotate;
+	bool aTranslate;
 
 public:
 	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");
@@ -108,5 +110,11 @@ public:
 
 	const bool GetNormalMapStatus() const;
 	void SetNormalMapStatus(bool status);
+
+	const bool GetARotate() const;
+	void SetArotate(bool status);
+
+	const bool GetATranslate() const;
+	void SetATranslate(bool status);
 
 };

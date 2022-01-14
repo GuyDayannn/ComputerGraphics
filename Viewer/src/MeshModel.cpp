@@ -101,6 +101,8 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	textureMapKind = UV;
 	colorKind = TEXTURE;
 	normalMap = false;
+	aRotate = false;
+	aTranslate = false;
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
@@ -342,4 +344,24 @@ const bool MeshModel::GetNormalMapStatus() const
 void MeshModel::SetNormalMapStatus(bool status)
 {
 	normalMap = status;
+}
+
+const bool MeshModel::GetARotate() const
+{
+	return aRotate;
+}
+
+void MeshModel::SetArotate(bool status)
+{
+	aRotate = status;
+}
+
+const bool MeshModel::GetATranslate() const
+{
+	return aTranslate;
+}
+
+void MeshModel::SetATranslate(bool status)
+{
+	aTranslate = status;
 }
