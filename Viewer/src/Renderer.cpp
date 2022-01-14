@@ -214,14 +214,14 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("..\\Data\\mars.png", true))
+	if (!texture1.loadTexture("..\\Data\\TheMoon.jpeg", true))
 	{
-		texture1.loadTexture("..\\Data\\mars.png", true);
+		texture1.loadTexture("..\\Data\\TheMoon.jpeg", true);
 	}
 
-	if (!normalTextrue1.loadTexture("..\\Data\\normalwall.png", true))
+	if (!normalTextrue1.loadTexture("..\\Data\\TheMoonNormal.jpeg", true))
 	{
-		normalTextrue1.loadTexture("..\\Data\\normalwall.png", true);
+		normalTextrue1.loadTexture("..\\Data\\TheMoonNormal.jpeg", true);
 	}
 
 	cubeMapTexture.loadCubeMap();
