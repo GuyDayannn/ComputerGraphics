@@ -112,7 +112,7 @@ public:
 	void SetNormalMapStatus(bool status);
 
 	const bool GetARotate() const;
-	void SetArotate(bool status);
+	void SetARotate(bool status);
 
 	const bool GetATranslate() const;
 	void SetATranslate(bool status);

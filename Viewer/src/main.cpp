@@ -39,6 +39,7 @@ static bool zAxis = false;
 static float translation = 0.0f;
 static float rotation = 0.0f;
 static float scale = 1.0f;
+static bool startScene = false;
 
 /*
 ** Camera Fields for ImGui
@@ -563,28 +564,50 @@ void DrawImguiMenus()
 			}
 
 
+			ImGui::Text("Automated Transformations");
+
+			static float aTranslateVal = 0.0f;
+			ImGui::SliderFloat("A Translate Val", &aTranslateVal, -0.01f, 0.01f);
+
+
+			bool aRotate = scene->GetActiveModel()->GetARotate();
+			if (ImGui::Checkbox("Auto Rotate", &aRotate))
+			{
+				scene->GetActiveModel()->SetARotate(aRotate);
+			}
+
+			ImGui::SameLine();
+
+			bool aTranslate = scene->GetActiveModel()->GetATranslate();
+			if (ImGui::Checkbox("Auto Translate", &aTranslate))
+			{
+				scene->GetActiveModel()->SetATranslate(aTranslate);
+			}
+
+
+
+			ImGui::Checkbox("Start Scene", &startScene); //toggle scene animation
+
+			for (int i = 0; i < scene->GetModelCount() && startScene; i++) //Automatioc transformations
+			{
+				if (scene->GetModel(i)->GetARotate())
+				{
+					scene->GetModel(i)->RotateYModel(glm::radians(0.025f));
+				}
+
+				if (scene->GetModel(i)->GetATranslate())
+				{
+					scene->GetModel(i)->TranslateModel(glm::vec3(aTranslateVal, 0.0f, 0.0f));
+				}
+			}
+
+			ImGui::Text("Manual Transformations");
 			//Axis to work with
 			ImGui::RadioButton("x", &axis, X);
 			ImGui::SameLine();
 			ImGui::RadioButton("y", &axis, Y);
 			ImGui::SameLine();
 			ImGui::RadioButton("z", &axis, Z);
-
-
-			bool aRotate = scene->GetActiveModel()->GetARotate();
-			if (ImGui::Checkbox("Auto Rotate", &aRotate))
-			{
-				scene->GetActiveModel()->SetArotate(aRotate);
-			}
-			
-			
-			for (int i = 0; i < scene->GetModelCount(); i++)
-			{
-				if (scene->GetModel(i)->GetARotate())
-				{
-					scene->GetModel(i)->RotateYModel(glm::radians(0.025f));
-				}
-			}
 
 			if (ImGui::SliderFloat("Translation", &translation, -0.02, 0.02))
 			{

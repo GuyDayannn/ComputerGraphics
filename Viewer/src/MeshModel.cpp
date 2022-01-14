@@ -351,7 +351,7 @@ const bool MeshModel::GetARotate() const
 	return aRotate;
 }
 
-void MeshModel::SetArotate(bool status)
+void MeshModel::SetARotate(bool status)
 {
 	aRotate = status;
 }
