@@ -521,9 +521,17 @@ void DrawImguiMenus()
 			}
 
 			bool normalType = scene->GetActiveModel()->GetNormalMapStatus();
+			bool depthType = scene->GetActiveModel()->GetDepthMapStatus();
 			if (ImGui::Checkbox("Use normal map", &(normalType)))
 			{
 				scene->GetActiveModel()->SetNormalMapStatus(normalType);
+				if (!normalType) depthType = normalType; // if normal is off turn depth off
+			}
+
+			if (ImGui::Checkbox("Use depth map", &(depthType)))
+			{
+				scene->GetActiveModel()->SetDepthMapStatus(depthType);
+				if (depthType) normalType = depthType; // if depth is on turn normal map on
 			}
 
 			int colType = scene->GetActiveModel()->GetColorKind();

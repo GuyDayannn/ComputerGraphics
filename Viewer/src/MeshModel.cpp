@@ -101,6 +101,7 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	textureMapKind = UV;
 	colorKind = TEXTURE;
 	normalMap = false;
+	depthMap = false;
 	aRotate = false;
 	aTranslate = false;
 
@@ -344,6 +345,18 @@ const bool MeshModel::GetNormalMapStatus() const
 void MeshModel::SetNormalMapStatus(bool status)
 {
 	normalMap = status;
+	if (!normalMap) depthMap = status;
+}
+
+const bool MeshModel::GetDepthMapStatus() const
+{
+	return depthMap;
+}
+
+void MeshModel::SetDepthMapStatus(bool status)
+{
+	depthMap = status;
+	if(depthMap) normalMap = status; // normal map required for depth map
 }
 
 const bool MeshModel::GetARotate() const

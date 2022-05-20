@@ -18,6 +18,7 @@ private:
 	ShaderProgram mirrorShader;
 	Texture2D texture1;
 	Texture2D normalTextrue1;
+	Texture2D depthTexture;
 	Texture2D cubeMapTexture;
 	std::shared_ptr<MeshModel> cubeModel;
 

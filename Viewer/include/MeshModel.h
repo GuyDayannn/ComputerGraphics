@@ -55,6 +55,7 @@ protected:
 	int textureMapKind; // 0 - CORD 1 - PLANE 2 - CYLINDER 3 - SPHERE
 	int colorKind; // 0 - color - 1 - texture
 	bool normalMap;
+	bool depthMap;
 	bool aRotate;
 	bool aTranslate;
 
@@ -110,6 +111,9 @@ public:
 
 	const bool GetNormalMapStatus() const;
 	void SetNormalMapStatus(bool status);
+
+	const bool GetDepthMapStatus() const;
+	void SetDepthMapStatus(bool status);
 
 	const bool GetARotate() const;
 	void SetARotate(bool status);

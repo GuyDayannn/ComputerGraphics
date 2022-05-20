@@ -67,8 +67,10 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 				colorShader.setUniform("projection", camera.GetProjectionTransformation());
 				colorShader.setUniform("material.textureMap", 0);
 				colorShader.setUniform("material.normalMap", 1);
+				colorShader.setUniform("material.depthMap", 2);
 				colorShader.setUniform("texType", currentModel->GetTextureMapKind());
 				colorShader.setUniform("normalType", currentModel->GetNormalMapStatus());
+				colorShader.setUniform("depthType", currentModel->GetDepthMapStatus());
 				colorShader.setUniform("colType", currentModel->GetColorKind());
 				colorShader.setUniform("camPos", camera.GetEye()); // active camera position
 				colorShader.setUniform("lightCount", scene->GetLightCount()); // number of lights
@@ -119,6 +121,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 				// Set 'texture1' as the active texture at slot #0
 				texture1.bind(0);
 				normalTextrue1.bind(1);
+				depthTexture.bind(2);
 
 				// Drag our model's faces (triangles) in fill mode
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -129,6 +132,7 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 				// Unset 'texture1' as the active texture at slot #0
 				texture1.unbind(0);
 				normalTextrue1.unbind(1);
+				depthTexture.unbind(2);
 
 				colorShader.setUniform("color", glm::vec3(0, 0, 0));
 
@@ -214,15 +218,21 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("..\\Data\\TheMoon.jpeg", true))
+	if (!texture1.loadTexture("..\\Data\\bricks22.jpg", true))
 	{
-		texture1.loadTexture("..\\Data\\TheMoon.jpeg", true);
+		texture1.loadTexture("..\\Data\\bricks22.jpg", true);
 	}
 
-	if (!normalTextrue1.loadTexture("..\\Data\\TheMoonNormal.jpeg", true))
+	if (!normalTextrue1.loadTexture("..\\Data\\bricks22_normal.jpg", true))
 	{
-		normalTextrue1.loadTexture("..\\Data\\TheMoonNormal.jpeg", true);
+		normalTextrue1.loadTexture("..\\Data\\bricks22_normal.jpg", true);
 	}
+
+	if (!depthTexture.loadTexture("..\\Data\\bricks22_disp.jpg", true))
+	{
+		depthTexture.loadTexture("..\\Data\\bricks22_disp.jpg", true);
+	}
+
 
 	cubeMapTexture.loadCubeMap();
 

@@ -4,12 +4,14 @@
 #define TEXTURE 1
 #define REGULAR false
 #define NORMAL_MAP true
+#define DEPTH_MAP true
 
 
 struct Material
 {
 	sampler2D textureMap;
 	sampler2D normalMap;
+	sampler2D depthMap;
 	float shininess;
 	vec3 ambientColor;
 	vec3 diffuseColor;
@@ -32,6 +34,7 @@ struct LightMaterial
 // We set this field's properties from the C++ code
 uniform Material material; //model matriel
 uniform bool normalType;
+uniform bool depthType;
 uniform LightMaterial lightMatriel[LIGHTS_MAX]; // array of light properties
 uniform int lightCount;
 uniform int colType;
@@ -53,12 +56,64 @@ in vec3 TangentFragPos;
 // The final color of the fragment (pixel)
 out vec4 frag_color;
 
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+	// number of depth layers
+	const float minLayers = 8.0;
+	const float maxLayers = 32.0;
+	float numLayers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), viewDir), 0.0)); 
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = viewDir.xy * 0.1; 
+    vec2 deltaTexCoords = P / numLayers;
+
+	// get initial values
+	vec2  currentTexCoords = texCoords;
+	float currentDepthMapValue = texture(material.depthMap, currentTexCoords).r;
+  
+	while(currentLayerDepth < currentDepthMapValue)
+	{
+		// shift texture coordinates along direction of P
+		currentTexCoords -= deltaTexCoords;
+		// get depthmap value at current texture coordinates
+		currentDepthMapValue = texture(material.depthMap, currentTexCoords).r;  
+		// get depth of next layer
+		currentLayerDepth += layerDepth;  
+	}
+
+	// get texture coordinates before collision (reverse operations)
+	vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+	// get depth after and before collision for linear interpolation
+	float afterDepth  = currentDepthMapValue - currentLayerDepth;
+	float beforeDepth = texture(material.depthMap, prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+	// interpolation of texture coordinates
+	float weight = afterDepth / (afterDepth - beforeDepth);
+	vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+	return finalTexCoords;
+}
+
 void main()
 {
 	
 	// Sample the texture-map at the UV coordinates given by 'fragTexCoords'
-	vec3 textureColor = vec3(texture(material.textureMap, fragTexCoords));
-	vec3 texNormal = vec3(texture(material.normalMap, fragTexCoords));
+	vec3 viewDir;
+	vec2 texCoords = fragTexCoords;
+	if(depthType == DEPTH_MAP) 
+	{
+		viewDir = normalize(TangentCamPos - TangentFragPos);
+		texCoords = ParallaxMapping(texCoords,  viewDir);
+		if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+			discard;
+	
+	}
+	vec3 textureColor = vec3(texture(material.textureMap, texCoords));
+	vec3 texNormal = texture(material.normalMap, texCoords).rgb;
 	texNormal = normalize(texNormal * 2.0f - 1.0f);
 	float toonLvl = float(toonLevels);
 
@@ -91,12 +146,12 @@ void main()
 		vec3 lightPntDir = normalize(lightPos[i] - fragPos);
 		if(normalType == NORMAL_MAP) 
 			texlightPntDir = normalize(TangentLightPos[i] - TangentFragPos); // lightPntDir for normal map
-		float dotPro = dot(lightPntDir, pntNormal);
+		float dotPro = max(dot(pntNormal, lightPntDir), 0.0f);
 		if(toonShading) // for toonShading
 			dotPro = floor(dotPro * toonLvl) / toonLvl;
 		if(normalType == NORMAL_MAP) 
 		{
-			texdotPro = dot(texlightPntDir, texNormal); // dotPro for normal map
+			texdotPro = max(dot(texNormal, texlightPntDir), 0.0f); // dotPro for normal map
 			if(toonShading) texdotPro = floor(texdotPro * toonLvl) / toonLvl;
 		}
 		if(normalType == REGULAR)
@@ -111,12 +166,12 @@ void main()
 		vec3 reflection = normalize(reflect(-lightPntDir, fragNormal));
 		if(normalType == NORMAL_MAP)
 			texreflection = normalize(reflect(-texlightPntDir, texNormal)); // reflection for normal map
-		float dotProSpec = pow(max(dot(reflection, eyeToPoint), 0.0f), material.shininess);
+		float dotProSpec = pow(max(dot(eyeToPoint, reflection), 0.0f), material.shininess);
 		if(toonShading) // for toonShading
 			dotProSpec = floor(dotProSpec * toonLvl) / toonLvl;
 		if(normalType == NORMAL_MAP)
 		{
-			texdotProSpec = pow(max(dot(texreflection, texeyeToPoint), 0.0f), material.shininess); // dotProSpec for normal map
+			texdotProSpec = pow(max(dot(texeyeToPoint, texreflection), 0.0f), material.shininess); // dotProSpec for normal map
 			if (toonShading) texdotProSpec = floor(texdotProSpec * toonLvl) / toonLvl;
 		}
 		if(normalType == REGULAR)
