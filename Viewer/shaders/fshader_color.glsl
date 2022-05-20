@@ -110,8 +110,8 @@ void main()
 		texCoords = ParallaxMapping(texCoords,  viewDir);
 		if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
 			discard;
-	
 	}
+
 	vec3 textureColor = vec3(texture(material.textureMap, texCoords));
 	vec3 texNormal = texture(material.normalMap, texCoords).rgb;
 	texNormal = normalize(texNormal * 2.0f - 1.0f);
